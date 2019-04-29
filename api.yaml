@@ -1,0 +1,704 @@
+openapi: 3.0.1
+info:
+  title: Tiqets Supplier API
+  description: |
+    The Tiqets Supplier API specification was created to allow suppliers to take charge control of the implementation process and turnaround times.
+
+
+    It is loosely based on REST.
+    You format GET or POST requests in JSON and you will receive either a JSON-formatted response or an HTTP error.
+
+    # Data sharing
+    Tiqets does not share personal information of its customers with third parties, unless explicitly agreed otherwise. The API does however provide the means to share personal information, but will default to placeholder values.
+
+    Any personal information received is to be treated according to the rules laid out in the European Union's "General Data Protection Regulation (GDPR)"
+
+    # Generic requirements
+
+    ### Optional endpoints
+    The functionality behind some endpoints isn't required to be implemented.
+    Optional endpoints are documented to allow an HTTP 501 response.
+
+    ### Response times
+
+    Maximum response times of the various API endpoints:
+
+      * Under 5 seconds.
+      * Availability calls with a data range of just 1 day: under 200ms
+
+    # Concepts
+
+    ### Product
+
+    The attraction, event or tour one is buying a ticket for.
+
+    Example:
+
+    * Entrance to the Louvre
+    * Hop-on Hop-off bus ticket
+
+    Product IDs must remain the same regardless of dates.
+
+    ### Variants
+
+    At the variant level one can differentiate price points and inclusions, such as:
+
+    * Adult
+    * Child
+    * Adult | Audio Guide
+    * Adult | Audio Guide French
+    * 24H Hop On Hop Off bus
+    * 48H Hop On Hop Off bus
+
+    Variant IDs must:
+
+    * Remain the same regardless of dates and timeslots.
+    If you use different IDs in your own systems (based on date/time), make sure the ID that Tiqets receives from you remains the same.
+    * Be strings that comply with the following regular expression: /[A-Za-z0-9_\-]{1,16}/
+    Examples:
+      * "1"
+      * "ABC-123"
+      * "20193112"
+      * "a3_cd-E22331"
+      * "1234567890123456789012"
+
+    ### Date ranges
+
+    Date range parameters are inclusive. This means that:
+
+    * A range that starts on 2019-12-29 and that ends on 2019-12-31 covers 3 whole days.
+    * A range that starts on 2019-12-29 and that ends on 2019-12-29 covers 1 day.
+
+  contact:
+    email: connections@tiqets.com
+  version: 1.0.0
+tags:
+  - name: Availability
+    description: |
+      Availability related endpoints list the variants (ticket types) that are currently available for sale and what limits apply.
+      The provided values must be up-to-date.
+
+      These endpoints need to respond quickly as our cache building processes will hit them in large bursts when we are rebuilding the entire cache.
+      Note that our cache is only used for customer experience reasons. Before placing orders we will always validate that the request dates and/or timeslots still offer availability.
+
+      Availability must be provided consistently for at least 2 months in advance, up to 6 months.
+
+      The cache rebuilding process looks as follows:
+
+      1. **Available Dates**
+
+          We fetch all dates that the venue has tickets available to quickly populate the calendar.
+
+      1. **Fetch Variants**
+
+          Per available date we will fetch the variants that you have available for that date.
+
+      1. **Fetch Timeslots**
+
+          If applicable, we will fetch the available timeslots and the variants that are available for that timeslot.
+
+      A word on "availability"
+      The max_tickets value specify the maximum amount of tickets that can be added to an order for that specific element.
+      See the tree structure below.
+
+      * **Example with timeslots**
+
+        Tree:
+        ```
+        ┏ Dates (20)
+        ┗┳━ Timeslots (15)
+          ┗┳━━ Variants (20)
+            ┗┳━━ Adult (10)
+              ┗━━ Child (10)
+        ```
+
+        Explanation:
+        * At most 15 items in one order.
+          The timeslot-level limit is the lowest.
+        * The sum of the individual variants exceeds the timeslot-level limit
+
+        Example limits:
+        * Adding 8 adult tickets leaves room 7 for more child tickets.
+
+      * **Example without timeslots**
+
+        Tree:
+        ```
+        ┏ Dates (10)
+        ┗┳━ Variants (99)
+          ┗┳━━ Adult (10)
+            ┗━━ Child (2)
+        ```
+
+        Explanation:
+        * At most 10 items in one order.
+          The dates-level limit is the lowest.
+        * The sum of the individual variants exceeds the timeslot-level limit
+
+        Example limits:
+        * Adding 8 adults tickets leaves room for 2 child tickets.
+paths:
+  '/v1/products/{product_id}/dates':
+    get:
+      tags:
+        - Availability
+      summary: Available Dates
+      description: |
+        Returns a list of all the dates that have at least one ticket available between the requested start and end date.
+
+        Only include business dates in the response.
+        Omit the dates the venue is closed.
+
+      operationId: getDates
+      parameters:
+        - name: product_id
+          in: path
+          description: ID of a single product.
+          required: true
+          schema:
+            type: string
+        - name: start
+          in: query
+          description: Start of the date range
+          required: true
+          schema:
+            type: string
+            format: date
+            example: '2019-06-21'
+        - name: end
+          in: query
+          description: End of the date range
+          required: true
+          schema:
+            type: string
+            format: date
+            example: '2019-06-21'
+      responses:
+        '200':
+          description: List of dates
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dates'
+        '400':
+          description: |
+            Bad request
+
+            ## Internal error codes
+
+            | Internal error code |        Error         |                           Message                           |
+            |---------------------|----------------------|-------------------------------------------------------------|
+            |                1000 | Missing argument     | Required argument ATTRIBUTE_NAME was not found              |
+            |                1001 | Missing product      | Product with ID ID_NUMBER doesn't exist                     |
+            |                2000 | Incorrect date       | Incorrect date format xxx, please use the YYYY-dd-mm format |
+            |                2001 | Incorrect date range | The end date cannot be earlier then start date              |
+            |                2004 | Incorrect type       | Expected ATTRIBUTE_NAME to be a string, got TYPE instead    |
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '403':
+          description: Forbidden - Missing or incorrect API key
+          content: {}
+        '405':
+          description: Method Not Allowed - Incorrect method was used (GET/POST)
+          content: {}
+        '500':
+          description: Service Error - Please report that
+          content: {}
+      security:
+        - authorization_header: []
+  '/v1/products/{product_id}/variants':
+    get:
+      tags:
+        - Availability
+      summary: Availability without timeslots
+      description: |
+        Returns the variants that are available for the requested date range and what limits apply.
+        If your venue has unlimited availability, limits will still need to be set.
+      operationId: getVariants
+      parameters:
+        - name: product_id
+          in: path
+          description: ID of a single product
+          required: true
+          schema:
+            type: string
+        - name: start
+          in: query
+          description: Start of the date range
+          required: true
+          schema:
+            type: string
+            format: date
+            example: '2019-06-21'
+        - name: end
+          in: query
+          description: End of the date range
+          required: true
+          schema:
+            type: string
+            format: date
+            example: '2019-06-21'
+      responses:
+        '200':
+          description: List of dates with variants
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Variants'
+        '400':
+          description: |
+            Bad request
+
+            ## Internal error codes
+
+            | Internal error code |        Error         |                           Message                           |
+            |---------------------|----------------------|-------------------------------------------------------------|
+            |                1000 | Missing argument     | Required argument ATTRIBUTE_NAME was not found              |
+            |                1001 | Missing product      | Product with ID ID_NUMBER doesn't exist                     |
+            |                2000 | Incorrect date       | Incorrect date format xxx, please use the YYYY-dd-mm format |
+            |                2001 | Incorrect date range | The end date cannot be earlier then start date              |
+            |                2004 | Incorrect type       | Expected ATTRIBUTE_NAME to be a string, got TYPE instead    |
+          content: {}
+        '403':
+          description: Forbidden - Missing or incorrect API key
+          content: {}
+        '405':
+          description: Method Not Allowed - Incorrect method was used (GET/POST)
+          content: {}
+        '500':
+          description: Service Error - Please report that
+          content: {}
+        '501':
+          description: Returned when this endpoint is Not Implemented
+          content: {}
+      security:
+        - authorization_header: []
+  '/v1/products/{product_id}/timeslots':
+    get:
+      tags:
+        - Availability
+      summary: Availability with timeslots
+      description: |
+        Returns the various timeslots and their variants for the days within the requested date range.
+
+        Timeslot ID's must be strings that comply with the following regular expression: /[A-Za-z0-9_\-]{1,35}/
+
+      operationId: getTimeslots
+      parameters:
+        - name: product_id
+          in: path
+          description: ID of a single product
+          required: true
+          schema:
+            type: string
+        - name: start
+          in: query
+          description: Start of the date range
+          required: true
+          schema:
+            type: string
+            format: date
+            example: '2019-06-21'
+        - name: end
+          in: query
+          description: End of the date range
+          required: true
+          schema:
+            type: string
+            format: date
+            example: '2019-06-21'
+      responses:
+        '200':
+          description: List of dates
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Timeslots'
+        '400':
+          description: |
+            Bad request
+
+            ## Internal error codes
+
+            | Internal error code |        Error         |                           Message                           |
+            |---------------------|----------------------|-------------------------------------------------------------|
+            |                1000 | Missing argument     | Required argument ATTRIBUTE_NAME was not found              |
+            |                1001 | Missing product      | Product with ID ID_NUMBER doesn't exist                     |
+            |                2000 | Incorrect date       | Incorrect date format xxx, please use the YYYY-dd-mm format |
+            |                2001 | Incorrect date range | The end date cannot be earlier then start date              |
+            |                2004 | Incorrect type       | Expected ATTRIBUTE_NAME to be a string, got TYPE instead    |
+          content: {}
+        '403':
+          description: Forbidden - Missing or incorrect API key
+          content: {}
+        '405':
+          description: Method Not Allowed - Incorrect method was used (GET/POST)
+          content: {}
+        '500':
+          description: Service Error - Please report that
+          content: {}
+        '501':
+          description: Returned when this endpoint is Not Implemented
+          content: {}
+      security:
+        - authorization_header: []
+  '/v1/products/{product_id}/reservation':
+    post:
+      tags:
+        - Reservation
+      summary: Reservation
+      description: When a customer commits to the purchase of tickets, right before he enters the payment flow, Tiqets will reserve the tickets.
+        This reservation should be held **at least 15 minutes**.
+      operationId: reservation
+      parameters:
+        - name: product_id
+          in: path
+          description: ID of a single product
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Reservation'
+        required: true
+      responses:
+        '200':
+          description: List of dates
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationResponse'
+        '400':
+          description: |
+            Bad request
+
+            ## Internal error codes
+
+            | Internal error code |        Error         |                                            Message                                            |
+            |---------------------|----------------------|-----------------------------------------------------------------------------------------------|
+            |                1000 | Missing argument     | Required argument ATTRIBUTE_NAME was not found                                                |
+            |                1001 | Missing product      | Product with ID ID_NUMBER doesn't exist                                                       |
+            |                2000 | Incorrect date       | Incorrect date format xxx, please use the YYYY-dd-mm format                                   |
+            |                2001 | Incorrect date range | The end date cannot be earlier then start date                                                |
+            |                2002 | Wrong time slot ID   | Given timeslot_id doesn't belong to given date (YYYY-dd-mm)                                   |
+            |                2003 | Wrong variant ID     | Given variant_id doesn't belong to given timeslot_id (TIMESLOT_ID)                            |
+            |                2004 | Incorrect type       | Expected ATTRIBUTE_NAME to be a string, got TYPE instead                                      |
+            |                2005 | Invalid Value        | Eg. The phone number must not contain dots.                                                   |
+            |                3000 | Availability error   | Quantity (3) is not available anymore for a given variant (id: 4337) and time slot (id: 5567) |
+          content: {}
+        '403':
+          description: Forbidden - Missing or incorrect API key
+          content: {}
+        '405':
+          description: Method Not Allowed - Incorrect method was used (GET/POST)
+          content: {}
+        '500':
+          description: Service Error - Please report that
+          content: {}
+      security:
+        - authorization_header: []
+  /v1/booking:
+    post:
+      tags:
+        - Booking
+      summary: Booking
+      description: |
+        After the customer has paid, Tiqets will confirm the earlier made reservation by providing your reservation ID.
+      operationId: booking
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Booking'
+        required: true
+      responses:
+        '200':
+          description: Booking response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingResponse'
+        '400':
+          description: |
+            Bad request
+
+            ## Internal error codes
+
+            | Internal error code |        Error        |                         Message                          |
+            |---------------------|---------------------|----------------------------------------------------------|
+            |                1000 | Missing argument    | Required argument ATTRIBUTE_NAME was not found           |
+            |                2004 | Incorrect type      | Expected ATTRIBUTE_NAME to be a string, got TYPE instead |
+            |                3001 | Reservation expired | Your reservation has expired MINUTES minutes ago         |
+          content: {}
+        '403':
+          description: Forbidden - Missing or incorrect API key
+          content: {}
+        '405':
+          description: Method Not Allowed - Incorrect method was used (GET/POST)
+          content: {}
+        '500':
+          description: Service Error - Please report that
+          content: {}
+      security:
+        - authorization_header: []
+components:
+  schemas:
+    Variants:
+      type: array
+      example:
+        - id: '5567'
+          date: '2019-06-26'
+          max_tickets: 200
+          variants:
+            - id: '1'
+              name: Adult
+              max_tickets: 100
+            - id: '2'
+              name: Child
+              max_tickets: 70
+        - id: '5568'
+          date: '2019-06-27'
+          max_tickets: 200
+          variants:
+            - id: '1'
+              name: Adult
+              max_tickets: 110
+            - id: '2'
+              name: Child
+              max_tickets: 77
+      items:
+        type: object
+        properties:
+          id:
+            type: string
+          date:
+            type: string
+            format: date
+            example: '2019-06-27'
+          max_tickets:
+            type: integer
+          variants:
+            type: array
+            items:
+              $ref: '#/components/schemas/Variant'
+    Timeslots:
+      type: array
+      example:
+        - id: '5567'
+          date: '2019-06-26'
+          start: '17:30'
+          end: '18:30'
+          max_tickets: 200
+          variants:
+            - id: '1'
+              name: Adult
+              max_tickets: 100
+            - id: '2'
+              name: Child
+              max_tickets: 70
+        - id: '5568'
+          date: '2019-06-27'
+          start: '18:30'
+          end: '19:30'
+          max_tickets: 200
+          variants:
+            - id: '4458'
+              name: Adult
+              max_tickets: 110
+            - id: '4459'
+              name: Child
+              max_tickets: 77
+      items:
+        type: object
+        properties:
+          id:
+            type: string
+            description: ID should be unique and tided to a single date
+          date:
+            type: string
+            format: date
+            example: '2019-06-27'
+          start:
+            type: string
+          end:
+            type: string
+          max_tickets:
+            type: integer
+          variants:
+            type: array
+            items:
+              $ref: '#/components/schemas/Variant'
+    Variant:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        max_tickets:
+          type: integer
+    Dates:
+      type: array
+      example:
+        - date: '2019-06-26'
+          max_tickets: 64
+        - date: '2019-06-27'
+          max_tickets: 76
+      items:
+        type: object
+        properties:
+          date:
+            type: string
+            format: date
+            example: '2019-06-27'
+          max_tickets:
+            type: integer
+            example: 54
+    OrderItem:
+      type: object
+      required:
+      - variant_id
+      - quantity
+      properties:
+        variant_id:
+          type: string
+          example: '1'
+        quantity:
+          type: integer
+          example: 2
+    Reservation:
+      type: object
+      example:
+        date: '2019-06-26'
+        timeslot_id: '5567'
+        items:
+          - variant_id: '1'
+            quantity: 2
+          - variant_id: '2'
+            quantity: 1
+        customer:
+          first_name: 'Jon'
+          last_name: 'Snow'
+          email: 'jon@snow.com'
+          phone: '+48 555 555 555'
+      required:
+      - date
+      - timeslot_id
+      - tickets
+      - customer
+      properties:
+        date:
+          type: string
+          example: '2019-06-26'
+        timeslot_id:
+          type: string
+          example: '5567'
+        tickets:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+        customer:
+          type: object
+          required:
+          - first_name
+          - last_name
+          - email
+          - phone
+          properties:
+            first_name:
+              type: string
+              example: 'Jon'
+            last_name:
+              type: string
+              example: 'Snow'
+            email:
+              type: string
+              example: 'jon@snow.com'
+            phone:
+              type: string
+              example: '+58 555 555 555'
+    ReservationResponse:
+      type: object
+      properties:
+        reservation_id:
+          type: string
+          example: '78940'
+        expires_at:
+          type: string
+          format: date-time
+          example: '2019-06-30T19:45:00+00:00'
+    Booking:
+      type: object
+      required:
+      - reservation_id
+      - customer
+      properties:
+        reservation_id:
+          type: string
+          example: '9887'
+    BookingResponse:
+      type: object
+      example:
+        - booking_id: '657788'
+          barcode_position: ticket
+          barcode: ''
+          tickets:
+            '1':
+              - barcode1
+              - barcode2
+            '2':
+              - barcode3
+      properties:
+        booking_id:
+          type: string
+        barcode_position:
+          type: string
+          enum:
+            - order
+            - ticket
+        barcode:
+          type: string
+          description: can be omitted if barcode_position is set to ticket
+        tickets:
+          type: object
+          description: can be omitted if barcode_position is set to order
+          properties:
+            variant_id:
+              type: array
+              items:
+                $ref: '#/components/schemas/Barcode'
+    Barcode:
+      type: string
+    BadRequest:
+      type: object
+      properties:
+        error_code:
+          type: integer
+          example: 1000
+        error:
+          type: string
+          example: Missing argument
+        message:
+          type: string
+          example: Required argument start was not found
+  securitySchemes:
+    authorization_header:
+      type: apiKey
+      in: header
+      name: API-Key
+      description: |
+        All communication must take place over HTTPS.
+        Self-signed certificates are not accepted.
+
+        In all our calls to your API we pass an `API-Key` header containing the shared secret.
+        A response must only be returned if this key is correct.
+
+        ```
+        API-Key: "<YOUR-API-KEY>"
+        ```
+
+        If the provided value does not match the shared secret, the API will respond with an HTTP 403 status code and an empty body.
