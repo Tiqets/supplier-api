@@ -71,7 +71,7 @@ info:
 
   contact:
     email: connections@tiqets.com
-  version: 1.0.0
+  version: 1.1.0
 tags:
   - name: Availability
     description: |
@@ -282,9 +282,6 @@ paths:
       summary: Availability with timeslots
       description: |
         Returns the various timeslots and their variants for the days within the requested date range.
-
-        Timeslot ID's must be strings that comply with the following regular expression: /[A-Za-z0-9_\-]{1,35}/
-
       operationId: getTimeslots
       parameters:
         - name: product_id
@@ -349,8 +346,13 @@ paths:
       tags:
         - Reservation
       summary: Reservation
-      description: When a customer commits to the purchase of tickets, right before he enters the payment flow, Tiqets will reserve the tickets.
+      description: | 
+        When a customer commits to the purchase of tickets, right before he enters the payment flow, Tiqets will reserve the tickets.  
         This reservation should be held **at least 15 minutes**.
+        
+        Note that the timeslot field is optional.  
+        It is _only_ provided for products with timeslots and will contain the value of an existing timeslot's "start" value. 
+        
       operationId: reservation
       parameters:
         - name: product_id
@@ -388,6 +390,7 @@ paths:
             |                2003 | Wrong variant ID     | Given variant_id doesn't belong to given timeslot_id (TIMESLOT_ID)                            |
             |                2004 | Incorrect type       | Expected ATTRIBUTE_NAME to be a string, got TYPE instead                                      |
             |                2005 | Invalid Value        | Eg. The phone number must not contain dots.                                                   |
+            |                2006 | Superfluous timeslot parameter      | This product doesn't use timeslots.                                                       |
             |                3000 | Availability error   | Quantity (3) is not available anymore for a given variant (id: 4337) and time slot (id: 5567) |
           content: {}
         '403':
@@ -450,8 +453,7 @@ components:
     Variants:
       type: array
       example:
-        - id: '5567'
-          date: '2019-06-26'
+        - date: '2019-06-26'
           max_tickets: 200
           variants:
             - id: '1'
@@ -460,8 +462,7 @@ components:
             - id: '2'
               name: Child
               max_tickets: 70
-        - id: '5568'
-          date: '2019-06-27'
+        - date: '2019-06-27'
           max_tickets: 200
           variants:
             - id: '1'
@@ -473,8 +474,6 @@ components:
       items:
         type: object
         properties:
-          id:
-            type: string
           date:
             type: string
             format: date
@@ -488,8 +487,7 @@ components:
     Timeslots:
       type: array
       example:
-        - id: '5567'
-          date: '2019-06-26'
+        - date: '2019-06-26'
           start: '17:30'
           end: '18:30'
           max_tickets: 200
@@ -500,8 +498,7 @@ components:
             - id: '2'
               name: Child
               max_tickets: 70
-        - id: '5568'
-          date: '2019-06-27'
+        - date: '2019-06-27'
           start: '18:30'
           end: '19:30'
           max_tickets: 200
@@ -515,9 +512,6 @@ components:
       items:
         type: object
         properties:
-          id:
-            type: string
-            description: ID should be unique and tided to a single date
           date:
             type: string
             format: date
@@ -574,8 +568,8 @@ components:
       type: object
       example:
         date: '2019-06-26'
-        timeslot_id: '5567'
-        items:
+        timeslot: '09:30'
+        tickets:
           - variant_id: '1'
             quantity: 2
           - variant_id: '2'
@@ -585,18 +579,18 @@ components:
           last_name: 'Snow'
           email: 'jon@snow.com'
           phone: '+48 555 555 555'
+          country: 'nl'
       required:
       - date
-      - timeslot_id
       - tickets
       - customer
       properties:
         date:
           type: string
           example: '2019-06-26'
-        timeslot_id:
+        timeslot:
           type: string
-          example: '5567'
+          example: '09:30'
         tickets:
           type: array
           items:
@@ -608,6 +602,7 @@ components:
           - last_name
           - email
           - phone
+          - country
           properties:
             first_name:
               type: string
@@ -621,6 +616,9 @@ components:
             phone:
               type: string
               example: '+58 555 555 555'
+            country:
+              type: string
+              example: 'nl'
     ReservationResponse:
       type: object
       properties:
@@ -635,7 +633,6 @@ components:
       type: object
       required:
       - reservation_id
-      - customer
       properties:
         reservation_id:
           type: string
@@ -644,6 +641,7 @@ components:
       type: object
       example:
         - booking_id: '657788'
+          barcode_format: 'QRCODE'
           barcode_position: ticket
           barcode: ''
           tickets:
@@ -655,6 +653,15 @@ components:
       properties:
         booking_id:
           type: string
+        barcode_format:
+          type: string
+          enum:
+            - QRCODE
+            - CODE128
+            - CODE39
+            - ITF
+            - DATAMATRIX
+            - EAN13
         barcode_position:
           type: string
           enum:
