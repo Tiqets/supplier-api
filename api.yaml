@@ -54,7 +54,7 @@ info:
 
     * Remain the same regardless of dates and timeslots.
     If you use different IDs in your own systems (based on date/time), make sure the ID that Tiqets receives from you remains the same.
-    * Be strings that comply with the following regular expression: /[A-Za-z0-9_\-]{1,16}/
+    * Be strings that comply with the following regular expression: /[A-Za-z0-9_\-]{1,16}/
     Examples:
       * "1"
       * "ABC-123"
@@ -346,13 +346,13 @@ paths:
       tags:
         - Reservation
       summary: Reservation
-      description: | 
-        When a customer commits to the purchase of tickets, right before he enters the payment flow, Tiqets will reserve the tickets.  
+      description: |
+        When a customer commits to the purchase of tickets, right before he enters the payment flow, Tiqets will reserve the tickets.
         This reservation should be held **at least 15 minutes**.
-        
-        Note that the timeslot field is optional.  
-        It is _only_ provided for products with timeslots and will contain the value of an existing timeslot's "start" value. 
-        
+
+        Note that the timeslot field is optional.
+        It is _only_ provided for products with timeslots and will contain the value of an existing timeslot's "start" value.
+
       operationId: reservation
       parameters:
         - name: product_id
@@ -664,15 +664,19 @@ components:
             - EAN13
         barcode_position:
           type: string
+          description: |
+            Set this to "order" to generate only one barcode.
+
+            Set this to "ticket" to generate multiple barcodes.
           enum:
             - order
             - ticket
         barcode:
           type: string
-          description: can be omitted if barcode_position is set to ticket
+          description: Can be omitted if barcode_position is set to ticket
         tickets:
           type: object
-          description: can be omitted if barcode_position is set to order
+          description: Can be omitted if barcode_position is set to order
           properties:
             variant_id:
               type: array
