@@ -242,7 +242,7 @@ paths:
             example: '2019-06-21'
       responses:
         '200':
-          description: List of dates with variants
+          description: List of variants per day
           content:
             application/json:
               schema:
@@ -308,7 +308,7 @@ paths:
             example: '2019-06-21'
       responses:
         '200':
-          description: List of dates
+          description: List of timeslots per day
           content:
             application/json:
               schema:
@@ -369,7 +369,7 @@ paths:
         required: true
       responses:
         '200':
-          description: List of dates
+          description: Reservation details
           content:
             application/json:
               schema:
@@ -590,6 +590,7 @@ components:
           example: '2019-06-26'
         timeslot:
           type: string
+          description: start time of the time slot
           example: '09:30'
         tickets:
           type: array
@@ -640,16 +641,16 @@ components:
     BookingResponse:
       type: object
       example:
-        - booking_id: '657788'
-          barcode_format: 'QRCODE'
-          barcode_position: ticket
-          barcode: ''
-          tickets:
-            '1':
-              - barcode1
-              - barcode2
-            '2':
-              - barcode3
+        booking_id: '657788'
+        barcode_format: 'QRCODE'
+        barcode_position: ticket
+        barcode: ''
+        tickets:
+          '1':
+            - barcode1
+            - barcode2
+          '2':
+            - barcode3
       properties:
         booking_id:
           type: string
