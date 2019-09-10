@@ -1,0 +1,4 @@
+requests==2.22.0
+dacite==1.0.2
+terminaltables==3.1.0
+clickclick==1.2.2
