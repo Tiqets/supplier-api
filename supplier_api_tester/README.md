@@ -4,6 +4,12 @@
 
 Python 3.6+
 
+## Installation
+
+```sh
+pip install supplier-api-tester
+```
+
 ## Usage
 
 ```
