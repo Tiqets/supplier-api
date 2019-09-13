@@ -2,7 +2,6 @@ from datetime import date, datetime, timedelta
 
 from typing import List
 
-import dacite
 import requests
 
 from supplier_api_tester.client import client
@@ -40,6 +39,44 @@ def test_next_30_days(api_url, api_key, product_id, endpoint, adapter_func, vers
         raise FailedTest('There is no availability for next 30 days')
 
     return TestResult()
+
+
+def past_start_date(api_url, api_key, product_id, endpoint, version=1):
+    '''Checking availability with start date from the past'''
+    today = datetime.utcnow().date()
+    start = today - timedelta(days=1)
+    end = today
+
+    response = client(f'{api_url}/v{version}/products/{product_id}/{endpoint}', api_key, {
+        'start': start.isoformat(),
+        'end': end.isoformat(),
+    })
+    api_error = get_api_error(response)
+    expected_error = ApiError(
+        error_code=2007,
+        error='Incorrect start date',
+        message='Start date cannot be from the past',
+    )
+    return check_api_error(api_error, expected_error)
+
+
+def huge_date_range(api_url, api_key, product_id, endpoint, version=1):
+    '''Checking availability with huge date range'''
+    today = datetime.utcnow().date()
+    start = today
+    end = today + timedelta(days=365 * 10)
+
+    response = client(f'{api_url}/v{version}/products/{product_id}/{endpoint}', api_key, {
+        'start': start.isoformat(),
+        'end': end.isoformat(),
+    })
+    api_error = get_api_error(response)
+    expected_error = ApiError(
+        error_code=2008,
+        error='Date range is too wide',
+        message='Maximum date range is',
+    )
+    return check_api_error(api_error, expected_error)
 
 
 def test_missing_api_key(api_url, api_key, product_id, endpoint, version=1):
@@ -162,8 +199,7 @@ def test_error_for_non_existing_product(api_url, api_key, product_id, endpoint, 
         error='Missing product',
         message='Product with ID NON-EXISTING-PRODUCT-ID doesn\'t exist',
     )
-    check_api_error(api_error, expected_error)
-    return TestResult()
+    return check_api_error(api_error, expected_error)
 
 
 def incorrect_date_format(api_url, api_key, product_id, endpoint, version=1):
@@ -179,7 +215,7 @@ def incorrect_date_format(api_url, api_key, product_id, endpoint, version=1):
     api_error = get_api_error(response)
     expected_error = ApiError(
         error_code=2000,
-        error='Incorrect date',
+        error='Incorrect date format',
         message=f'Incorrect date format {bad_date_format}, please use the YYYY-dd-mm format',
     )
     check_api_error(api_error, expected_error)
@@ -192,7 +228,7 @@ def incorrect_date_format(api_url, api_key, product_id, endpoint, version=1):
     api_error = get_api_error(response)
     expected_error = ApiError(
         error_code=2000,
-        error='Incorrect date',
+        error='Incorrect date format',
         message=f'Incorrect date format {bad_date_format}, please use the YYYY-dd-mm format',
     )
     check_api_error(api_error, expected_error)
@@ -214,8 +250,7 @@ def end_before_start_error(api_url, api_key, product_id, endpoint, version=1):
         error='Incorrect date range',
         message='The end date cannot be earlier then start date',
     )
-    check_api_error(api_error, expected_error)
-    return TestResult()
+    return check_api_error(api_error, expected_error)
 
 
 def not_allowed_method(api_url, api_key, product_id, endpoint, version=1):

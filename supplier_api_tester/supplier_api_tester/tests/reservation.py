@@ -141,7 +141,7 @@ def test_error_for_non_existing_product(api_url, api_key, product_id, timeslots:
 
 @test_wrapper
 def test_incorrect_date_format(api_url, api_key, product_id, timeslots: bool, version=1):
-    '''Testing reservation with incorrect date'''
+    '''Testing reservation with incorrect date format'''
     url = f'{api_url}/v{version}/products/{product_id}/reservation'
     bad_date_format = '05/05/2020'
     slot = get_reservation_slot(api_url, api_key, product_id, timeslots)
@@ -153,8 +153,29 @@ def test_incorrect_date_format(api_url, api_key, product_id, timeslots: bool, ve
     api_error = get_api_error(response)
     expected_error = ApiError(
         error_code=2000,
-        error='Incorrect date',
+        error='Incorrect date format',
         message=f'Incorrect date format {bad_date_format}, please use the YYYY-dd-mm format',
+    )
+    check_api_error(api_error, expected_error)
+    return TestResult()
+
+
+@test_wrapper
+def test_past_date(api_url, api_key, product_id, timeslots: bool, version=1):
+    '''Testing reservation with past date'''
+    url = f'{api_url}/v{version}/products/{product_id}/reservation'
+    slot = get_reservation_slot(api_url, api_key, product_id, timeslots)
+    json_payload = get_payload_from_slot(slot)
+    yesterday = datetime.utcnow().date() - timedelta(days=1)
+    json_payload['date'] = yesterday.isoformat()
+    if timeslots:
+        json_payload['timeslot'] = slot.start
+    response = client(url, api_key, method=requests.post, json_payload=json_payload)
+    api_error = get_api_error(response)
+    expected_error = ApiError(
+        error_code=2009,
+        error='Incorrect date',
+        message=f'Cannot use the past date',
     )
     check_api_error(api_error, expected_error)
     return TestResult()
