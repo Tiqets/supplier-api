@@ -69,9 +69,19 @@ info:
     * A range that starts on 2019-12-29 and that ends on 2019-12-31 covers 3 whole days.
     * A range that starts on 2019-12-29 and that ends on 2019-12-29 covers 1 day.
 
+    ### Shared HTTP error status codes
+
+    Those status code are the same for every endpoint.
+
+    | Status code |                          Message                          |
+    |-------------|-----------------------------------------------------------|
+    |         403 | Forbidden - Missing or incorrect API key                  |
+    |         405 | Method Not Allowed - Incorrect method was used (GET/POST) |
+    |         500 | Service Error - Please report that                        |
+
   contact:
     email: connections@tiqets.com
-  version: 1.1.0
+  version: 1.2.0
 tags:
   - name: Availability
     description: |
@@ -186,28 +196,20 @@ paths:
 
             ## Internal error codes
 
-            | Internal error code |        Error         |                           Message                           |
-            |---------------------|----------------------|-------------------------------------------------------------|
-            |                1000 | Missing argument     | Required argument ATTRIBUTE_NAME was not found              |
-            |                1001 | Missing product      | Product with ID ID_NUMBER doesn't exist                     |
-            |                2000 | Incorrect date       | Incorrect date format xxx, please use the YYYY-dd-mm format |
-            |                2001 | Incorrect date range | The end date cannot be earlier then start date              |
-            |                2004 | Incorrect type       | Expected ATTRIBUTE_NAME to be a string, got TYPE instead    |
+            | Internal error code |         Error         |                                         Message                                          |
+            |---------------------|-----------------------|------------------------------------------------------------------------------------------|
+            |                1000 | Missing argument      | Required argument ATTRIBUTE_NAME was not found                                           |
+            |                1001 | Missing product       | Product with ID ID_NUMBER doesn't exist                                                  |
+            |                2000 | Incorrect date format | Incorrect date format xxx, please use the YYYY-dd-mm format                              |
+            |                2001 | Incorrect date range  | The end date cannot be earlier then start date                                           |
+            |                2009 | Incorrect date        | Eg. Cannot use the past date or Given date is too far ahead in the future (max 6 months) |
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/BadRequest'
-        '403':
-          description: Forbidden - Missing or incorrect API key
-          content: {}
-        '405':
-          description: Method Not Allowed - Incorrect method was used (GET/POST)
-          content: {}
-        '500':
-          description: Service Error - Please report that
-          content: {}
       security:
         - authorization_header: []
+
   '/v1/products/{product_id}/variants':
     get:
       tags:
@@ -253,22 +255,13 @@ paths:
 
             ## Internal error codes
 
-            | Internal error code |        Error         |                           Message                           |
-            |---------------------|----------------------|-------------------------------------------------------------|
-            |                1000 | Missing argument     | Required argument ATTRIBUTE_NAME was not found              |
-            |                1001 | Missing product      | Product with ID ID_NUMBER doesn't exist                     |
-            |                2000 | Incorrect date       | Incorrect date format xxx, please use the YYYY-dd-mm format |
-            |                2001 | Incorrect date range | The end date cannot be earlier then start date              |
-            |                2004 | Incorrect type       | Expected ATTRIBUTE_NAME to be a string, got TYPE instead    |
-          content: {}
-        '403':
-          description: Forbidden - Missing or incorrect API key
-          content: {}
-        '405':
-          description: Method Not Allowed - Incorrect method was used (GET/POST)
-          content: {}
-        '500':
-          description: Service Error - Please report that
+            | Internal error code |         Error         |                                         Message                                          |
+            |---------------------|-----------------------|------------------------------------------------------------------------------------------|
+            |                1000 | Missing argument      | Required argument ATTRIBUTE_NAME was not found                                           |
+            |                1001 | Missing product       | Product with ID ID_NUMBER doesn't exist                                                  |
+            |                2000 | Incorrect date format | Incorrect date format xxx, please use the YYYY-dd-mm format                              |
+            |                2001 | Incorrect date range  | The end date cannot be earlier then start date                                           |
+            |                2009 | Incorrect date        | Eg. Cannot use the past date or Given date is too far ahead in the future (max 6 months) |
           content: {}
         '501':
           description: Returned when this endpoint is Not Implemented
@@ -319,22 +312,13 @@ paths:
 
             ## Internal error codes
 
-            | Internal error code |        Error         |                           Message                           |
-            |---------------------|----------------------|-------------------------------------------------------------|
-            |                1000 | Missing argument     | Required argument ATTRIBUTE_NAME was not found              |
-            |                1001 | Missing product      | Product with ID ID_NUMBER doesn't exist                     |
-            |                2000 | Incorrect date       | Incorrect date format xxx, please use the YYYY-dd-mm format |
-            |                2001 | Incorrect date range | The end date cannot be earlier then start date              |
-            |                2004 | Incorrect type       | Expected ATTRIBUTE_NAME to be a string, got TYPE instead    |
-          content: {}
-        '403':
-          description: Forbidden - Missing or incorrect API key
-          content: {}
-        '405':
-          description: Method Not Allowed - Incorrect method was used (GET/POST)
-          content: {}
-        '500':
-          description: Service Error - Please report that
+            | Internal error code |         Error         |                                         Message                                          |
+            |---------------------|-----------------------|------------------------------------------------------------------------------------------|
+            |                1000 | Missing argument      | Required argument ATTRIBUTE_NAME was not found                                           |
+            |                1001 | Missing product       | Product with ID ID_NUMBER doesn't exist                                                  |
+            |                2000 | Incorrect date format | Incorrect date format xxx, please use the YYYY-dd-mm format                              |
+            |                2001 | Incorrect date range  | The end date cannot be earlier then start date                                           |
+            |                2009 | Incorrect date        | Eg. Cannot use the past date or Given date is too far ahead in the future (max 6 months) |
           content: {}
         '501':
           description: Returned when this endpoint is Not Implemented
@@ -380,27 +364,18 @@ paths:
 
             ## Internal error codes
 
-            | Internal error code |        Error         |                                            Message                                            |
-            |---------------------|----------------------|-----------------------------------------------------------------------------------------------|
-            |                1000 | Missing argument     | Required argument ATTRIBUTE_NAME was not found                                                |
-            |                1001 | Missing product      | Product with ID ID_NUMBER doesn't exist                                                       |
-            |                2000 | Incorrect date       | Incorrect date format xxx, please use the YYYY-dd-mm format                                   |
-            |                2001 | Incorrect date range | The end date cannot be earlier then start date                                                |
-            |                2002 | Wrong time slot ID   | Given timeslot_id doesn't belong to given date (YYYY-dd-mm)                                   |
-            |                2003 | Wrong variant ID     | Given variant_id doesn't belong to given timeslot_id (TIMESLOT_ID)                            |
-            |                2004 | Incorrect type       | Expected ATTRIBUTE_NAME to be a string, got TYPE instead                                      |
-            |                2005 | Invalid Value        | Eg. The phone number must not contain dots.                                                   |
-            |                2006 | Superfluous timeslot parameter      | This product doesn't use timeslots.                                                       |
-            |                3000 | Availability error   | Quantity (3) is not available anymore for a given variant (id: 4337) and time slot (id: 5567) |
-          content: {}
-        '403':
-          description: Forbidden - Missing or incorrect API key
-          content: {}
-        '405':
-          description: Method Not Allowed - Incorrect method was used (GET/POST)
-          content: {}
-        '500':
-          description: Service Error - Please report that
+            | Internal error code |             Error              |                                            Message                                            |
+            |---------------------|--------------------------------|-----------------------------------------------------------------------------------------------|
+            |                1000 | Missing argument               | Required argument ATTRIBUTE_NAME was not found                                                |
+            |                1001 | Missing product                | Product with ID ID_NUMBER doesn't exist                                                       |
+            |                2000 | Incorrect date format          | Incorrect date format xxx, please use the YYYY-dd-mm format                                   |
+            |                2002 | Wrong time slot ID             | Given timeslot_id doesn't belong to given date (YYYY-dd-mm)                                   |
+            |                2003 | Wrong variant ID               | Given variant_id doesn't belong to given timeslot_id (TIMESLOT_ID)                            |
+            |                2004 | Incorrect type                 | Expected ATTRIBUTE_NAME to be a string, got TYPE instead                                      |
+            |                2005 | Invalid Value                  | Eg. The phone number must not contain dots.                                                   |
+            |                2006 | Superfluous timeslot parameter | This product doesn't use timeslots.                                                           |
+            |                2009 | Incorrect date                 | Eg. Cannot use the past date or Given date is too far ahead in the future (max 6 months)      |
+            |                3000 | Availability error             | Quantity (3) is not available anymore for a given variant (id: 4337) and time slot (id: 5567) |
           content: {}
       security:
         - authorization_header: []
@@ -431,20 +406,12 @@ paths:
 
             ## Internal error codes
 
-            | Internal error code |        Error        |                         Message                          |
-            |---------------------|---------------------|----------------------------------------------------------|
-            |                1000 | Missing argument    | Required argument ATTRIBUTE_NAME was not found           |
-            |                2004 | Incorrect type      | Expected ATTRIBUTE_NAME to be a string, got TYPE instead |
-            |                3001 | Reservation expired | Your reservation has expired MINUTES minutes ago         |
-          content: {}
-        '403':
-          description: Forbidden - Missing or incorrect API key
-          content: {}
-        '405':
-          description: Method Not Allowed - Incorrect method was used (GET/POST)
-          content: {}
-        '500':
-          description: Service Error - Please report that
+            | Internal error code |          Error           |                         Message                          |
+            |---------------------|--------------------------|----------------------------------------------------------|
+            |                1000 | Missing argument         | Required argument ATTRIBUTE_NAME was not found           |
+            |                2004 | Incorrect type           | Expected ATTRIBUTE_NAME to be a string, got TYPE instead |
+            |                3001 | Reservation expired      | Your reservation has expired MINUTES minutes ago         |
+            |                3002 | Incorrect reservation ID | Given reservation ID is incorrect                        |
           content: {}
       security:
         - authorization_header: []
