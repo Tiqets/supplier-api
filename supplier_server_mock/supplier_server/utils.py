@@ -1,0 +1,75 @@
+from base64 import b64encode, b64decode
+from datetime import date, datetime
+import json
+
+from .constants import PRODUCTS, VARIANTS
+from .exceptions import BadRequest
+
+
+def get_date(data, name, required=True):
+    data_str = data.get(name)
+    if not data_str:
+        if not required:
+            return None
+        raise BadRequest(1000, 'Missing argument', f"Required argument {name} was not found")
+    try:
+        return date.fromisoformat(data_str)
+    except ValueError:
+        raise BadRequest(2000, 'Incorrect date format', f'Incorrect date format {data_str}, please use the YYYY-dd-mm format')
+
+
+def check_product_id(product_id: str):
+    if product_id not in PRODUCTS:
+        raise BadRequest(1001, 'Missing product', f"Product with ID {product_id} doesn't exist")
+
+
+def str_to_int(some_str, number_of_digits) -> int:
+    return int(str(abs(hash(some_str)) % (10 ** 8))[:number_of_digits])
+
+
+def get_availability(product_id: str, day: date):
+    '''
+    Fake randomness generator.
+    '''
+    if day.isoweekday() == 7:
+        return {
+            'date': day.isoformat(),
+            'max_tickets': 0,
+            "variants": []
+        }
+    variants = []
+    number_of_digits = 1 if day.isoweekday() % 3 == 0 else 2
+    max_tickets = str_to_int(day.isoformat(), number_of_digits)
+    tickets_left = max_tickets
+    for i, variant in enumerate(VARIANTS, 1):
+        if i == len(VARIANTS):
+            variant_max_ticket = tickets_left
+        else:
+            variant_max_ticket = min(
+                tickets_left,
+                str_to_int(f'{i * day.isoweekday()}{day.isoformat()}', number_of_digits)
+            )
+            tickets_left -= variant_max_ticket
+        variants.append({
+            "id": str(i),
+            "name": variant,
+            "max_tickets": variant_max_ticket,
+        })
+    return {
+        'date': day.isoformat(),
+        'max_tickets': max_tickets,
+        "variants": variants,
+    }
+
+
+def encode_reservation_id(expires_at: datetime, tickets: list) -> str:
+    variants_quantity_map = {ticket['variant_id']: ticket['quantity'] for ticket in tickets}
+    json_content = json.dumps([expires_at.isoformat(), variants_quantity_map])
+    return b64encode(json_content.encode()).replace(b'=', b'!').decode()
+
+
+def decode_reservation_data(reservation_id: str) -> tuple:
+    json_content = json.loads(b64decode(reservation_id.replace('!', '=')).decode())
+    expires_at = datetime.fromisoformat(json_content[0])
+    variants_quantity_map = json_content[1]
+    return expires_at, variants_quantity_map
