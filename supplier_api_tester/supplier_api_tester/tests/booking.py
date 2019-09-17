@@ -99,6 +99,22 @@ def test_not_allowed_method(api_url, api_key, product_id, timeslots: bool, versi
 
 
 @test_wrapper
+def test_booking_incorrect_reservation_id(api_url, api_key, product_id, timeslots: bool, version=1):
+    '''Booking with incorrect reservation ID.'''
+    url = f'{api_url}/v{version}/booking'
+    response = client(url, api_key, method=requests.post, json_payload={
+        'reservation_id': 'NON-EXISTING-ID',
+    })
+    api_error = get_api_error(response)
+    expected_error = ApiError(
+        error_code=3002,
+        error='Incorrect reservation ID',
+        message="Given reservation ID is incorrect",
+    )
+    check_api_error(api_error, expected_error)
+    return TestResult()
+
+@test_wrapper
 def test_booking(api_url, api_key, product_id, timeslots: bool, version=1):
     '''Booking tickets for at least 1 variant'''
     url = f'{api_url}/v{version}/products/{product_id}/reservation'

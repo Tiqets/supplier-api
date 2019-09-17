@@ -60,6 +60,18 @@ def end_before_start_error(api_url, api_key, product_id, version=1):
 
 
 @test_wrapper
+def past_start_date(api_url, api_key, product_id, version=1):
+    '''[Dates] Checking past date'''
+    return availability.past_start_date(api_url, api_key, product_id, 'dates', version=1)
+
+
+@test_wrapper
+def huge_date_range(api_url, api_key, product_id, version=1):
+    '''[Dates] Checking huge date range'''
+    return availability.huge_date_range(api_url, api_key, product_id, 'dates', version=1)
+
+
+@test_wrapper
 def not_allowed_method(api_url, api_key, product_id, version=1):
     '''[Dates] Testing methods that are not allowed'''
     return availability.not_allowed_method(api_url, api_key, product_id, 'dates', version=1)
