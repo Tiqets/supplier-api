@@ -31,11 +31,7 @@ def test_missing_reservation_id(api_url, api_key, product_id, timeslots: bool, v
 def test_missing_api_key(api_url, api_key, product_id, timeslots: bool, version=1):
     '''Booking without the API key'''
     url = f'{api_url}/v{version}/booking'
-    slot = get_reservation_slot(api_url, api_key, product_id, timeslots)
-    json_payload = get_payload_from_slot(slot, variant_quantity=2, min_quantity=3)
-    if timeslots:
-        json_payload['timeslot'] = slot.start
-    response = client(url, api_key, method=requests.post, json_payload=json_payload, headers={})
+    response = client(url, api_key, method=requests.post, json_payload={}, headers={})
 
     if response.status_code != 403:
         raise FailedTest(
@@ -58,13 +54,7 @@ def test_missing_api_key(api_url, api_key, product_id, timeslots: bool, version=
 def test_incorrect_api_key(api_url, api_key, product_id, timeslots: bool, version=1):
     '''Booking with incorrect API-Key'''
     url = f'{api_url}/v{version}/booking'
-    slot = get_reservation_slot(api_url, api_key, product_id, timeslots)
-    json_payload = get_payload_from_slot(slot, variant_quantity=2, min_quantity=3)
-    if timeslots:
-        json_payload['timeslot'] = slot.start
-    response = client(url, api_key, method=requests.post, json_payload=json_payload, headers={
-        'API-Key': 'NON-EXISTING-API-KEY',
-    })
+    response = client(url, api_key, method=requests.post, json_payload={}, headers={'API-Key': 'NON-EXISTING-API-KEY'})
 
     if response.status_code != 403:
         raise FailedTest(
