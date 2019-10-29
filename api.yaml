@@ -69,7 +69,7 @@ info:
     * A range that starts on 2019-12-29 and that ends on 2019-12-31 covers 3 whole days.
     * A range that starts on 2019-12-29 and that ends on 2019-12-29 covers 1 day.
 
-    ### Shared HTTP error status codes
+    # Shared HTTP error status codes
 
     Those status code are the same for every endpoint.
 
@@ -78,6 +78,17 @@ info:
     |         403 | Forbidden - Missing or incorrect API key                  |
     |         405 | Method Not Allowed - Incorrect method was used (GET/POST) |
     |         500 | Service Error - Please report that                        |
+
+    # Testing tools
+
+    **Mock server**
+
+    To check how the Supplier API server may work you can install and play with our [mock server](https://github.com/Tiqets/supplier-api/tree/master/supplier_server_mock).
+
+    **Testing tool**
+
+    Testing your implementation can be done using a [special tool](https://github.com/Tiqets/supplier-api/tree/master/supplier_api_tester) that we developed for this purpose.
+    It requires Python to be installed on your system.
 
   contact:
     email: connections@tiqets.com
