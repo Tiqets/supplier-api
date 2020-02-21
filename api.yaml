@@ -159,7 +159,30 @@ tags:
         Example limits:
         * Adding 8 adults tickets leaves room for 2 child tickets.
 paths:
-  '/v1/products/{product_id}/dates':
+  "/v1/products":
+    get:
+      tags:
+        - "Product catalog"
+      summary: A catalog of available products.
+      description: Returns a list of available products.
+      operationId: getProducts
+      parameters:
+        - name: uses_timeslots
+          in: path
+          description: Filter products that use or not use timeslots.
+          required: false
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: List of products
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Products"
+      security:
+        - authorization_header: []
+  "/v1/products/{product_id}/dates":
     get:
       tags:
         - Availability
@@ -185,7 +208,7 @@ paths:
           schema:
             type: string
             format: date
-            example: '2019-06-21'
+            example: "2019-06-21"
         - name: end
           in: query
           description: End of the date range
@@ -193,15 +216,15 @@ paths:
           schema:
             type: string
             format: date
-            example: '2019-06-21'
+            example: "2019-06-21"
       responses:
-        '200':
+        "200":
           description: List of dates
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Dates'
-        '400':
+                $ref: "#/components/schemas/Dates"
+        "400":
           description: |
             Bad request
 
@@ -217,11 +240,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BadRequest'
+                $ref: "#/components/schemas/BadRequest"
       security:
         - authorization_header: []
 
-  '/v1/products/{product_id}/variants':
+  "/v1/products/{product_id}/variants":
     get:
       tags:
         - Availability
@@ -244,7 +267,7 @@ paths:
           schema:
             type: string
             format: date
-            example: '2019-06-21'
+            example: "2019-06-21"
         - name: end
           in: query
           description: End of the date range
@@ -252,15 +275,15 @@ paths:
           schema:
             type: string
             format: date
-            example: '2019-06-21'
+            example: "2019-06-21"
       responses:
-        '200':
+        "200":
           description: List of variants per day
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Variants'
-        '400':
+                $ref: "#/components/schemas/Variants"
+        "400":
           description: |
             Bad request
 
@@ -274,12 +297,12 @@ paths:
             |                2001 | Incorrect date range  | The end date cannot be earlier then start date                                           |
             |                2009 | Incorrect date        | Eg. Cannot use the past date or Given date is too far ahead in the future (max 6 months) |
           content: {}
-        '501':
+        "501":
           description: Returned when this endpoint is Not Implemented
           content: {}
       security:
         - authorization_header: []
-  '/v1/products/{product_id}/timeslots':
+  "/v1/products/{product_id}/timeslots":
     get:
       tags:
         - Availability
@@ -301,7 +324,7 @@ paths:
           schema:
             type: string
             format: date
-            example: '2019-06-21'
+            example: "2019-06-21"
         - name: end
           in: query
           description: End of the date range
@@ -309,15 +332,15 @@ paths:
           schema:
             type: string
             format: date
-            example: '2019-06-21'
+            example: "2019-06-21"
       responses:
-        '200':
+        "200":
           description: List of timeslots per day
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Timeslots'
-        '400':
+                $ref: "#/components/schemas/Timeslots"
+        "400":
           description: |
             Bad request
 
@@ -331,12 +354,12 @@ paths:
             |                2001 | Incorrect date range  | The end date cannot be earlier then start date                                           |
             |                2009 | Incorrect date        | Eg. Cannot use the past date or Given date is too far ahead in the future (max 6 months) |
           content: {}
-        '501':
+        "501":
           description: Returned when this endpoint is Not Implemented
           content: {}
       security:
         - authorization_header: []
-  '/v1/products/{product_id}/reservation':
+  "/v1/products/{product_id}/reservation":
     post:
       tags:
         - Reservation
@@ -360,16 +383,16 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Reservation'
+              $ref: "#/components/schemas/Reservation"
         required: true
       responses:
-        '200':
+        "200":
           description: Reservation details
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ReservationResponse'
-        '400':
+                $ref: "#/components/schemas/ReservationResponse"
+        "400":
           description: |
             Bad request
 
@@ -402,16 +425,16 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Booking'
+              $ref: "#/components/schemas/Booking"
         required: true
       responses:
-        '200':
+        "200":
           description: Booking response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BookingResponse'
-        '400':
+                $ref: "#/components/schemas/BookingResponse"
+        "400":
           description: |
             Bad request
 
@@ -428,25 +451,53 @@ paths:
         - authorization_header: []
 components:
   schemas:
+    Products:
+      type: array
+      example:
+        - id: "687345694"
+          name: "Example Tour"
+          uses_timeslots: true
+        - id: "345678900-345678"
+          name: "Example Museum"
+          description: "All day entry to Example Museum."
+          uses_timeslots: false
+      items:
+        type: object
+        $ref: "#/components/schemas/Product"
+    Product:
+      type: object
+      required:
+        - id
+        - name
+        - uses_timeslots
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        uses_timeslots:
+          type: boolean
     Variants:
       type: array
       example:
-        - date: '2019-06-26'
+        - date: "2019-06-26"
           max_tickets: 200
           variants:
-            - id: '1'
+            - id: "1"
               name: Adult
               max_tickets: 100
-            - id: '2'
+            - id: "2"
               name: Child
               max_tickets: 70
-        - date: '2019-06-27'
+        - date: "2019-06-27"
           max_tickets: 200
           variants:
-            - id: '1'
+            - id: "1"
               name: Adult
               max_tickets: 110
-            - id: '2'
+            - id: "2"
               name: Child
               max_tickets: 77
       items:
@@ -455,36 +506,36 @@ components:
           date:
             type: string
             format: date
-            example: '2019-06-27'
+            example: "2019-06-27"
           max_tickets:
             type: integer
           variants:
             type: array
             items:
-              $ref: '#/components/schemas/Variant'
+              $ref: "#/components/schemas/Variant"
     Timeslots:
       type: array
       example:
-        - date: '2019-06-26'
-          start: '17:30'
-          end: '18:30'
+        - date: "2019-06-26"
+          start: "17:30"
+          end: "18:30"
           max_tickets: 200
           variants:
-            - id: '1'
+            - id: "1"
               name: Adult
               max_tickets: 100
-            - id: '2'
+            - id: "2"
               name: Child
               max_tickets: 70
-        - date: '2019-06-27'
-          start: '18:30'
-          end: '19:30'
+        - date: "2019-06-27"
+          start: "18:30"
+          end: "19:30"
           max_tickets: 200
           variants:
-            - id: '4458'
+            - id: "4458"
               name: Adult
               max_tickets: 110
-            - id: '4459'
+            - id: "4459"
               name: Child
               max_tickets: 77
       items:
@@ -493,7 +544,7 @@ components:
           date:
             type: string
             format: date
-            example: '2019-06-27'
+            example: "2019-06-27"
           start:
             type: string
           end:
@@ -503,7 +554,7 @@ components:
           variants:
             type: array
             items:
-              $ref: '#/components/schemas/Variant'
+              $ref: "#/components/schemas/Variant"
     Variant:
       type: object
       properties:
@@ -516,9 +567,9 @@ components:
     Dates:
       type: array
       example:
-        - date: '2019-06-26'
+        - date: "2019-06-26"
           max_tickets: 64
-        - date: '2019-06-27'
+        - date: "2019-06-27"
           max_tickets: 76
       items:
         type: object
@@ -526,108 +577,108 @@ components:
           date:
             type: string
             format: date
-            example: '2019-06-27'
+            example: "2019-06-27"
           max_tickets:
             type: integer
             example: 54
     OrderItem:
       type: object
       required:
-      - variant_id
-      - quantity
+        - variant_id
+        - quantity
       properties:
         variant_id:
           type: string
-          example: '1'
+          example: "1"
         quantity:
           type: integer
           example: 2
     Reservation:
       type: object
       example:
-        date: '2019-06-26'
-        timeslot: '09:30'
+        date: "2019-06-26"
+        timeslot: "09:30"
         tickets:
-          - variant_id: '1'
+          - variant_id: "1"
             quantity: 2
-          - variant_id: '2'
+          - variant_id: "2"
             quantity: 1
         customer:
-          first_name: 'Jon'
-          last_name: 'Snow'
-          email: 'jon@snow.com'
-          phone: '+48 555 555 555'
-          country: 'nl'
+          first_name: "Jon"
+          last_name: "Snow"
+          email: "jon@snow.com"
+          phone: "+48 555 555 555"
+          country: "nl"
       required:
-      - date
-      - tickets
-      - customer
+        - date
+        - tickets
+        - customer
       properties:
         date:
           type: string
-          example: '2019-06-26'
+          example: "2019-06-26"
         timeslot:
           type: string
           description: start time of the time slot
-          example: '09:30'
+          example: "09:30"
         tickets:
           type: array
           items:
-            $ref: '#/components/schemas/OrderItem'
+            $ref: "#/components/schemas/OrderItem"
         customer:
           type: object
           required:
-          - first_name
-          - last_name
-          - email
-          - phone
-          - country
+            - first_name
+            - last_name
+            - email
+            - phone
+            - country
           properties:
             first_name:
               type: string
-              example: 'Jon'
+              example: "Jon"
             last_name:
               type: string
-              example: 'Snow'
+              example: "Snow"
             email:
               type: string
-              example: 'jon@snow.com'
+              example: "jon@snow.com"
             phone:
               type: string
-              example: '+58 555 555 555'
+              example: "+58 555 555 555"
             country:
               type: string
-              example: 'nl'
+              example: "nl"
     ReservationResponse:
       type: object
       properties:
         reservation_id:
           type: string
-          example: '78940'
+          example: "78940"
         expires_at:
           type: string
           format: date-time
-          example: '2019-06-30T19:45:00+00:00'
+          example: "2019-06-30T19:45:00+00:00"
     Booking:
       type: object
       required:
-      - reservation_id
+        - reservation_id
       properties:
         reservation_id:
           type: string
-          example: '9887'
+          example: "9887"
     BookingResponse:
       type: object
       example:
-        booking_id: '657788'
-        barcode_format: 'QRCODE'
+        booking_id: "657788"
+        barcode_format: "QRCODE"
         barcode_position: ticket
-        barcode: ''
+        barcode: ""
         tickets:
-          '1':
+          "1":
             - barcode1
             - barcode2
-          '2':
+          "2":
             - barcode3
       properties:
         booking_id:
@@ -660,7 +711,7 @@ components:
             variant_id:
               type: array
               items:
-                $ref: '#/components/schemas/Barcode'
+                $ref: "#/components/schemas/Barcode"
     Barcode:
       type: string
     BadRequest:
