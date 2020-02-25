@@ -44,6 +44,7 @@ def available_dates(product_id: str):
 @date_range_validator
 def availability_no_timeslots(product_id: str):
     utils.check_product_id(product_id)
+    utils.check_non_timeslot_product(product_id)
     start = utils.get_date(request.args, 'start')
     end = utils.get_date(request.args, 'end')
     if start > end:
@@ -65,6 +66,7 @@ def availability_no_timeslots(product_id: str):
 @date_range_validator
 def availability_timeslots(product_id: str):
     utils.check_product_id(product_id)
+    utils.check_timeslot_product(product_id)
     start = utils.get_date(request.args, 'start')
     end = utils.get_date(request.args, 'end')
     if start > end:

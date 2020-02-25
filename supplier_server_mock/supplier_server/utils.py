@@ -19,8 +19,22 @@ def get_date(data, name, required=True):
 
 
 def check_product_id(product_id: str):
-    if product_id not in PRODUCTS:
+    if product_id not in [p['id'] for p in PRODUCTS]:
         raise BadRequest(1001, 'Missing product', f"Product with ID {product_id} doesn't exist")
+
+
+def check_timeslot_product(product_id: str):
+    if product_id not in [p['id'] for p in PRODUCTS if p['use_timeslot']]:
+        raise BadRequest(
+            1002, 'Timeslot product expected', f'Requested timeslot availability for non timeslot product ID {product_id}'
+        )
+
+
+def check_non_timeslot_product(product_id: str):
+    if product_id not in [p['id'] for p in PRODUCTS if not p['use_timeslot']]:
+        raise BadRequest(
+            1003, 'Non-timeslot product expected', f'Requested non timeslot availability for timeslot product ID {product_id}'
+        )
 
 
 def str_to_int(some_str, number_of_digits) -> int:

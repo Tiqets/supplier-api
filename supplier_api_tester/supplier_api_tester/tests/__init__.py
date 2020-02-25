@@ -30,6 +30,7 @@ AVAILABILITY_VARIANTS_TEST = (
     availability_variants.past_start_date,
     availability_variants.huge_date_range,
     availability_variants.not_allowed_method,
+    availability_timeslots.invalid_product,
 )
 
 AVAILABILITY_TIMESLOTS_TEST = (
@@ -44,6 +45,7 @@ AVAILABILITY_TIMESLOTS_TEST = (
     availability_timeslots.past_start_date,
     availability_timeslots.huge_date_range,
     availability_timeslots.not_allowed_method,
+    availability_variants.invalid_product,
 )
 
 RESERVATION_TEST = (

@@ -289,13 +289,14 @@ paths:
 
             ## Internal error codes
 
-            | Internal error code |         Error         |                                         Message                                          |
-            |---------------------|-----------------------|------------------------------------------------------------------------------------------|
-            |                1000 | Missing argument      | Required argument ATTRIBUTE_NAME was not found                                           |
-            |                1001 | Missing product       | Product with ID ID_NUMBER doesn't exist                                                  |
-            |                2000 | Incorrect date format | Incorrect date format xxx, please use the YYYY-dd-mm format                              |
-            |                2001 | Incorrect date range  | The end date cannot be earlier then start date                                           |
-            |                2009 | Incorrect date        | Eg. Cannot use the past date or Given date is too far ahead in the future (max 6 months) |
+            | Internal error code |             Error             |                                         Message                                          |
+            |---------------------|-------------------------------|------------------------------------------------------------------------------------------|
+            |                1000 | Missing argument              | Required argument ATTRIBUTE_NAME was not found                                           |
+            |                1001 | Missing product               | Product with ID ID_NUMBER doesn't exist                                                  |
+            |                1003 | Non-timeslot product expected | Requested non timeslot availability for timeslot product ID ID_NUMBER                    |
+            |                2000 | Incorrect date format         | Incorrect date format xxx, please use the YYYY-dd-mm format                              |
+            |                2001 | Incorrect date range          | The end date cannot be earlier then start date                                           |
+            |                2009 | Incorrect date                | Eg. Cannot use the past date or Given date is too far ahead in the future (max 6 months) |
           content: {}
         "501":
           description: Returned when this endpoint is Not Implemented
@@ -346,13 +347,14 @@ paths:
 
             ## Internal error codes
 
-            | Internal error code |         Error         |                                         Message                                          |
-            |---------------------|-----------------------|------------------------------------------------------------------------------------------|
-            |                1000 | Missing argument      | Required argument ATTRIBUTE_NAME was not found                                           |
-            |                1001 | Missing product       | Product with ID ID_NUMBER doesn't exist                                                  |
-            |                2000 | Incorrect date format | Incorrect date format xxx, please use the YYYY-dd-mm format                              |
-            |                2001 | Incorrect date range  | The end date cannot be earlier then start date                                           |
-            |                2009 | Incorrect date        | Eg. Cannot use the past date or Given date is too far ahead in the future (max 6 months) |
+            | Internal error code |           Error           |                                         Message                                          |
+            |---------------------|---------------------------|------------------------------------------------------------------------------------------|
+            |                1000 | Missing argument          | Required argument ATTRIBUTE_NAME was not found                                           |
+            |                1001 | Missing product           | Product with ID ID_NUMBER doesn't exist                                                  |
+            |                1002 | Timeslot product expected | Requested timeslot availability for non timeslot product ID ID_NUMBER                    |
+            |                2000 | Incorrect date format     | Incorrect date format xxx, please use the YYYY-dd-mm format                              |
+            |                2001 | Incorrect date range      | The end date cannot be earlier then start date                                           |
+            |                2009 | Incorrect date            | Eg. Cannot use the past date or Given date is too far ahead in the future (max 6 months) |
           content: {}
         "501":
           description: Returned when this endpoint is Not Implemented
