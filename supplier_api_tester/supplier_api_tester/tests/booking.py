@@ -128,7 +128,7 @@ def test_booking(api_url, api_key, product_id, timeslots: bool, version=1):
         for variant_id, tickets_quantity in variant_quantity_map.items():
             tickets_for_variant = booking.tickets.get(variant_id)
             if tickets_for_variant is None:
-                raise FailedTest('No tickets for variant {variant_id}')
+                raise FailedTest(f'No tickets for variant {variant_id}')
             if len(tickets_for_variant) != tickets_quantity:
                 raise FailedTest(f'Expected {tickets_quantity} codes for variant {variant_id} but got only {len(tickets_for_variant)}')
 

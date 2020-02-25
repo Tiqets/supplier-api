@@ -167,10 +167,9 @@ paths:
       description: Returns a list of available products.
       operationId: getProducts
       parameters:
-        - name: uses_timeslots
-          in: path
+        - name: use_timeslots
+          in: query
           description: Filter products that use or not use timeslots.
-          required: false
           schema:
             type: boolean
       responses:
@@ -180,6 +179,9 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Products"
+        "501":
+          description: Returned when this endpoint is Not Implemented
+          content: {}
       security:
         - authorization_header: []
   "/v1/products/{product_id}/dates":

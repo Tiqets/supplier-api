@@ -17,15 +17,12 @@ def print_title(title):
 @click.option('-k', '--api-key', required=True, prompt='API Key', type=str)
 @click.option('-p', '--product-id', required=True, prompt='Product ID', type=str)
 @click.option('-t', '--timeslots', is_flag=True, default=False, help='Use timeslots')
-@click.option('-a', '--availability', is_flag=True, default=False, help='Run availability tests')
-@click.option('-r', '--reservation', is_flag=True, default=False, help='Run reservation tests')
-@click.option('-b', '--booking', is_flag=True, default=False, help='Run booking tests')
-def supplier_tester(url, api_key, product_id, timeslots, availability, reservation, booking):
+@click.option('-a', '--availability', is_flag=True, default=True, help='Run availability tests')
+@click.option('-r', '--reservation', is_flag=True, default=True, help='Run reservation tests')
+@click.option('-b', '--booking', is_flag=True, default=True, help='Run booking tests')
+@click.option('-c', '--catalog', is_flag=True, default=True, help='Run product catalog tests')
+def supplier_tester(url, api_key, product_id, timeslots, availability, reservation, booking, catalog):
     '''Test you Supplier API implementation'''
-    if not any((availability, reservation, booking)):
-        availability = True
-        reservation = True
-        booking = True
 
     if availability:
         print_title('AVAILABILITY TESTS')
@@ -33,9 +30,7 @@ def supplier_tester(url, api_key, product_id, timeslots, availability, reservati
             host=url,
             api_key=api_key,
             product_id=product_id,
-            availability_test=True,
-            reservation_test=False,
-            booking_test=False,
+            test_target='availability',
             timeslots=timeslots,
         )
         results = runner.run()
@@ -47,9 +42,7 @@ def supplier_tester(url, api_key, product_id, timeslots, availability, reservati
             host=url,
             api_key=api_key,
             product_id=product_id,
-            availability_test=False,
-            reservation_test=True,
-            booking_test=False,
+            test_target='reservation',
             timeslots=timeslots,
         )
         results = runner.run()
@@ -61,9 +54,19 @@ def supplier_tester(url, api_key, product_id, timeslots, availability, reservati
             host=url,
             api_key=api_key,
             product_id=product_id,
-            availability_test=False,
-            reservation_test=False,
-            booking_test=True,
+            test_target='booking',
+            timeslots=timeslots,
+        )
+        results = runner.run()
+        terminal_printer(results)
+
+    if catalog:
+        print_title('PRODUCT CATALOG')
+        runner = SupplierApiTester(
+            host=url,
+            api_key=api_key,
+            product_id=product_id,
+            test_target='catalog',
             timeslots=timeslots,
         )
         results = runner.run()

@@ -1,8 +1,9 @@
 from . import availability_dates
 from . import availability_variants
 from . import availability_timeslots
-from . import reservation
 from . import booking
+from . import product_catalog
+from . import reservation
 
 AVAILABILITY_TEST = (
     availability_dates.test_response_format,
@@ -66,4 +67,10 @@ BOOKING_TEST = (
     booking.test_not_allowed_method,
     booking.test_booking_incorrect_reservation_id,
     booking.test_booking,
+)
+
+PRODUCT_CATALOG = (
+    product_catalog.test_get_products,
+    product_catalog.test_get_timeslots_products,
+    product_catalog.test_get_no_timeslots_products,
 )

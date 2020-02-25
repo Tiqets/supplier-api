@@ -30,6 +30,12 @@ class TestResult:
     def is_error(self):
         return self.status == 2
 
+@dataclass
+class Product:
+    id: str
+    name: str
+    use_timeslot: bool
+    description: Optional[str]
 
 @dataclass
 class DailyAvailability:
