@@ -1,11 +1,10 @@
 from datetime import date, datetime
-
 from typing import List
 
 import dacite
 
 from ..exceptions import FailedTest
-from ..models import ApiError, DailyAvailability, DailyVariants, Timeslot, Reservation, Booking
+from ..models import ApiError, Booking, DailyAvailability, DailyVariants, Product, Reservation, Timeslot
 
 
 def get_daily_availability(response) -> List[DailyAvailability]:
@@ -81,6 +80,27 @@ def get_timeslots(response) -> List[Timeslot]:
     ):
         raise FailedTest('Incorrect JSON format in response from the /timeslots endpoint')
     return days
+
+
+def get_products(response) -> List[Product]:
+    '''Getting and testing response from the /products endpoint'''
+    if type(response) is not list:
+        raise FailedTest('The response should be a JSON Array')
+    try:
+        products = [
+            dacite.from_dict(
+                data_class=Product,
+                data=product,
+            )
+            for product in response
+        ]
+    except (
+        dacite.exceptions.WrongTypeError,
+        dacite.exceptions.MissingValueError,
+        dacite.exceptions.UnexpectedDataError,
+    ):
+        raise FailedTest('Incorrect JSON format in response from the /products endpoint')
+    return products
 
 
 def get_reservation(response) -> Reservation:

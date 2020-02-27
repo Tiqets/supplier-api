@@ -32,7 +32,7 @@ def terminal_printer(results):
         table_data.append(data_row)
     table = AsciiTable(table_data)
     if any_message:
-        message_size = table.column_max_width(2)
+        message_size = table.column_max_width(3)
         for column in table.table_data:
-            column[2] = '\n'.join(wrap(column[2], message_size))
+            column[3] = '\n'.join(wrap(column[3], message_size))
     print(table.table)

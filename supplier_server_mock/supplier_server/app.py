@@ -14,6 +14,15 @@ app.register_error_handler(werkzeug.exceptions.InternalServerError, error_handle
 app.register_error_handler(exceptions.BadRequest, error_handlers.bad_request)
 
 
+@app.route('/v1/products')
+@authorization_header
+def products():
+    use_timeslot = request.args.get('use_timeslot')
+    if use_timeslot is not None:
+        return jsonify([p for p in constants.PRODUCTS if p['use_timeslot'] == use_timeslot])
+    return jsonify([p for p in constants.PRODUCTS])
+
+
 @app.route('/v1/products/<product_id>/dates')
 @authorization_header
 @date_range_validator
@@ -44,6 +53,7 @@ def available_dates(product_id: str):
 @date_range_validator
 def availability_no_timeslots(product_id: str):
     utils.check_product_id(product_id)
+    utils.check_non_timeslot_product(product_id)
     start = utils.get_date(request.args, 'start')
     end = utils.get_date(request.args, 'end')
     if start > end:
@@ -65,6 +75,7 @@ def availability_no_timeslots(product_id: str):
 @date_range_validator
 def availability_timeslots(product_id: str):
     utils.check_product_id(product_id)
+    utils.check_timeslot_product(product_id)
     start = utils.get_date(request.args, 'start')
     end = utils.get_date(request.args, 'end')
     if start > end:

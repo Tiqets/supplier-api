@@ -267,3 +267,37 @@ def not_allowed_method(api_url, api_key, product_id, endpoint, version=1):
                 'Expected status code: 405.'
             )
     return TestResult()
+
+
+def test_error_for_non_timeslot_product(api_url, api_key, product_id, endpoint, version=1):
+    '''Testing timeslot availability for non timeslot product'''
+
+    tomorrow = get_tomorrow()
+    response = client(f'{api_url}/v{version}/products/{product_id}/{endpoint}', api_key, {
+        'start': tomorrow.isoformat(),
+        'end': tomorrow.isoformat(),
+    })
+    api_error = get_api_error(response)
+    expected_error = ApiError(
+        error_code=1002,
+        error='Timeslot product expected',
+        message=f'Requested timeslot availability for non timeslot product ID {product_id}',
+    )
+    return check_api_error(api_error, expected_error)
+
+
+def test_error_for_timeslot_product(api_url, api_key, product_id, endpoint, version=1):
+    '''Testing variant availability for timeslot product'''
+
+    tomorrow = get_tomorrow()
+    response = client(f'{api_url}/v{version}/products/{product_id}/{endpoint}', api_key, {
+        'start': tomorrow.isoformat(),
+        'end': tomorrow.isoformat(),
+    })
+    api_error = get_api_error(response)
+    expected_error = ApiError(
+        error_code=1003,
+        error='Non-timeslot product expected',
+        message=f'Requested non timeslot availability for timeslot product ID {product_id}',
+    )
+    return check_api_error(api_error, expected_error)

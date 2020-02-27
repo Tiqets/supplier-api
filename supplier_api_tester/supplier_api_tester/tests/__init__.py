@@ -1,8 +1,9 @@
 from . import availability_dates
 from . import availability_variants
 from . import availability_timeslots
-from . import reservation
 from . import booking
+from . import product_catalog
+from . import reservation
 
 AVAILABILITY_TEST = (
     availability_dates.test_response_format,
@@ -30,6 +31,7 @@ AVAILABILITY_VARIANTS_TEST = (
     availability_variants.past_start_date,
     availability_variants.huge_date_range,
     availability_variants.not_allowed_method,
+    availability_timeslots.invalid_product,
 )
 
 AVAILABILITY_TIMESLOTS_TEST = (
@@ -44,6 +46,7 @@ AVAILABILITY_TIMESLOTS_TEST = (
     availability_timeslots.past_start_date,
     availability_timeslots.huge_date_range,
     availability_timeslots.not_allowed_method,
+    availability_variants.invalid_product,
 )
 
 RESERVATION_TEST = (
@@ -64,4 +67,10 @@ BOOKING_TEST = (
     booking.test_not_allowed_method,
     booking.test_booking_incorrect_reservation_id,
     booking.test_booking,
+)
+
+PRODUCT_CATALOG = (
+    product_catalog.test_get_products,
+    product_catalog.test_get_timeslots_products,
+    product_catalog.test_get_no_timeslots_products,
 )

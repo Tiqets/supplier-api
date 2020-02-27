@@ -75,3 +75,9 @@ def huge_date_range(api_url, api_key, product_id, version=1):
 def not_allowed_method(api_url, api_key, product_id, version=1):
     '''[Variants] Testing methods that are not allowed'''
     return availability.not_allowed_method(api_url, api_key, product_id, 'variants', version=1)
+
+
+@test_wrapper
+def invalid_product(api_url, api_key, product_id, version=1):
+    '''[Variants] Testing errors on timeslot product'''
+    return availability.test_error_for_timeslot_product(api_url, api_key, product_id, 'variants', version=1)
