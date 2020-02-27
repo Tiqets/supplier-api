@@ -460,11 +460,11 @@ components:
       example:
         - id: "687345694"
           name: "Example Tour"
-          uses_timeslots: true
+          use_timeslots: true
         - id: "345678900-345678"
           name: "Example Museum"
           description: "All day entry to Example Museum."
-          uses_timeslots: false
+          use_timeslots: false
       items:
         type: object
         $ref: "#/components/schemas/Product"
@@ -473,7 +473,7 @@ components:
       required:
         - id
         - name
-        - uses_timeslots
+        - use_timeslots
       properties:
         id:
           type: string
@@ -481,7 +481,7 @@ components:
           type: string
         description:
           type: string
-        uses_timeslots:
+        use_timeslots:
           type: boolean
     Variants:
       type: array
