@@ -22,10 +22,11 @@ Options:
   -u, --url TEXT         [required]
   -k, --api-key TEXT     [required]
   -p, --product-id TEXT  [required]
-  -t, --timeslots
-  -a, --availability
-  -r, --reservation
-  -b, --booking
+  -t, --timeslots        Use timeslots
+  -a, --availability     Run availability tests
+  -r, --reservation      Run reservation tests
+  -b, --booking          Run booking tests
+  -c, --catalog          Run product catalog tests
   --help                 Show this message and exit.
 ```
 
