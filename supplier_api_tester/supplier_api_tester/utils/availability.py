@@ -216,7 +216,7 @@ def incorrect_date_format(api_url, api_key, product_id, endpoint, version=1):
     expected_error = ApiError(
         error_code=2000,
         error='Incorrect date format',
-        message=f'Incorrect date format {bad_date_format}, please use the YYYY-dd-mm format',
+        message=f'Incorrect date format {bad_date_format}, please use the YYYY-MM-DD format',
     )
     check_api_error(api_error, expected_error)
 
@@ -229,7 +229,7 @@ def incorrect_date_format(api_url, api_key, product_id, endpoint, version=1):
     expected_error = ApiError(
         error_code=2000,
         error='Incorrect date format',
-        message=f'Incorrect date format {bad_date_format}, please use the YYYY-dd-mm format',
+        message=f'Incorrect date format {bad_date_format}, please use the YYYY-MM-DD format',
     )
     check_api_error(api_error, expected_error)
 
