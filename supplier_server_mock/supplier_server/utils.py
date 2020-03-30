@@ -24,14 +24,14 @@ def check_product_id(product_id: str):
 
 
 def check_timeslot_product(product_id: str):
-    if product_id not in [p['id'] for p in PRODUCTS if p['use_timeslot']]:
+    if product_id not in [p['id'] for p in PRODUCTS if p['use_timeslots']]:
         raise BadRequest(
             1002, 'Timeslot product expected', f'Requested timeslot availability for non timeslot product ID {product_id}'
         )
 
 
 def check_non_timeslot_product(product_id: str):
-    if product_id not in [p['id'] for p in PRODUCTS if not p['use_timeslot']]:
+    if product_id not in [p['id'] for p in PRODUCTS if not p['use_timeslots']]:
         raise BadRequest(
             1003, 'Non-timeslot product expected', f'Requested non timeslot availability for timeslot product ID {product_id}'
         )

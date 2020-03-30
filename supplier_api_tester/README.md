@@ -21,7 +21,7 @@ Usage: supplier_tester [OPTIONS]
 Options:
   -u, --url TEXT         [required]
   -k, --api-key TEXT     [required]
-  -p, --product-id TEXT  [required]
+  -p, --product-id TEXT  Product ID to call tests on. Required with -a and -t flags
   -t, --timeslots        Use timeslots
   -a, --availability     Run availability tests
   -r, --reservation      Run reservation tests
@@ -33,11 +33,15 @@ Options:
 Running all tests:
 
 ```sh
-    supplier_tester -u 'http://localhost:8000' -k 'secret' -p 'A400-FX'
+    supplier_tester -u 'http://localhost:8000' -k 'secret' -p 'A500-FX'  # For products without timeslots
+    supplier_tester -u 'http://localhost:8000' -k 'secret' -p 'A400-FX' -t  # For products with timeslots
 ```
+
+**Remember to choose valid product id. It has to refer timeslotted product when you use `-t` flag.**
 
 Running only availability tests:
 
 ```sh
-    supplier_tester -u 'http://localhost:8000' -k 'secret' -p 'A400-FX' -a
+    supplier_tester -u 'http://localhost:8000' -k 'secret' -p 'A500-FX' -a  # For products without timeslots
+    supplier_tester -u 'http://localhost:8000' -k 'secret' -p 'A400-FX' -a -t  # For products with timeslots
 ```
