@@ -2,7 +2,8 @@
 
 ## 1.3.1
 
-- Updating `Product.use_timeslot` to `Product.use_timeslots` in supplier tester and mock server.
+- Update `Product.use_timeslot` to `Product.use_timeslots` in supplier tester and mock server.
+- Make `product-id` not required on product catalog tests.
 
 ## 1.3.0
 

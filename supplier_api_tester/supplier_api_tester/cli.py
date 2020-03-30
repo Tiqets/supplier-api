@@ -15,7 +15,7 @@ def print_title(title):
 @click.command()
 @click.option('-u', '--url', required=True, prompt='Server URL', type=str)
 @click.option('-k', '--api-key', required=True, prompt='API Key', type=str)
-@click.option('-p', '--product-id', required=True, prompt='Product ID', type=str)
+@click.option('-p', '--product-id', type=str, help='Product ID to call tests on. Required with -a and -t flags')
 @click.option('-t', '--timeslots', is_flag=True, default=False, help='Use timeslots')
 @click.option('-a', '--availability', is_flag=True, default=False, help='Run availability tests')
 @click.option('-r', '--reservation', is_flag=True, default=False, help='Run reservation tests')
@@ -29,6 +29,9 @@ def supplier_tester(url, api_key, product_id, timeslots, availability, reservati
         reservation = True
         booking = True
         catalog = True
+
+    if any((availability, timeslots, reservation, booking)) and not product_id:
+        product_id = click.prompt('Product ID')
 
     if availability:
         print_title('AVAILABILITY TESTS')

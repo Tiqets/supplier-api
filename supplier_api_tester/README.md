@@ -21,7 +21,7 @@ Usage: supplier_tester [OPTIONS]
 Options:
   -u, --url TEXT         [required]
   -k, --api-key TEXT     [required]
-  -p, --product-id TEXT  [required]
+  -p, --product-id TEXT  Product ID to call tests on. Required with -a and -t flags
   -t, --timeslots        Use timeslots
   -a, --availability     Run availability tests
   -r, --reservation      Run reservation tests
