@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.1
+
+- Updating `Product.use_timeslot` to `Product.use_timeslots` in supplier tester and mock server.
+
 ## 1.3.0
 
 - Adding product catalog endpoint
