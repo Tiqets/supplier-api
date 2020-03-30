@@ -33,11 +33,15 @@ Options:
 Running all tests:
 
 ```sh
-    supplier_tester -u 'http://localhost:8000' -k 'secret' -p 'A400-FX'
+    supplier_tester -u 'http://localhost:8000' -k 'secret' -p 'A500-FX'  # For products without timeslots
+    supplier_tester -u 'http://localhost:8000' -k 'secret' -p 'A400-FX' -t  # For products with timeslots
 ```
+
+**Remember to choose valid product id. It has to refer timeslotted product when you use `-t` flag.**
 
 Running only availability tests:
 
 ```sh
-    supplier_tester -u 'http://localhost:8000' -k 'secret' -p 'A400-FX' -a
+    supplier_tester -u 'http://localhost:8000' -k 'secret' -p 'A500-FX' -a  # For products without timeslots
+    supplier_tester -u 'http://localhost:8000' -k 'secret' -p 'A400-FX' -a -t  # For products with timeslots
 ```

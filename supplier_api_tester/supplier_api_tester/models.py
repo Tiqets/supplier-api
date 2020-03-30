@@ -34,7 +34,7 @@ class TestResult:
 class Product:
     id: str
     name: str
-    use_timeslot: bool
+    use_timeslots: bool
     description: Optional[str]
 
 @dataclass
