@@ -15,7 +15,7 @@ def get_date(data, name, required=True):
     try:
         return date.fromisoformat(data_str)
     except ValueError:
-        raise BadRequest(2000, 'Incorrect date format', f'Incorrect date format {data_str}, please use the YYYY-dd-mm format')
+        raise BadRequest(2000, 'Incorrect date format', f'Incorrect date format {data_str}, please use the YYYY-MM-DD format')
 
 
 def check_product_id(product_id: str):

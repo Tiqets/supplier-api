@@ -236,7 +236,7 @@ paths:
             |---------------------|-----------------------|------------------------------------------------------------------------------------------|
             |                1000 | Missing argument      | Required argument ATTRIBUTE_NAME was not found                                           |
             |                1001 | Missing product       | Product with ID ID_NUMBER doesn't exist                                                  |
-            |                2000 | Incorrect date format | Incorrect date format xxx, please use the YYYY-dd-mm format                              |
+            |                2000 | Incorrect date format | Incorrect date format xxx, please use the YYYY-MM-DD format                              |
             |                2001 | Incorrect date range  | The end date cannot be earlier then start date                                           |
             |                2009 | Incorrect date        | Eg. Cannot use the past date or Given date is too far ahead in the future (max 6 months) |
           content:
@@ -296,7 +296,7 @@ paths:
             |                1000 | Missing argument              | Required argument ATTRIBUTE_NAME was not found                                           |
             |                1001 | Missing product               | Product with ID ID_NUMBER doesn't exist                                                  |
             |                1003 | Non-timeslot product expected | Requested non timeslot availability for timeslot product ID ID_NUMBER                    |
-            |                2000 | Incorrect date format         | Incorrect date format xxx, please use the YYYY-dd-mm format                              |
+            |                2000 | Incorrect date format         | Incorrect date format xxx, please use the YYYY-MM-DD format                              |
             |                2001 | Incorrect date range          | The end date cannot be earlier then start date                                           |
             |                2009 | Incorrect date                | Eg. Cannot use the past date or Given date is too far ahead in the future (max 6 months) |
           content: {}
@@ -354,7 +354,7 @@ paths:
             |                1000 | Missing argument          | Required argument ATTRIBUTE_NAME was not found                                           |
             |                1001 | Missing product           | Product with ID ID_NUMBER doesn't exist                                                  |
             |                1002 | Timeslot product expected | Requested timeslot availability for non timeslot product ID ID_NUMBER                    |
-            |                2000 | Incorrect date format     | Incorrect date format xxx, please use the YYYY-dd-mm format                              |
+            |                2000 | Incorrect date format     | Incorrect date format xxx, please use the YYYY-MM-DD format                              |
             |                2001 | Incorrect date range      | The end date cannot be earlier then start date                                           |
             |                2009 | Incorrect date            | Eg. Cannot use the past date or Given date is too far ahead in the future (max 6 months) |
           content: {}
@@ -406,8 +406,8 @@ paths:
             |---------------------|--------------------------------|-----------------------------------------------------------------------------------------------|
             |                1000 | Missing argument               | Required argument ATTRIBUTE_NAME was not found                                                |
             |                1001 | Missing product                | Product with ID ID_NUMBER doesn't exist                                                       |
-            |                2000 | Incorrect date format          | Incorrect date format xxx, please use the YYYY-dd-mm format                                   |
-            |                2002 | Wrong time slot ID             | Given timeslot_id doesn't belong to given date (YYYY-dd-mm)                                   |
+            |                2000 | Incorrect date format          | Incorrect date format xxx, please use the YYYY-MM-DD format                                   |
+            |                2002 | Wrong time slot ID             | Given timeslot_id doesn't belong to given date (YYYY-MM-DD)                                   |
             |                2003 | Wrong variant ID               | Given variant_id doesn't belong to given timeslot_id (TIMESLOT_ID)                            |
             |                2004 | Incorrect type                 | Expected ATTRIBUTE_NAME to be a string, got TYPE instead                                      |
             |                2005 | Invalid Value                  | Eg. The phone number must not contain dots.                                                   |

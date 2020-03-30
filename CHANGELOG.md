@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.2
+
+- Fix date format display in API errors.
+
 ## 1.3.1
 
 - Update `Product.use_timeslot` to `Product.use_timeslots` in supplier tester and mock server.
