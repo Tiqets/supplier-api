@@ -18,10 +18,10 @@ def test_get_products(api_url, api_key, version=1):
 
 @test_wrapper
 def test_get_timeslots_products(api_url, api_key, version=1):
-    '''Get product catalog with use_timeslots=true query filter'''
+    '''Get product catalog with use_timeslots=True query filter'''
 
     url = f'{api_url}/v{version}/products'
-    response = client(url, api_key, method=requests.get, params={'use_timeslots': True})
+    response = client(url, api_key, method=requests.get, params={'use_timeslots':'True'})
     products = get_products(response)
     _validate_timeslots(products, use_timeslots=True)
     return TestResult()
@@ -29,10 +29,10 @@ def test_get_timeslots_products(api_url, api_key, version=1):
 
 @test_wrapper
 def test_get_no_timeslots_products(api_url, api_key, version=1):
-    '''Get product catalog with use_timeslots=false query filter'''
+    '''Get product catalog with use_timeslots=False query filter'''
 
     url = f'{api_url}/v{version}/products'
-    response = client(url, api_key, method=requests.get, params={'use_timeslots': True})
+    response = client(url, api_key, method=requests.get, params={'use_timeslots':'False'})
     products = get_products(response)
     _validate_timeslots(products, use_timeslots=False)
     return TestResult()

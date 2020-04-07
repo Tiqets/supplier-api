@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.3
+
+- Changing `use_timeslots` parameter from boolean to string.
+
 ## 1.3.2
 
 - Fix date format display in API errors.

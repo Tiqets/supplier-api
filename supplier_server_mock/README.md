@@ -24,3 +24,9 @@ supplier_server
 make image
 make run
 ```
+
+## Example request
+
+```
+curl -H "API-Key: secret" http://localhost:8000/v1/products
+```
