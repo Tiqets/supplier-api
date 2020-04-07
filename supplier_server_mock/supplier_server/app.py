@@ -17,7 +17,7 @@ app.register_error_handler(exceptions.BadRequest, error_handlers.bad_request)
 @app.route('/v1/products')
 @authorization_header
 def products():
-    use_timeslots = request.args.get('use_timeslots')
+    use_timeslots = request.args.get('use_timeslots') == 'True'
     if use_timeslots is not None:
         return jsonify([p for p in constants.PRODUCTS if p['use_timeslots'] == use_timeslots])
     return jsonify([p for p in constants.PRODUCTS])
