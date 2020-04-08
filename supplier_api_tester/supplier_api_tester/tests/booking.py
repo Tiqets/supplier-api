@@ -80,9 +80,10 @@ def test_not_allowed_method(api_url, api_key, product_id, timeslots: bool, versi
     url = f'{api_url}/v{version}/booking'
     for method in (requests.get, requests.put, requests.patch, requests.delete):
         response = client(url, api_key, method=method, json_payload={})
-        if response.status_code != 405:
+        status_code = getattr(response, 'status_code', 200)
+        if status_code != 405:
             raise FailedTest(
-                f'Incorrect status code ({response.status_code}) when calling the API via method {method.__name__.upper()}. '
+                f'Incorrect status code ({status_code}) when calling the API via method {method.__name__.upper()}. '
                 'Expected status code: 405.'
             )
     return TestResult()
