@@ -26,7 +26,7 @@ def test_missing_api_key(api_url, api_key, product_id, timeslots: bool, version=
         )
 
     if response.text != 'Forbidden - Missing or incorrect API key':
-        raise TestResult(
+        return TestResult(
             status=1,
             message=(
                 f'Incorrect text message ({response.text}). '
@@ -52,7 +52,7 @@ def test_incorrect_api_key(api_url, api_key, product_id, timeslots: bool, versio
         )
 
     if response.text != 'Forbidden - Missing or incorrect API key':
-        raise TestResult(
+        return TestResult(
             status=1,
             message=(
                 f'Incorrect text message ({response.text}). '
@@ -193,7 +193,7 @@ def test_not_allowed_method(api_url, api_key, product_id, timeslots: bool, versi
         response = client(url, api_key, method=method, json_payload=json_payload)
         if response.status_code != 405:
             raise FailedTest(
-                f'Incorrect status code ({response.status_code}) when calling the API via method {method}. '
+                f'Incorrect status code ({response.status_code}) when calling the API via method {method.__name__.upper()}. '
                 'Expected status code: 405.'
             )
     return TestResult()

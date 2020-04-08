@@ -16,11 +16,11 @@ def date_range_validator(f):
         if start > end:
             raise exceptions.BadRequest(2001, 'Incorrect date range', 'The end date cannot be earlier then start date')
         if start < datetime.utcnow().date():
-            raise exceptions.BadRequest(2007, 'Incorrect start date', 'Start date cannot be from the past')
+            raise exceptions.BadRequest(2009, 'Incorrect date', 'Cannot use the past date')
         if arrow.get(start).shift(months=constants.MAX_DATE_RANGE).date() < end:
             raise exceptions.BadRequest(
-                2008,
-                'Date range is too wide',
+                2009,
+                'Incorrect date',
                 f'Maximum date range is {constants.MAX_DATE_RANGE} months'
             )
         return f(*args, **kwargs)

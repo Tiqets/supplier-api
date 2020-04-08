@@ -53,9 +53,9 @@ def past_start_date(api_url, api_key, product_id, endpoint, version=1):
     })
     api_error = get_api_error(response)
     expected_error = ApiError(
-        error_code=2007,
-        error='Incorrect start date',
-        message='Start date cannot be from the past',
+        error_code=2009,
+        error='Incorrect date',
+        message='Cannot use the past date',
     )
     return check_api_error(api_error, expected_error)
 
@@ -72,8 +72,8 @@ def huge_date_range(api_url, api_key, product_id, endpoint, version=1):
     })
     api_error = get_api_error(response)
     expected_error = ApiError(
-        error_code=2008,
-        error='Date range is too wide',
+        error_code=2009,
+        error='Incorrect date',
         message='Maximum date range is',
     )
     return check_api_error(api_error, expected_error)
@@ -86,7 +86,6 @@ def test_missing_api_key(api_url, api_key, product_id, endpoint, version=1):
         'start': tomorrow.isoformat(),
         'end': tomorrow.isoformat(),
     }, headers={})
-
     if response.status_code != 403:
         raise FailedTest(
             f'Incorrect status code ({response.status_code}) when calling the API wihout the API-Key. '
@@ -94,7 +93,7 @@ def test_missing_api_key(api_url, api_key, product_id, endpoint, version=1):
         )
 
     if response.text != 'Forbidden - Missing or incorrect API key':
-        raise TestResult(
+        return TestResult(
             status=1,
             message=(
                 f'Incorrect text message ({response.text}). '
@@ -120,7 +119,7 @@ def test_incorrect_api_key(api_url, api_key, product_id, endpoint, version=1):
         )
 
     if response.text != 'Forbidden - Missing or incorrect API key':
-        raise TestResult(
+        return TestResult(
             status=1,
             message=(
                 f'Incorrect text message ({response.text}). '
@@ -261,9 +260,10 @@ def not_allowed_method(api_url, api_key, product_id, endpoint, version=1):
             'start': tomorrow.isoformat(),
             'end': tomorrow.isoformat(),
         }, method=method)
-        if response.status_code != 405:
+        status_code = getattr(response, 'status_code', 200)
+        if status_code != 405:
             raise FailedTest(
-                f'Incorrect status code ({response.status_code}) when calling the API via method {method}. '
+                f'Incorrect status code ({status_code}) when calling the API via method {method.__name__.upper()}. '
                 'Expected status code: 405.'
             )
     return TestResult()
