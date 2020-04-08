@@ -23,9 +23,7 @@
 ## 1.2.0
 
 - Changing error name for the `2000` internal error code from "Incorrect date" to "Incorrect date format"
-- Adding 4 new errors:
-  - `2007` - Incorrect start date
-  - `2008` - Date range is too wide
+- Adding 2 new errors:
   - `2009` - Incorrect date
   - `3002` - Incorrect reservation ID
 - Moving shared HTTP error status codes (`403`, `405`, `500`) to the beginning of the document.
