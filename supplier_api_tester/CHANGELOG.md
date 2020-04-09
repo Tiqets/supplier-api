@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.6
+
+- Updating the example of `BookingResponse`
+
 ## 1.3.5
 
 - For for errors with receiving the 200 status code when 4xx is expected
