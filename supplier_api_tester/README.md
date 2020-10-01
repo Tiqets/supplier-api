@@ -27,7 +27,8 @@ Options:
   -r, --reservation      Run reservation tests
   -b, --booking          Run booking tests
   -c, --catalog          Run product catalog tests
-  --help                 Show this message and exit.
+  -nc, --no-colors       Not using colors on output
+  --help                 Show this message and exit
 ```
 
 Running all tests:
