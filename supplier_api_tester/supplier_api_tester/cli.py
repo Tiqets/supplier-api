@@ -21,7 +21,8 @@ def print_title(title):
 @click.option('-r', '--reservation', is_flag=True, default=False, help='Run reservation tests')
 @click.option('-b', '--booking', is_flag=True, default=False, help='Run booking tests')
 @click.option('-c', '--catalog', is_flag=True, default=False, help='Run product catalog tests')
-def supplier_tester(url, api_key, product_id, timeslots, availability, reservation, booking, catalog):
+@click.option('-nc', '--no-colors', is_flag=True, default=False, help='Not using colors on output')
+def supplier_tester(url, api_key, product_id, timeslots, availability, reservation, booking, catalog, no_colors):
     '''Test you Supplier API implementation'''
 
     if not any((availability, reservation, booking, catalog)):
@@ -43,7 +44,7 @@ def supplier_tester(url, api_key, product_id, timeslots, availability, reservati
             timeslots=timeslots,
         )
         results = runner.run()
-        terminal_printer(results)
+        terminal_printer(results, no_colors)
 
     if reservation:
         print_title('RESERVATION TESTS')
@@ -55,7 +56,7 @@ def supplier_tester(url, api_key, product_id, timeslots, availability, reservati
             timeslots=timeslots,
         )
         results = runner.run()
-        terminal_printer(results)
+        terminal_printer(results, no_colors)
 
     if booking:
         print_title('BOOKING TESTS')
@@ -67,7 +68,7 @@ def supplier_tester(url, api_key, product_id, timeslots, availability, reservati
             timeslots=timeslots,
         )
         results = runner.run()
-        terminal_printer(results)
+        terminal_printer(results, no_colors)
 
     if catalog:
         print_title('PRODUCT CATALOG')
@@ -79,4 +80,4 @@ def supplier_tester(url, api_key, product_id, timeslots, availability, reservati
             timeslots=timeslots,
         )
         results = runner.run()
-        terminal_printer(results)
+        terminal_printer(results, no_colors)

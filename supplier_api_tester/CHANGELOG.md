@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.7
+
+- Adding option for running testing tool without colors on output (`--no-colors` or `-nc`)
+
 ## 1.3.6
 
 - Updating the example of `BookingResponse`
