@@ -212,8 +212,8 @@ def test_reservation(api_url, api_key, product_id, timeslots: bool, version=1):
     reservation = get_reservation(response)
     if not reservation.reservation_id:
         raise FailedTest('No reservation ID found')
-    if reservation.expires_at.tzname() != 'UTC':
-        raise FailedTest('Expiration time should be in the UTC timezone.')
+    if not reservation.expires_at.tzname():
+        raise FailedTest('Expiration time should have the timezone.')
     if datetime.now(timezone.utc) + timedelta(minutes=14) > reservation.expires_at:
         raise FailedTest('Reservation should be held at least 15 minutes.')
     return TestResult()
