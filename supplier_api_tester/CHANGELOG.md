@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.8
+
+- Checking if the expiration date for reservation has any timezone instead of checking for UTC
+
 ## 1.3.7
 
 - Adding option for running testing tool without colors on output (`--no-colors` or `-nc`)
