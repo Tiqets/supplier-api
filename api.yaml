@@ -103,16 +103,16 @@ tags:
       Note that our cache is only used for customer experience reasons. Before placing orders we will always validate that the request dates and/or timeslots still offer availability.
 
       The availability endpoints should behave as follows:
-          - At least 2 months should be provided. In case the request for availability is for more days in advance than are actually able to be provided, the API should not fail but just send the amount of days available.
-          - The request will be for the next 6 natural months from the day of the request (not more, not less in the current version). This means that depending on the month it could be a different total amount of days.
+        - The request will be for the next 6 natural months from the day of the request (not more, not less in the current version). This means that depending on the month it could be a different total amount of days.
+        - At least 2 months should be provided. In case the request for availability is for more days in advance than are actually able to be provided, the API should not fail but just send the amount of days available (the only error we expect on this regard is if we make a request for more than 6 natural months). 
 
       Example request:
-          - Parameters: 
-            - start_date: 20/01/2020
-            - end_date: 20/07/2020
-            - API only has 2 months of availability
-          Expected output:
-            - Availability for those 2 months that can be provided, never an error.
+        - Parameters: 
+          - start_date: 20/01/2020
+          - end_date: 20/07/2020
+          - API only has 2 months of availability
+        Expected output:
+          - Availability for those 2 months that can be provided, never an error.
             
             
       The cache rebuilding process looks as follows:
