@@ -79,6 +79,24 @@ info:
     |         405 | Method Not Allowed - Incorrect method was used (GET/POST) |
     |         500 | Service Error - Please report that                        |
 
+    # Internal errors
+
+    Each request besides the status codes can return an internal error (400 - Bad request) described with this JSON structure:
+
+    ```
+    {
+      "error_code": 1000,
+      "error": "Missing argument",
+      "message": "Required argument start was not found"
+    }
+    ```
+
+    Internal errors are divided into those categories:
+
+    * **1xxx** - Missing input
+    * **2xxx** - Invalid input
+    * **3xxx** - Request processing failed
+
     # Testing tools
 
     **Mock server**
@@ -92,7 +110,7 @@ info:
 
   contact:
     email: connections@tiqets.com
-  version: 1.3.6
+  version: 1.4.0
 tags:
   - name: Availability
     description: |
@@ -104,17 +122,17 @@ tags:
 
       The availability endpoints should behave as follows:
         - The request will be for the next 6 natural months from the day of the request (not more, not less in the current version). This means that depending on the month it could be a different total amount of days.
-        - At least 2 months should be provided. In case the request for availability is for more days in advance than are actually able to be provided, the API should not fail but just send the amount of days available (the only error we expect on this regard is if we make a request for more than 6 natural months). 
+        - At least 2 months should be provided. In case the request for availability is for more days in advance than are actually able to be provided, the API should not fail but just send the amount of days available (the only error we expect on this regard is if we make a request for more than 6 natural months).
 
       Example request:
-        - Parameters: 
+        - Parameters:
           - start_date: 20/01/2020
           - end_date: 20/07/2020
           - API only has 2 months of availability
         Expected output:
           - Availability for those 2 months that can be provided, never an error.
-            
-            
+
+
       The cache rebuilding process looks as follows:
 
       1. **Available Dates**
@@ -311,7 +329,10 @@ paths:
             |                2000 | Incorrect date format         | Incorrect date format xxx, please use the YYYY-MM-DD format                              |
             |                2001 | Incorrect date range          | The end date cannot be earlier then start date                                           |
             |                2009 | Incorrect date                | Eg. Cannot use the past date or Given date is too far ahead in the future (max 6 months) |
-          content: {}
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
         "501":
           description: Returned when this endpoint is Not Implemented
           content: {}
@@ -369,7 +390,10 @@ paths:
             |                2000 | Incorrect date format     | Incorrect date format xxx, please use the YYYY-MM-DD format                              |
             |                2001 | Incorrect date range      | The end date cannot be earlier then start date                                           |
             |                2009 | Incorrect date            | Eg. Cannot use the past date or Given date is too far ahead in the future (max 6 months) |
-          content: {}
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
         "501":
           description: Returned when this endpoint is Not Implemented
           content: {}
@@ -426,7 +450,10 @@ paths:
             |                2006 | Superfluous timeslot parameter | This product doesn't use timeslots.                                                           |
             |                2009 | Incorrect date                 | Eg. Cannot use the past date or Given date is too far ahead in the future (max 6 months)      |
             |                3000 | Availability error             | Quantity (3) is not available anymore for a given variant (id: 4337) and time slot (id: 5567) |
-          content: {}
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
       security:
         - authorization_header: []
   /v1/booking:
@@ -462,7 +489,46 @@ paths:
             |                2004 | Incorrect type           | Expected ATTRIBUTE_NAME to be a string, got TYPE instead |
             |                3001 | Reservation expired      | Your reservation has expired MINUTES minutes ago         |
             |                3002 | Incorrect reservation ID | Given reservation ID is incorrect                        |
-          content: {}
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
+      security:
+        - authorization_header: []
+  "/v1/booking/{booking_id}":
+    delete:
+      tags:
+        - Booking
+      summary: Cancellation
+      parameters:
+        - name: booking_id
+          in: path
+          description: booking ID
+          required: true
+          schema:
+            type: string
+      description: |
+        Cancel a booking base on booking ID.
+      operationId: cancellation
+      responses:
+        "204":
+          description: Booking was cancelled
+        "400":
+          description: |
+            Bad request
+
+            ## Internal error codes
+
+            | Internal error code |          Error             |                         Message                                            |
+            |---------------------|----------------------------|----------------------------------------------------------------------------|
+            |                1004  | Missing booking           | Booking with ID ID_NUMBER doesn't exist                                    |
+            |                2009  | Incorrect date            | The booking can only be cancelled HOURS hours in advance                   |
+            |                3003  | Already Cancelled         | The booking with ID BOOKING_ID has already been cancelled                  |
+            |                3004  | Cancellation not possible | The booking can't be cancelled, the product doesn't allow cancellations    |
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
       security:
         - authorization_header: []
 components:
@@ -486,6 +552,8 @@ components:
         - id
         - name
         - use_timeslots
+        - is_refundable
+        - cutoff_time
       properties:
         id:
           type: string
@@ -495,6 +563,12 @@ components:
           type: string
         use_timeslots:
           type: boolean
+        is_refundable:
+          type: boolean
+          description: Product supports cancellations
+        cutoff_time:
+          type: integer
+          desciption: The minimal number of hours before the booking date/time for the cancellation to be successful. 0 means no limit.
     Variants:
       type: array
       example:
@@ -742,6 +816,14 @@ components:
         message:
           type: string
           example: Required argument start was not found
+    Cancellation:
+      type: object
+      required:
+        - booking_id
+      properties:
+        booking_id:
+          type: string
+          example: "9887"
   securitySchemes:
     authorization_header:
       type: apiKey

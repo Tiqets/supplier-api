@@ -160,6 +160,12 @@ def booking():
     }
 
 
+@app.route('/v1/booking/<booking_id>', methods=['DELETE'])
+@authorization_header
+def cancel_booking(booking_id):
+    return ('', 204)
+
+
 def run():
     app.run(host='0.0.0.0', port=8000, debug=False)
 

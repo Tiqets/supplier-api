@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.4.0
+
+- Adding endpoint for cancellations
+- Adding two new product fields:
+  - `is_refundable` - product supports cancellations
+  - `cutoff_time` - the minimal number of hours before the booking date/time for the cancellation to be successful. 0 means no limit.
+
 ## 1.3.3
 
 - Changing `use_timeslots` parameter from boolean to string.
