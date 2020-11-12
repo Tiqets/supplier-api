@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.0
+
+- Displaying reports on failed tests
+
 ## 1.3.8
 
 - Checking if the expiration date for reservation has any timezone instead of checking for UTC

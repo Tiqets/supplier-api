@@ -4,11 +4,21 @@ from typing import Optional, List, Dict
 
 
 @dataclass
+class Response:
+    url: str
+    status_code: int
+    headers: Dict[str, str]
+    payload: Optional[str] = None
+    body: Optional[str] = None
+
+
+@dataclass
 class TestResult:
     title: str = ''
     status: int = 0
     message: Optional[str] = None
     duration: int = 0
+    response: Optional[Response] = None
 
     @property
     def status_text(self):

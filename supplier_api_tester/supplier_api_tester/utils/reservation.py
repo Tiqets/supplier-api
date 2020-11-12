@@ -15,17 +15,17 @@ def get_reservation_slot(api_url, api_key, product_id, timeslots: bool, version=
     start = datetime.utcnow().date()
     end = start + timedelta(days=30)
     if timeslots:
-        response = client(f'{api_url}/v{version}/products/{product_id}/timeslots', api_key, {
+        raw_response, response = client(f'{api_url}/v{version}/products/{product_id}/timeslots', api_key, {
             'start': start.isoformat(),
             'end': end.isoformat(),
         })
-        days = get_timeslots(response)
+        days = get_timeslots(raw_response, response)
     else:
-        response = client(f'{api_url}/v{version}/products/{product_id}/variants', api_key, {
+        raw_response, response = client(f'{api_url}/v{version}/products/{product_id}/variants', api_key, {
             'start': start.isoformat(),
             'end': end.isoformat(),
         })
-        days = get_variants(response)
+        days = get_variants(raw_response, response)
 
     days = [day for day in days if day.variants and day.max_tickets > 0]
     single_variant_item = None
@@ -39,7 +39,10 @@ def get_reservation_slot(api_url, api_key, product_id, timeslots: bool, version=
             single_variant_item = day
 
     if not single_variant_item:
-        raise FailedTest('There is no availability in the next 30 days to test a reservation.')
+        raise FailedTest(
+            message='There is no availability in the next 30 days to test a reservation.',
+            response=raw_response,
+        )
     cache.reservation_slot_cache = single_variant_item
     return single_variant_item
 
