@@ -1,3 +1,6 @@
+from typing import List
+
+from .models import TestResult
 from .tests import (
     AVAILABILITY_TEST,
     AVAILABILITY_VARIANTS_TEST,
@@ -25,7 +28,7 @@ class SupplierApiTester(object):
         self.test_target = test_target
         self.timeslots = timeslots
 
-    def run(self):
+    def run(self) -> List[TestResult]:
         TEST_TARGETS = {
             'availability': _run_tests(AVAILABILITY_TEST, self.host, self.api_key, self.product_id),
             'reservation': _run_tests(RESERVATION_TEST, self.host, self.api_key, self.product_id, self.timeslots),
