@@ -1,7 +1,7 @@
 # Changelog
 
 ## 1.4.1
-- Adding PFD as supported barcode_format
+- Adding "PDF" as supported "barcode_format"
 
 ## 1.4.0
 
