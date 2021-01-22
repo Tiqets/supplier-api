@@ -129,10 +129,9 @@ tags:
           - start_date: 20/01/2020
           - end_date: 20/07/2020
           - API only has 2 months of availability
-        Expected output:
-          - Availability for those 2 months that can be provided, never an error.
+          - Expected output: Availability for those 2 months that can be provided, never an error.
 
-
+      
       The cache rebuilding process looks as follows:
 
       1. **Available Dates**
@@ -568,7 +567,7 @@ components:
           description: Product supports cancellations
         cutoff_time:
           type: integer
-          desciption: The minimal number of hours before the booking date/time for the cancellation to be successful. 0 means no limit.
+          description: The minimal number of hours before the booking date/time for the cancellation to be successful. 0 means no limit.
     Variants:
       type: array
       example:
@@ -782,6 +781,7 @@ components:
             - ITF
             - DATAMATRIX
             - EAN13
+            - PDF
         barcode_position:
           type: string
           description: |
@@ -793,7 +793,10 @@ components:
             - ticket
         barcode:
           type: string
-          description: Can be omitted if barcode_position is set to ticket
+          description: |
+            If "barcode_format" is set to "PDF" then include a base64 encoded PDF.
+
+            Can be omitted if barcode_position is set to ticket.
         tickets:
           type: object
           description: Can be omitted if barcode_position is set to order
