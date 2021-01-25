@@ -4,7 +4,6 @@ import werkzeug
 
 import arrow
 from flask import Flask, request, jsonify
-
 from .auth import authorization_header
 from .validation import date_range_validator
 from . import constants, error_handlers, exceptions, utils
@@ -170,7 +169,10 @@ def booking():
 @app.route('/v1/booking/<booking_id>', methods=['DELETE'])
 @authorization_header
 def cancel_booking(booking_id):
-    return ('', 204)
+    booking_id = request.json.get("booking_id")
+    if not booking_id:
+        raise exceptions.BadRequest(1000, 'Missing argument', 'Required argument \'booking_id\' was not found')
+    return jsonify({"cancelled": booking_id})
 
 
 def run():

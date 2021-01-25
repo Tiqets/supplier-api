@@ -141,3 +141,29 @@ def test_booking(api_url, api_key, product_id, timeslots: bool, version=1):
                 )
 
     return TestResult()
+
+@test_wrapper
+def test_cancellation(api_url, api_key, product_id, timeslots: bool, version=1):
+    '''Perform booking that will be cancelled'''
+    url = f'{api_url}/v{version}/products/{product_id}/reservation'
+    slot = get_reservation_slot(api_url, api_key, product_id, timeslots)
+    variant_quantity_map = {
+         variant.id: 2 for variant in slot.variants if variant.max_tickets > 2
+    }
+
+    json_payload = get_payload_from_slot(slot, variant_quantity=2, min_quantity=3)
+    if timeslots:
+        json_payload['timeslot'] = slot.start
+    raw_response, response = client(url, api_key, method=requests.post, json_payload=json_payload)
+    reservation = get_reservation(raw_response, response)
+
+    url = f'{api_url}/v{version}/booking'
+    raw_response, response = client(url, api_key, method=requests.post, json_payload={
+        'reservation_id': reservation.reservation_id,
+    })
+    booking = get_booking(raw_response, response)
+    booking_id = booking.booking_id
+    url = f'{api_url}/v{version}/booking/{booking_id}'
+    raw_response, response = client(url, api_key, method=requests.delete, json_payload={"booking_id": booking_id})
+    return TestResult()
+
