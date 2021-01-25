@@ -98,3 +98,4 @@ class Booking:
     barcode_position: str
     barcode: Optional[str]
     tickets: Optional[Dict[str, List[str]]]
+    is_cancelled: Optional[bool]
