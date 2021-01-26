@@ -170,12 +170,13 @@ def booking():
 @app.route('/v1/booking/<booking_id>', methods=['DELETE'])
 @authorization_header
 def cancel_booking(booking_id):
-    booking_id = request.json.get("booking_id")
     try:
         booked_at, product_id = utils.decode_booking_data(booking_id)
-        product = [p for p in constants.PRODUCTS if p["id"]== product_id][0]
     except binascii.Error:
         raise exceptions.BadRequest(1004, 'Missing booking', 'Required argument \'booking_id\' was not found')
+    product = [p for p in constants.PRODUCTS if p["id"]== product_id][0]
+    if booking_id in product["cancelled_bookings"]:
+        raise exceptions.BadRequest(3003, 'Already cancelled', f'The booking with ID {booking_id} was already cancelled')
     if not product["is_refundable"]:
         raise exceptions.BadRequest(3004, 'Cancellation not possible', 'The booking cannot be cancelled, the product does not allow cancellations')    
     booking_time = datetime.fromisoformat(booked_at)
@@ -184,6 +185,8 @@ def cancel_booking(booking_id):
     hours_ago = round((cancellation_time - booking_time).seconds/3600)
     if product["cutoff_time"] != 0 and hours_ago > product["cutoff_time"]:
         raise exceptions.BadRequest(2009, 'Incorrect date', f'The booking can only be cancelled {product["cutoff_time"]} in advance')
+    product["cancelled_bookings"].append(booking_id)
+
     return make_response(jsonify({"deleted": booking_id}), 204)
 
 

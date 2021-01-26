@@ -5,7 +5,8 @@ PRODUCTS = [
         'use_timeslots': True,
         'is_refundable': True,
         'cutoff_time': 24,
-        'ticket_content_type': 'CODE128'
+        # but this is not part of spec...
+        'cancelled_bookings': []
     },
     {
         'id': 'A400-FX',
@@ -14,7 +15,7 @@ PRODUCTS = [
         'description': 'Test timeslot product',
         'is_refundable': False,
         'cutoff_time': 0,
-        'ticket_content_type': 'CODE128'
+        'cancelled_bookings': []
     },
     {
         'id': 'A500-FX',
@@ -24,6 +25,7 @@ PRODUCTS = [
         'is_refundable': True,
         'cutoff_time': 0,
         'ticket_content_type': 'CODE128'
+        'cancelled_bookings': []
     },
     {
         'id': 'A550-FX',
@@ -33,6 +35,8 @@ PRODUCTS = [
         'is_refundable': True,
         'cutoff_time': 0,
         'ticket_content_type': 'PDF'
+        'cutoff_time': 15,
+        'cancelled_bookings': []
     },
     {
         'id': 'A600-FX',
@@ -41,6 +45,7 @@ PRODUCTS = [
         'is_refundable': False,
         'cutoff_time': 0,
         'ticket_content_type': 'CODE128'
+        'cancelled_bookings': []
     },
 ]
 VARIANTS = ('Adult', 'Child')
