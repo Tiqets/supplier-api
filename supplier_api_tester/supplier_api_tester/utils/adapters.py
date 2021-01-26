@@ -1,3 +1,6 @@
+import base64
+import binascii
+
 from datetime import date, datetime
 from typing import List
 
@@ -6,6 +9,29 @@ from requests.models import Request
 
 from ..exceptions import FailedTest
 from ..models import ApiError, Booking, DailyAvailability, DailyVariants, Product, Reservation, Timeslot
+
+
+def check_base64(item):
+    try:
+        return base64.b64encode(base64.b64decode(item)).decode() == item
+    except binascii.Error:
+        return False
+
+def booking_pdf_validator(booking: Booking, raw_response:Request):
+    if booking.barcode_position == 'order':
+        if not check_base64(booking.barcode):
+            raise FailedTest(
+                message = "Error while decoding (base64) PDF voucher for the order",
+                response=raw_response
+        )
+    elif booking.barcode_position == 'ticket':
+        for variant, barcodes in booking.tickets.items():
+            for barcode in barcodes:
+                if not check_base64(barcode):
+                    raise FailedTest(
+                        message="Error while decoding (base64) PDF voucher for the ticket",
+                        response=raw_response
+                    )
 
 
 def get_daily_availability(raw_response: Request, response) -> List[DailyAvailability]:
@@ -178,11 +204,16 @@ def get_booking(raw_response: Request, response) -> Booking:
             response=raw_response,
         )
 
-    if booking.barcode_format not in ('QRCODE', 'CODE128', 'CODE39', 'ITF', 'DATAMATRIX', 'EAN13'):
+    if booking.barcode_format not in ('QRCODE', 'CODE128', 'CODE39', 'ITF', 'DATAMATRIX', 'EAN13', 'PDF'):
+        
         raise FailedTest(
             message=f'Incorrect barcode format ({booking.barcode_format})',
             response=raw_response,
         )
+    
+    if booking.barcode_format == 'PDF':
+        booking_pdf_validator(booking, raw_response)
+
     if booking.barcode_position not in ('order', 'ticket'):
         raise FailedTest(
             message=f'Incorrect value in the barcode_position field ({booking.barcode_position})',

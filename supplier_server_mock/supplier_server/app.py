@@ -1,3 +1,4 @@
+import base64
 from datetime import date, datetime, timedelta
 import werkzeug
 
@@ -129,7 +130,7 @@ def reservation(product_id: str):
             )
     expires_at = arrow.utcnow().shift(minutes=30)
     return {
-        'reservation_id': utils.encode_reservation_id(expires_at, tickets),
+        'reservation_id': utils.encode_reservation_id(expires_at, tickets, product_id),
         'expires_at': expires_at.isoformat(),
     }
 
@@ -137,24 +138,30 @@ def reservation(product_id: str):
 @app.route('/v1/booking', methods=['POST'])
 @authorization_header
 def booking():
-    reservation_id = request.json.get('reservation_id')
+    reservation_id = request.json.get('reservation_id')    
     if not reservation_id:
         raise exceptions.BadRequest(1000, 'Missing argument', 'Required argument \'reservation_id\' was not found')
     try:
-        expires_at, variant_quantity_map = utils.decode_reservation_data(reservation_id)
+        expires_at, variant_quantity_map, product_id = utils.decode_reservation_data(reservation_id)
     except:
+
         raise exceptions.BadRequest(3002, 'Incorrect reservation ID', 'Given reservation ID is incorrect')
     now = arrow.utcnow().datetime
     if now > expires_at:
         minutes_ago = round((now - expires_at).seconds / 60)
         raise exceptions.BadRequest(3001, 'Reservation expired', f'Your reservation has expired {minutes_ago} minutes ago')
     tickets = {}
+    product = [p for p in constants.PRODUCTS if p["id"] == product_id][0]
     for variant_id, quantity in variant_quantity_map.items():
-        barcodes = [str(utils.str_to_int(f'{reservation_id}{variant_id}{i}', 10)) for i in range(quantity)]
+        if product["ticket_content_type"] == "PDF":
+            barcodes = [utils.encode_barcode(f'{reservation_id}{variant_id}{i}') for i in range(quantity)]
+        else:
+            barcodes = [str(utils.str_to_int(f'{reservation_id}{variant_id}{i}', 10)) for i in range(quantity)]
         tickets[variant_id] = barcodes
+    
     return {
         'booking_id': f'{utils.str_to_int(expires_at.isoformat(), 10)}',
-        'barcode_format': 'CODE128',
+        'barcode_format': product["ticket_content_type"],
         'barcode_position': 'ticket',
         'tickets': tickets,
     }

@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.4.1
+- Updating test-tool with testing validity of tickets for PDF type
+
 ## 1.4.0
 
 - Displaying reports on failed tests

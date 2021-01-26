@@ -8,7 +8,7 @@ with open('requirements.txt') as f:
 
 setuptools.setup(
     name='Supplier API mock server',
-    version='1.3.4',
+    version='1.4.1',
     author='Tiqets Team',
     author_email='connections@tiqets.com',
     description='Mock Server with Supplier API implementation',

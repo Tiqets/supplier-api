@@ -75,10 +75,13 @@ def get_availability(product_id: str, day: date):
         "variants": variants,
     }
 
+def encode_barcode(some_str):
+    return b64encode(some_str.encode()).decode()
 
-def encode_reservation_id(expires_at: datetime, tickets: list) -> str:
+
+def encode_reservation_id(expires_at: datetime, tickets: list, product_id: str) -> str:
     variants_quantity_map = {ticket['variant_id']: ticket['quantity'] for ticket in tickets}
-    json_content = json.dumps([expires_at.isoformat(), variants_quantity_map])
+    json_content = json.dumps([expires_at.isoformat(), variants_quantity_map, product_id])
     return b64encode(json_content.encode()).replace(b'=', b'!').decode()
 
 
@@ -86,4 +89,5 @@ def decode_reservation_data(reservation_id: str) -> tuple:
     json_content = json.loads(b64decode(reservation_id.replace('!', '=')).decode())
     expires_at = datetime.fromisoformat(json_content[0])
     variants_quantity_map = json_content[1]
-    return expires_at, variants_quantity_map
+    product_id = json_content[2]
+    return expires_at, variants_quantity_map, product_id
