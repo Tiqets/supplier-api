@@ -1,9 +1,10 @@
 import base64
+import binascii
 from datetime import date, datetime, timedelta
 import werkzeug
 
 import arrow
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, make_response
 from .auth import authorization_header
 from .validation import date_range_validator
 from . import constants, error_handlers, exceptions, utils
@@ -170,11 +171,10 @@ def booking():
 @authorization_header
 def cancel_booking(booking_id):
     booking_id = request.json.get("booking_id")
-    decoded_booking_data = utils.decode_booking_data(booking_id)
-    booked_at, product_id = decoded_booking_data
-
-    product = [p for p in constants.PRODUCTS if p["id"]== product_id][0]
-    if not booking_id:
+    try:
+        booked_at, product_id = utils.decode_booking_data(booking_id)
+        product = [p for p in constants.PRODUCTS if p["id"]== product_id][0]
+    except binascii.Error:
         raise exceptions.BadRequest(1004, 'Missing booking', 'Required argument \'booking_id\' was not found')
     if not product["is_refundable"]:
         raise exceptions.BadRequest(3004, 'Cancellation not possible', 'The booking cannot be cancelled, the product does not allow cancellations')    
@@ -184,7 +184,9 @@ def cancel_booking(booking_id):
     hours_ago = round((cancellation_time - booking_time).seconds/3600)
     if product["cutoff_time"] != 0 and hours_ago > product["cutoff_time"]:
         raise exceptions.BadRequest(2009, 'Incorrect date', f'The booking can only be cancelled {product["cutoff_time"]} in advance')
-    return jsonify({"cancelled": booking_id})
+    return make_response(jsonify({"deleted": booking_id}), 204)
+
+
 
 def run():
     app.run(host='0.0.0.0', port=8000, debug=False)

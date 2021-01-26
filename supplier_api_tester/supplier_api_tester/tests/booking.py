@@ -163,9 +163,36 @@ def test_cancellation(api_url, api_key, product_id, timeslots: bool, version=1):
     })
     booking = get_booking(raw_response, response)
     booking_id = booking.booking_id
+
+    # cancel existing booking
     url = f'{api_url}/v{version}/booking/{booking_id}'
     raw_response, response = client(url, api_key, method=requests.delete, json_payload={"booking_id": booking_id})
-    if raw_response.status_code == 200:
+    if raw_response.status_code == 204:
         booking.is_cancelled = True
+
+    # cancel booking with no ID/non-existent ID
+    non_existing_booking_id = "I-DO-NOT-EXIST"
+    url = f'{api_url}/v{version}/booking/{non_existing_booking_id}'
+    raw_response, response = client(url, api_key, method=requests.delete, json_payload={"booking_id": non_existing_booking_id})
+    api_error = get_api_error(raw_response, response)
+    expected_error = ApiError(
+        error_code=1004,
+        error='Missing booking',
+        message='Required argument \'booking_id\' was not found',
+    )
+    check_api_error(raw_response, api_error, expected_error)
+
+    # cancel booking that was already cancelled:
+
+    url = f'{api_url}/v{version}/booking/{booking_id}'
+    raw_response, response = client(url, api_key, method=requests.delete, json_payload={"booking_id": booking_id})
+    if booking.is_cancelled:
+        api_error = get_api_error(raw_response, response)
+        expected_error = ApiError(
+            error_code=3003,
+            error='Already cancelled',
+            message=f'The booking with ID {booking_id} was already cancelled',
+        )
+        check_api_error(raw_response, api_error, expected_error)
     return TestResult()
 

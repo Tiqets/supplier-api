@@ -36,7 +36,7 @@ def client(
             response=response,
         )
 
-    if response.status_code in (403, 405, 500):
+    if response.status_code in (204, 403, 405, 500):
         return response, None
 
     try:

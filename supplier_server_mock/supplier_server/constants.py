@@ -11,7 +11,6 @@ PRODUCTS = [
         'id': 'A400-FX',
         'name': 'A400-FX',
         'use_timeslots': True,
-        'is_refundable': True,
         'description': 'Test timeslot product',
         'is_refundable': False,
         'cutoff_time': 0,
