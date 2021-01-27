@@ -46,6 +46,8 @@ class Product:
     name: str
     use_timeslots: bool
     description: Optional[str]
+    is_refundable: bool
+    cutoff_time: int
 
 @dataclass
 class DailyAvailability:

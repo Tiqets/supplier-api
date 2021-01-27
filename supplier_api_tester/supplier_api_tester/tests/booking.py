@@ -94,7 +94,7 @@ def test_booking_incorrect_reservation_id(api_url, api_key, product_id, timeslot
     '''Booking with incorrect reservation ID.'''
     url = f'{api_url}/v{version}/booking'
     raw_response, response = client(url, api_key, method=requests.post, json_payload={
-        'reservation_id': 'NON-EXISTING-ID',
+        'reservation_id': 'Tk9OLUVYSVNUSU5HLUlECg!!', # NON-EXISTING-ID
     })
     api_error = get_api_error(raw_response, response)
     expected_error = ApiError(
