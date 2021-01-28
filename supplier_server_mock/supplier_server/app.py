@@ -175,6 +175,7 @@ def cancel_booking(booking_id):
     except binascii.Error:
         raise exceptions.BadRequest(1004, 'Missing booking', 'Required argument \'booking_id\' was not found')
     product = [p for p in constants.PRODUCTS if p["id"]== product_id][0]
+    # if we want to test that we need to store the cancelled booking id somewhere
     if booking_id in product["cancelled_bookings"]:
         raise exceptions.BadRequest(3003, 'Already cancelled', f'The booking with ID {booking_id} was already cancelled')
     if not product["is_refundable"]:
