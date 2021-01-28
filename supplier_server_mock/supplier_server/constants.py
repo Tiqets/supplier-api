@@ -24,7 +24,7 @@ PRODUCTS = [
         'description': 'Test non timeslot product',
         'is_refundable': True,
         'cutoff_time': 0,
-        'ticket_content_type': 'CODE128'
+        'ticket_content_type': 'CODE128',
         'cancelled_bookings': []
     },
     {
@@ -34,8 +34,7 @@ PRODUCTS = [
         'description': 'Test barcode',
         'is_refundable': True,
         'cutoff_time': 0,
-        'ticket_content_type': 'PDF'
-        'cutoff_time': 15,
+        'ticket_content_type': 'PDF',
         'cancelled_bookings': []
     },
     {
@@ -44,7 +43,7 @@ PRODUCTS = [
         'use_timeslots': False,
         'is_refundable': False,
         'cutoff_time': 0,
-        'ticket_content_type': 'CODE128'
+        'ticket_content_type': 'CODE128',
         'cancelled_bookings': []
     },
 ]
