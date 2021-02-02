@@ -130,7 +130,7 @@ def reservation(product_id: str):
             )
     expires_at = arrow.utcnow().shift(minutes=30)
     return {
-        'reservation_id': utils.encode_reservation_id(expires_at, tickets, product_id),
+        'reservation_id': utils.encode_reservation_id(expires_at, tickets, product_id, day),
         'expires_at': expires_at.isoformat(),
     }
 
@@ -142,7 +142,7 @@ def booking():
     if not reservation_id:
         raise exceptions.BadRequest(1000, 'Missing argument', 'Required argument \'reservation_id\' was not found')
     try:
-        expires_at, variant_quantity_map, product_id = utils.decode_reservation_data(reservation_id)
+        expires_at, variant_quantity_map, product_id, date = utils.decode_reservation_data(reservation_id)
     except:
 
         raise exceptions.BadRequest(3002, 'Incorrect reservation ID', 'Given reservation ID is incorrect')
@@ -160,7 +160,7 @@ def booking():
         tickets[variant_id] = barcodes
     
     return {
-        'booking_id': utils.encode_booking_id(now.isoformat(), product_id),
+        'booking_id': utils.encode_booking_id(now.isoformat(), date.isoformat(), product_id),
         'barcode_format': product["ticket_content_type"],
         'barcode_position': 'ticket',
         'tickets': tickets,
@@ -171,24 +171,27 @@ def booking():
 @authorization_header
 def cancel_booking(booking_id):
     try:
-        booked_at, product_id = utils.decode_booking_data(booking_id)
+        booked_at, booked_for, product_id = utils.decode_booking_data(booking_id)
     except binascii.Error:
-        raise exceptions.BadRequest(1004, 'Missing booking', 'Required argument \'booking_id\' was not found')
+        raise exceptions.BadRequest(1004, 'Missing booking', f"Booking with ID {booking_id} doesn't exist")
     product = [p for p in constants.PRODUCTS if p["id"]== product_id][0]
-    # if we want to test that we need to store the cancelled booking id somewhere
-    if booking_id in product["cancelled_bookings"]:
-        raise exceptions.BadRequest(3003, 'Already cancelled', f'The booking with ID {booking_id} was already cancelled')
+    
     if not product["is_refundable"]:
-        raise exceptions.BadRequest(3004, 'Cancellation not possible', 'The booking cannot be cancelled, the product does not allow cancellations')    
+        raise exceptions.BadRequest(3004, 'Cancellation not possible', 'The booking cannot be cancelled, the product does not allow cancellations')
+    if booking_id in product["cancelled_bookings"]:
+        raise exceptions.BadRequest(3003, 'Already cancelled', f'The booking with ID {booking_id} was already cancelled')    
     booking_time = datetime.fromisoformat(booked_at)
-    cancellation_time = arrow.utcnow().datetime
-    difference = cancellation_time - booking_time
-    hours_ago = round((cancellation_time - booking_time).seconds/3600)
-    if product["cutoff_time"] != 0 and hours_ago > product["cutoff_time"]:
+    booking_for_time = datetime.fromisoformat(booked_for)
+    cancellation_time = datetime.utcnow()
+    difference = booking_for_time - cancellation_time
+    hours_difference = round(difference.total_seconds()/3600)
+    if booking_for_time < cancellation_time:
+        raise exceptions.BadRequest(2009, 'Incorrect date', 'Cannot use the past date')
+    if product["cutoff_time"] != 0 and hours_difference > product["cutoff_time"]:
         raise exceptions.BadRequest(2009, 'Incorrect date', f'The booking can only be cancelled {product["cutoff_time"]} in advance')
+    # if we want to test double cancellation, we need to store the cancelled booking id somewhere
     product["cancelled_bookings"].append(booking_id)
-
-    return make_response(jsonify({"deleted": booking_id}), 204)
+    return '', 204
 
 
 

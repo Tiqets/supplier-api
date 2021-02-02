@@ -7,7 +7,7 @@ from ..client import client
 from ..decorators import test_wrapper
 from ..exceptions import FailedTest
 from ..models import TestResult, DailyAvailability, Timeslot, ApiError
-from ..utils.adapters import get_reservation, get_booking, get_api_error
+from ..utils.adapters import get_reservation, get_booking, get_api_error, get_products
 from ..utils.reservation import get_payload_from_slot, get_reservation_slot
 from ..utils.errors import check_api_error
 
@@ -164,12 +164,25 @@ def test_cancellation(api_url, api_key, product_id, timeslots: bool, version=1):
     booking = get_booking(raw_response, response)
     booking_id = booking.booking_id
 
+    # check if product supports cancellations
+    url = f'{api_url}/v{version}/products'
+    raw_response, response = client(url, api_key, method=requests.get)
+    products = get_products(raw_response, response)
+    product = [product for product in products if product.id == product_id][0]
+   
     # cancel existing booking
     url = f'{api_url}/v{version}/booking/{booking_id}'
     raw_response, response = client(url, api_key, method=requests.delete, json_payload={"booking_id": booking_id})
-    if raw_response.status_code == 204:
-        booking.is_cancelled = True
 
+    # throw error if product does not support cancellation
+    if not product.is_refundable:
+        api_error = get_api_error(raw_response, response)
+        expected_error = ApiError(
+        error_code=3004,
+        error='Cancellation not possible',
+        message='The booking cannot be cancelled, the product does not allow cancellations',
+        )
+        check_api_error(raw_response, api_error, expected_error)
     # cancel booking with no ID/non-existent ID
     non_existing_booking_id = "I-DO-NOT-EXIST"
     url = f'{api_url}/v{version}/booking/{non_existing_booking_id}'
@@ -185,7 +198,7 @@ def test_cancellation(api_url, api_key, product_id, timeslots: bool, version=1):
     # cancel booking that was already cancelled:
     url = f'{api_url}/v{version}/booking/{booking_id}'
     raw_response, response = client(url, api_key, method=requests.delete, json_payload={"booking_id": booking_id})
-    if booking.is_cancelled:
+    if product.is_refundable:
         api_error = get_api_error(raw_response, response)
         expected_error = ApiError(
             error_code=3003,

@@ -79,23 +79,25 @@ def encode_barcode(some_str):
     return b64encode(some_str.encode()).decode()
 
 
-def encode_reservation_id(expires_at: datetime, tickets: list, product_id: str) -> str:
+def encode_reservation_id(expires_at: datetime, tickets: list, product_id: str, date: datetime) -> str:
     variants_quantity_map = {ticket['variant_id']: ticket['quantity'] for ticket in tickets}
-    json_content = json.dumps([expires_at.isoformat(), variants_quantity_map, product_id])
+    json_content = json.dumps([expires_at.isoformat(), variants_quantity_map, product_id, date.isoformat()])
     return b64encode(json_content.encode()).replace(b'=', b'!').decode()
 
-def encode_booking_id(date_str, product_id):
-    json_content = json.dumps([date_str, product_id])
+def encode_booking_id(date_str, booking_date_str, product_id):
+    json_content = json.dumps([date_str, booking_date_str,product_id])
     return b64encode(json_content.encode()).replace(b'=', b'!').decode()
 
 def decode_booking_data(booking_id:str):
     json_content = json.loads(b64decode(booking_id.replace('!', '=')).decode())
-    date_data, product_id = json_content
-    return date_data, product_id
+    now_date, booking_date, product_id = json_content
+    return now_date, booking_date, product_id
 
 def decode_reservation_data(reservation_id: str) -> tuple:
     json_content = json.loads(b64decode(reservation_id.replace('!', '=')).decode())
     expires_at = datetime.fromisoformat(json_content[0])
     variants_quantity_map = json_content[1]
     product_id = json_content[2]
-    return expires_at, variants_quantity_map, product_id
+    date = datetime.fromisoformat(json_content[3])
+    # variants_quantity_map, product_id, date = json_content[1:]
+    return expires_at, variants_quantity_map, product_id, date
