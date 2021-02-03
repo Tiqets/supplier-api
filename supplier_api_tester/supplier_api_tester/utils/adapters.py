@@ -259,5 +259,5 @@ def get_api_error(raw_response: Request, response) -> ApiError:
 
 def decode_booking_data(booking_id:str):
     json_content = json.loads(b64decode(booking_id.replace('!', '=')).decode())
-    now_date, booking_date, product_id = json_content
-    return now_date, booking_date, product_id
+    booking_date, product_id = json_content
+    return booking_date, product_id

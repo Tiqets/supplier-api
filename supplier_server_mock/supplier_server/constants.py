@@ -5,6 +5,7 @@ PRODUCTS = [
         'use_timeslots': True,
         'is_refundable': True,
         'cutoff_time': 24,
+        'ticket_content_type': 'CODE128',
         # but this is not part of spec...
         'cancelled_bookings': []
     },

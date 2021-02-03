@@ -163,14 +163,17 @@ def test_cancellation(api_url, api_key, product_id, timeslots: bool, version=1):
     })
     booking = get_booking(raw_response, response)
     booking_id = booking.booking_id
-    booking_data = decode_booking_data(booking_id)
+    
     
     # check if product supports cancellations
     url = f'{api_url}/v{version}/products'
-    raw_response, response = client(url, api_key, method=requests.get)
-    products = get_products(raw_response, response)
-    product = [product for product in products if product.id == product_id][0]
-   
+    # get a list of both timeslot and non timeslot products
+    raw_response, response = client(url, api_key, method=requests.get, params={'use_timeslots':'False'})
+    non_timeslot_products = get_products(raw_response, response)
+    raw_response, response = client(url, api_key, method=requests.get, params={'use_timeslots':'True'})
+    timeslot_products = get_products(raw_response, response)
+    products_all = timeslot_products + non_timeslot_products
+    product = [product for product in products_all if product.id == product_id][0]
     # cancel existing booking
     url = f'{api_url}/v{version}/booking/{booking_id}'
     raw_response, response = client(url, api_key, method=requests.delete, json_payload={"booking_id": booking_id})
@@ -185,14 +188,12 @@ def test_cancellation(api_url, api_key, product_id, timeslots: bool, version=1):
         )
         check_api_error(raw_response, api_error, expected_error)
 
-    # cancel booking that cannot be cancelled due to cut_off time/being past date
-    booked_at, booked_for, product_id = booking_data
-    booking_time = datetime.fromisoformat(booked_at)
+    # cancel booking in refundable product that cannot be cancelled due to cut_off time/being past date
+    booking_data = decode_booking_data(booking_id)
+    booked_for, product_id = booking_data
     booking_for_time = datetime.fromisoformat(booked_for)
     cancellation_time = datetime.utcnow()
-    difference = booking_for_time - cancellation_time
-    hours_difference = round(difference.total_seconds()/3600)
-    if booking_for_time < cancellation_time:
+    if product.is_refundable and booking_for_time < cancellation_time:
         api_error = get_api_error(raw_response, response)
         expected_error = ApiError(
         error_code=2009,
@@ -201,7 +202,9 @@ def test_cancellation(api_url, api_key, product_id, timeslots: bool, version=1):
         )
         check_api_error(raw_response, api_error, expected_error)
 
-    if product.cutoff_time != 0 and product.cutoff_time > hours_difference:
+    difference = booking_for_time - cancellation_time
+    hours_in_advance = round(difference.total_seconds()/3600)
+    if product.is_refundable and product.cutoff_time != 0 and product.cutoff_time > hours_in_advance:
         api_error = get_api_error(raw_response, response)
         expected_error = ApiError(
         error_code=2009,
@@ -213,8 +216,9 @@ def test_cancellation(api_url, api_key, product_id, timeslots: bool, version=1):
     # cancel booking that was already cancelled:
     url = f'{api_url}/v{version}/booking/{booking_id}'
     raw_response, response = client(url, api_key, method=requests.delete, json_payload={"booking_id": booking_id})
+
     cancel_date_ok = (booking_for_time > cancellation_time)
-    cancelled_before_cutoff = (product.cutoff_time == 0 or product.cutoff_time < hours_difference)
+    cancelled_before_cutoff = (product.cutoff_time == 0 or product.cutoff_time < hours_in_advance)
     cancellation_time_ok = (cancel_date_ok and cancelled_before_cutoff)
     if cancellation_time_ok and product.is_refundable:
         api_error = get_api_error(raw_response, response)
