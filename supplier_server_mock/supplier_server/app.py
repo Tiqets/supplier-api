@@ -178,8 +178,7 @@ def cancel_booking(booking_id):
     
     if not product["is_refundable"]:
         raise exceptions.BadRequest(3004, 'Cancellation not possible', 'The booking cannot be cancelled, the product does not allow cancellations')
-    if booking_id in product["cancelled_bookings"]:
-        raise exceptions.BadRequest(3003, 'Already cancelled', f'The booking with ID {booking_id} was already cancelled')    
+    
     booking_time = datetime.fromisoformat(booked_at)
     booking_for_time = datetime.fromisoformat(booked_for)
     cancellation_time = datetime.utcnow()
@@ -187,8 +186,12 @@ def cancel_booking(booking_id):
     hours_difference = round(difference.total_seconds()/3600)
     if booking_for_time < cancellation_time:
         raise exceptions.BadRequest(2009, 'Incorrect date', 'Cannot use the past date')
-    if product["cutoff_time"] != 0 and hours_difference > product["cutoff_time"]:
-        raise exceptions.BadRequest(2009, 'Incorrect date', f'The booking can only be cancelled {product["cutoff_time"]} in advance')
+    if product["cutoff_time"] != 0 and product["cutoff_time"] > hours_difference:
+        raise exceptions.BadRequest(2009, 'Incorrect date', f'The booking can only be cancelled {product["cutoff_time"]} hoursreset in advance')
+
+    if booking_id in product["cancelled_bookings"]:
+        raise exceptions.BadRequest(3003, 'Already cancelled', f'The booking with ID {booking_id} was already cancelled')    
+    
     # if we want to test double cancellation, we need to store the cancelled booking id somewhere
     product["cancelled_bookings"].append(booking_id)
     return '', 204
