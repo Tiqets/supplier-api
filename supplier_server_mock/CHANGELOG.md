@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.4.2
+- Added cancellation endpoint
+
 ## 1.4.1
 - Updating mock server with support for PDF type
 
