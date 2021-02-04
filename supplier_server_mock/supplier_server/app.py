@@ -166,9 +166,11 @@ def booking():
         else:
             barcodes = [str(utils.str_to_int(f'{reservation_id}{variant_id}{i}', 10)) for i in range(quantity)]
         tickets[variant_id] = barcodes
-    
+    booking_id = utils.encode_booking_id(booking_date.isoformat(), product_id)
+    if booking_id in product['cancelled_bookings']:
+        del product['cancelled_bookings'][product['cancelled_bookings'].index(booking_id)]
     return {
-        'booking_id': utils.encode_booking_id(booking_date.isoformat(), product_id),
+        'booking_id': booking_id,
         'barcode_format': product["ticket_content_type"],
         'barcode_position': 'ticket',
         'tickets': tickets,
