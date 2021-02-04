@@ -1,10 +1,10 @@
 import base64
+import binascii
 from datetime import date, datetime, timedelta
 import werkzeug
 
 import arrow
-from flask import Flask, request, jsonify
-
+from flask import Flask, request, jsonify, make_response
 from .auth import authorization_header
 from .validation import date_range_validator
 from . import constants, error_handlers, exceptions, utils
@@ -112,6 +112,14 @@ def reservation(product_id: str):
             f'This date is too far ahead in the future. You can book max {constants.MAX_DATE_RANGE} months ahead.'
         )
     timeslot = request.json.get('timeslot')
+
+    # booking date is different for timeslot and non timeslot strategies:
+    if timeslot:
+        reservation_date = datetime.fromisoformat(day.isoformat() + " " + timeslot)
+       
+    else:
+        reservation_date = day
+
     tickets = request.json.get('tickets')
     if not tickets:
         raise exceptions.BadRequest(1000, 'Missing argument', 'Required argument tickets was not found')
@@ -130,7 +138,7 @@ def reservation(product_id: str):
             )
     expires_at = arrow.utcnow().shift(minutes=30)
     return {
-        'reservation_id': utils.encode_reservation_id(expires_at, tickets, product_id),
+        'reservation_id': utils.encode_reservation_id(expires_at, tickets, product_id, reservation_date),
         'expires_at': expires_at.isoformat(),
     }
 
@@ -142,7 +150,7 @@ def booking():
     if not reservation_id:
         raise exceptions.BadRequest(1000, 'Missing argument', 'Required argument \'reservation_id\' was not found')
     try:
-        expires_at, variant_quantity_map, product_id = utils.decode_reservation_data(reservation_id)
+        expires_at, variant_quantity_map, product_id, booking_date = utils.decode_reservation_data(reservation_id)
     except:
 
         raise exceptions.BadRequest(3002, 'Incorrect reservation ID', 'Given reservation ID is incorrect')
@@ -158,9 +166,11 @@ def booking():
         else:
             barcodes = [str(utils.str_to_int(f'{reservation_id}{variant_id}{i}', 10)) for i in range(quantity)]
         tickets[variant_id] = barcodes
-    
+    booking_id = utils.encode_booking_id(booking_date.isoformat(), product_id)
+    if booking_id in product['cancelled_bookings']:
+        del product['cancelled_bookings'][product['cancelled_bookings'].index(booking_id)]
     return {
-        'booking_id': f'{utils.str_to_int(expires_at.isoformat(), 10)}',
+        'booking_id': booking_id,
         'barcode_format': product["ticket_content_type"],
         'barcode_position': 'ticket',
         'tickets': tickets,
@@ -170,7 +180,33 @@ def booking():
 @app.route('/v1/booking/<booking_id>', methods=['DELETE'])
 @authorization_header
 def cancel_booking(booking_id):
-    return ('', 204)
+    try:
+        booked_for, product_id = utils.decode_booking_data(booking_id)
+    except binascii.Error:
+        raise exceptions.BadRequest(1004, 'Missing booking', f"Booking with ID {booking_id} doesn't exist")
+    product = [p for p in constants.PRODUCTS if p["id"]== product_id][0]
+    
+    if not product["is_refundable"]:
+        raise exceptions.BadRequest(3004, 'Cancellation not possible', 'The booking cannot be cancelled, the product does not allow cancellations')
+
+    booking_for_time = datetime.fromisoformat(booked_for)
+    cancellation_time = datetime.utcnow()
+
+    if booking_for_time < cancellation_time:
+        raise exceptions.BadRequest(2009, 'Incorrect date', 'Cannot use the past date')
+
+    difference = booking_for_time - cancellation_time
+    hours_in_advance = round(difference.total_seconds()/3600)
+    if product["cutoff_time"] != 0 and product["cutoff_time"] > hours_in_advance:
+        raise exceptions.BadRequest(2009, 'Incorrect date', f'The booking can only be cancelled {product["cutoff_time"]} hours in advance')
+
+    if booking_id in product["cancelled_bookings"]:
+        raise exceptions.BadRequest(3003, 'Already cancelled', f'The booking with ID {booking_id} was already cancelled')    
+    
+    # if we want to test double cancellation, we need to store the cancelled booking id somewhere
+    product["cancelled_bookings"].append(booking_id)
+    return '', 204
+
 
 
 def run():

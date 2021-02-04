@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.4.2
+- Updating test-tool with testing cancellation
+
 ## 1.4.1
 - Updating test-tool with testing validity of tickets for PDF type
 

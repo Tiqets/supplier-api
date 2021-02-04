@@ -30,13 +30,13 @@ def client(
             response=response,
         )
 
-    if response.status_code not in (200, 400, 403, 405, 500):
+    if response.status_code not in (200, 204, 400, 403, 405, 500):
         raise FailedTest(
             message=f'Unexpected status code {response.status_code} from {url}',
             response=response,
         )
 
-    if response.status_code in (403, 405, 500):
+    if response.status_code in (204, 403, 405, 500):
         return response, None
 
     try:

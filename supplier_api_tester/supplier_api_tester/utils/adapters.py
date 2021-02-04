@@ -1,5 +1,7 @@
 import base64
+from base64 import b64encode, b64decode
 import binascii
+import json
 
 from datetime import date, datetime
 from typing import List
@@ -254,3 +256,8 @@ def get_api_error(raw_response: Request, response) -> ApiError:
             message=f'Incorrect response format for 400 error ({e})',
             response=raw_response,
         )
+
+def decode_booking_data(booking_id:str):
+    json_content = json.loads(b64decode(booking_id.replace('!', '=')).decode())
+    booking_date, product_id = json_content
+    return booking_date, product_id
