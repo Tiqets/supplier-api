@@ -24,31 +24,6 @@ def products():
     return jsonify([p for p in constants.PRODUCTS])
 
 
-@app.route('/v1/products/<product_id>/dates')
-@authorization_header
-@date_range_validator
-def available_dates(product_id: str):
-    utils.check_product_id(product_id)
-    start = utils.get_date(request.args, 'start')
-    end = utils.get_date(request.args, 'end')
-    if start > end:
-        raise exceptions.BadRequest(2001, 'Incorrect date range', 'The end date cannot be earlier then start date')
-
-    today = date.today()
-    if end < today:
-        return jsonify([])
-    start = max(today, start)
-    result = []
-    day = start
-    while day <= end:
-        result.append({
-            'date': day.isoformat(),
-            'max_tickets': utils.get_availability(product_id, day)['max_tickets']
-        })
-        day = day + timedelta(days=1)
-    return jsonify(result)
-
-
 @app.route('/v1/products/<product_id>/variants')
 @authorization_header
 @date_range_validator

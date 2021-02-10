@@ -4,7 +4,7 @@ from typing import Union
 from supplier_api_tester import cache
 from supplier_api_tester.client import client
 from supplier_api_tester.exceptions import FailedTest
-from supplier_api_tester.models import DailyAvailability, Timeslot
+from supplier_api_tester.models import DailyVariants, Timeslot
 from supplier_api_tester.utils.adapters import get_variants, get_timeslots
 
 
@@ -47,7 +47,7 @@ def get_reservation_slot(api_url, api_key, product_id, timeslots: bool, version=
     return single_variant_item
 
 
-def get_payload_from_slot(slot: Union[DailyAvailability, Timeslot], variant_quantity=1, min_quantity=1):
+def get_payload_from_slot(slot: Union[DailyVariants, Timeslot], variant_quantity=1, min_quantity=1):
     return {
         'date': slot.date.isoformat(),
         'tickets': [{

@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.4.3
+- Updating availability tests
+
 ## 1.4.2
 - Updating test-tool with testing cancellation
 

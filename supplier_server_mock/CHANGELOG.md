@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.4.3
+- Removing redundant "/dates" endpoint
+
 ## 1.4.2
 - Added cancellation endpoint
 

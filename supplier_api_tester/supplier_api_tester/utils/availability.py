@@ -6,7 +6,7 @@ import requests
 
 from supplier_api_tester.client import client
 from supplier_api_tester.exceptions import FailedTest
-from supplier_api_tester.models import ApiError, DailyAvailability, DailyVariants, TestResult
+from supplier_api_tester.models import ApiError, DailyVariants, TestResult
 from supplier_api_tester.utils.adapters import get_api_error
 from supplier_api_tester.utils.errors import check_api_error
 from supplier_api_tester.utils.date import get_tomorrow
@@ -135,7 +135,6 @@ def test_incorrect_api_key(api_url, api_key, product_id, endpoint, version=1):
 
 def test_missing_argument_error(api_url, api_key, product_id, endpoint, version=1):
     '''Testing missing argument errors'''
-
     tomorrow = get_tomorrow()
     warnings: List[str] = []
 
@@ -189,7 +188,6 @@ def test_missing_argument_error(api_url, api_key, product_id, endpoint, version=
 
 def test_error_for_non_existing_product(api_url, api_key, product_id, endpoint, version=1):
     '''Testing availability for non existing product'''
-
     tomorrow = get_tomorrow()
     raw_response, response = client(f'{api_url}/v{version}/products/NON-EXISTING-PRODUCT-ID/{endpoint}', api_key, {
         'start': tomorrow.isoformat(),
@@ -274,7 +272,6 @@ def not_allowed_method(api_url, api_key, product_id, endpoint, version=1):
 
 def test_error_for_non_timeslot_product(api_url, api_key, product_id, endpoint, version=1):
     '''Testing timeslot availability for non timeslot product'''
-
     tomorrow = get_tomorrow()
     raw_response, response = client(f'{api_url}/v{version}/products/{product_id}/{endpoint}', api_key, {
         'start': tomorrow.isoformat(),
@@ -291,7 +288,6 @@ def test_error_for_non_timeslot_product(api_url, api_key, product_id, endpoint, 
 
 def test_error_for_timeslot_product(api_url, api_key, product_id, endpoint, version=1):
     '''Testing variant availability for timeslot product'''
-
     tomorrow = get_tomorrow()
     raw_response, response = client(f'{api_url}/v{version}/products/{product_id}/{endpoint}', api_key, {
         'start': tomorrow.isoformat(),

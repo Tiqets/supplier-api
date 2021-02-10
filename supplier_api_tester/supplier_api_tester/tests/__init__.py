@@ -1,4 +1,3 @@
-from . import availability_dates
 from . import availability_variants
 from . import availability_timeslots
 from . import booking
@@ -6,18 +5,9 @@ from . import product_catalog
 from . import reservation
 
 AVAILABILITY_TEST = (
-    availability_dates.test_response_format,
-    availability_dates.test_next_30_days,
-    availability_dates.test_missing_api_key,
-    availability_dates.test_incorrect_api_key,
-    availability_dates.test_missing_argument_error,
-    availability_dates.test_error_for_non_existing_product,
-    availability_dates.incorrect_date_format,
-    availability_dates.end_before_start_error,
-    availability_dates.past_start_date,
-    availability_dates.huge_date_range,
-    availability_dates.not_allowed_method,
+    
 )
+
 
 AVAILABILITY_VARIANTS_TEST = (
     availability_variants.test_response_format,
