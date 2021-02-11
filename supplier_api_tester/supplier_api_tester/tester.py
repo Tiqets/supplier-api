@@ -45,5 +45,6 @@ class SupplierApiTester(object):
                 return results + list(TEST_TARGETS['variants'])
         return results
 
+
 def _run_tests(target, *args):
     return (test(*args) for test in target)

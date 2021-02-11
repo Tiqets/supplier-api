@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.4.2
+- Removing "/dates" endpoint as redundant
+
 ## 1.4.1
 - Adding "PDF" as supported "barcode_format"
 

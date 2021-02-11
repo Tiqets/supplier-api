@@ -213,68 +213,6 @@ paths:
           content: {}
       security:
         - authorization_header: []
-  "/v1/products/{product_id}/dates":
-    get:
-      tags:
-        - Availability
-      summary: Available Dates
-      description: |
-        Returns a list of all the dates that have at least one ticket available between the requested start and end date.
-
-        Only include business dates in the response.
-        Omit the dates the venue is closed.
-
-      operationId: getDates
-      parameters:
-        - name: product_id
-          in: path
-          description: ID of a single product.
-          required: true
-          schema:
-            type: string
-        - name: start
-          in: query
-          description: Start of the date range
-          required: true
-          schema:
-            type: string
-            format: date
-            example: "2019-06-21"
-        - name: end
-          in: query
-          description: End of the date range
-          required: true
-          schema:
-            type: string
-            format: date
-            example: "2019-06-21"
-      responses:
-        "200":
-          description: List of dates
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Dates"
-        "400":
-          description: |
-            Bad request
-
-            ## Internal error codes
-
-            | Internal error code |         Error         |                                         Message                                          |
-            |---------------------|-----------------------|------------------------------------------------------------------------------------------|
-            |                1000 | Missing argument      | Required argument ATTRIBUTE_NAME was not found                                           |
-            |                1001 | Missing product       | Product with ID ID_NUMBER doesn't exist                                                  |
-            |                2000 | Incorrect date format | Incorrect date format xxx, please use the YYYY-MM-DD format                              |
-            |                2001 | Incorrect date range  | The end date cannot be earlier then start date                                           |
-            |                2009 | Incorrect date        | Eg. Cannot use the past date or Given date is too far ahead in the future (max 6 months) |
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/BadRequest"
-      security:
-        - authorization_header: []
-
   "/v1/products/{product_id}/variants":
     get:
       tags:
@@ -653,23 +591,6 @@ components:
           type: string
         max_tickets:
           type: integer
-    Dates:
-      type: array
-      example:
-        - date: "2019-06-26"
-          max_tickets: 64
-        - date: "2019-06-27"
-          max_tickets: 76
-      items:
-        type: object
-        properties:
-          date:
-            type: string
-            format: date
-            example: "2019-06-27"
-          max_tickets:
-            type: integer
-            example: 54
     OrderItem:
       type: object
       required:

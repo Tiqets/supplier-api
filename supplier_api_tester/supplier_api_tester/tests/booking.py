@@ -6,7 +6,7 @@ import requests
 from ..client import client
 from ..decorators import test_wrapper
 from ..exceptions import FailedTest
-from ..models import TestResult, DailyAvailability, Timeslot, ApiError
+from ..models import TestResult, Timeslot, ApiError
 from ..utils.adapters import get_reservation, get_booking, get_api_error, get_products, decode_booking_data
 from ..utils.reservation import get_payload_from_slot, get_reservation_slot
 from ..utils.errors import check_api_error

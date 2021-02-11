@@ -49,11 +49,6 @@ class Product:
     is_refundable: bool
     cutoff_time: int
 
-@dataclass
-class DailyAvailability:
-    date: date
-    max_tickets: int
-
 
 @dataclass
 class Variant:

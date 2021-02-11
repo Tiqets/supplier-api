@@ -10,7 +10,7 @@ import dacite
 from requests.models import Request
 
 from ..exceptions import FailedTest
-from ..models import ApiError, Booking, DailyAvailability, DailyVariants, Product, Reservation, Timeslot
+from ..models import ApiError, Booking, DailyVariants, Product, Reservation, Timeslot
 
 
 def check_base64(item):
@@ -34,37 +34,6 @@ def booking_pdf_validator(booking: Booking, raw_response:Request):
                         message="Error while decoding (base64) PDF voucher for the ticket",
                         response=raw_response
                     )
-
-
-def get_daily_availability(raw_response: Request, response) -> List[DailyAvailability]:
-    '''Getting and testing response from the /dates endpoint'''
-    if type(response) is not list:
-        raise FailedTest(
-            message='The response should be a JSON Array',
-            response=raw_response,
-        )
-    try:
-        days = [
-            dacite.from_dict(
-                data_class=DailyAvailability,
-                data=day,
-                config=dacite.Config(
-                    type_hooks={date: date.fromisoformat},
-                    strict=True,
-                )
-            )
-            for day in response
-        ]
-    except (
-        dacite.exceptions.WrongTypeError,
-        dacite.exceptions.MissingValueError,
-        dacite.exceptions.UnexpectedDataError,
-    ) as e:
-        raise FailedTest(
-            message=f'Incorrect JSON format in response from the /dates endpoint ({e})',
-            response=raw_response,
-        )
-    return days
 
 
 def get_variants(raw_response: Request, response) -> List[DailyVariants]:
@@ -99,7 +68,7 @@ def get_variants(raw_response: Request, response) -> List[DailyVariants]:
 
 
 def get_timeslots(raw_response: Request, response) -> List[Timeslot]:
-    '''Getting and testing response from the /timeslots endpoint'''
+    '''Getting and testing response from the /timeslots endpoint'''   
     if type(response) is not list:
         raise FailedTest(
             message='The response should be a JSON Array',
