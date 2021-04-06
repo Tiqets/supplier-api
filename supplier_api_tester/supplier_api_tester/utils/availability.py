@@ -99,7 +99,7 @@ def test_missing_api_key(api_url, api_key, product_id, endpoint, version=1):
         return TestResult(
             status=1,
             message=(
-                f'Incorrect text message ({response.text}). '
+                f'Incorrect text message ({raw_response.text}). '
                 'Expected message: Forbidden - Missing or incorrect API key'
             )
         )

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.4
+
+- Fix for wrong variable name
+
 ## 1.4.3
 
 - Updating availability tests
