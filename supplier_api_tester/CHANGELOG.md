@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.5
+
+- Fix for cancelation test
+
 ## 1.4.4
 
 - Fix for wrong variable name
