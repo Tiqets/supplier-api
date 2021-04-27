@@ -68,7 +68,7 @@ def get_variants(raw_response: Request, response) -> List[DailyVariants]:
 
 
 def get_timeslots(raw_response: Request, response) -> List[Timeslot]:
-    '''Getting and testing response from the /timeslots endpoint'''   
+    '''Getting and testing response from the /timeslots endpoint'''
     if type(response) is not list:
         raise FailedTest(
             message='The response should be a JSON Array',
@@ -176,12 +176,12 @@ def get_booking(raw_response: Request, response) -> Booking:
         )
 
     if booking.barcode_format not in ('QRCODE', 'CODE128', 'CODE39', 'ITF', 'DATAMATRIX', 'EAN13', 'PDF'):
-        
+
         raise FailedTest(
             message=f'Incorrect barcode format ({booking.barcode_format})',
             response=raw_response,
         )
-    
+
     if booking.barcode_format == 'PDF':
         booking_pdf_validator(booking, raw_response)
 
@@ -225,8 +225,3 @@ def get_api_error(raw_response: Request, response) -> ApiError:
             message=f'Incorrect response format for 400 error ({e})',
             response=raw_response,
         )
-
-def decode_booking_data(booking_id:str):
-    json_content = json.loads(b64decode(booking_id.replace('!', '=')).decode())
-    booking_date, product_id = json_content
-    return booking_date, product_id

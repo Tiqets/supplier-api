@@ -8,7 +8,7 @@ with open('requirements.txt') as f:
 
 setuptools.setup(
     name='Supplier API tester',
-    version='1.4.4',
+    version='1.4.5',
     author='Tiqets Team',
     author_email='connections@tiqets.com',
     description='Console tool for validating the Supplier API implementation',
