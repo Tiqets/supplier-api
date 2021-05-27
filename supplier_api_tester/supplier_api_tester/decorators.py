@@ -31,7 +31,7 @@ def test_wrapper(f):
                     headers=e.response.headers,
                     payload=_format_json(e.response.request.body),
                     body=_format_json(e.response.text),
-                ),
+                ) if e.response else None,
             )
         test_result.title = f.__doc__
         test_result.duration = ns_to_ms(time.time_ns() - start)

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.6
+
+- Fix for reporting connection errors
+
 ## 1.4.5
 
 - Fix for cancelation test

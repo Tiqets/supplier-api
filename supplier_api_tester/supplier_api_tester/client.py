@@ -22,12 +22,12 @@ def client(
     except requests.exceptions.ConnectionError:
         raise FailedTest(
             message=f'Connection error occured while testing endpoint {url}. Check if your server is available.',
-            response=response,
+            response=None,
         )
     except requests.exceptions.HTTPError:
         raise FailedTest(
             message=f'HTTP error occured while testing endpoint {url}',
-            response=response,
+            response=None,
         )
 
     if response.status_code not in (200, 204, 400, 403, 405, 500):
