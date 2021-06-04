@@ -105,8 +105,19 @@ info:
 
     **Testing tool**
 
-    Testing your implementation can be done using a [special tool](https://github.com/Tiqets/supplier-api/tree/master/supplier_api_tester) that we developed for this purpose.
-    It requires Python to be installed on your system.
+    There are two options to test the implementation:
+
+    1. **Web tool**
+    
+        It can be accessed [here](https://supplier-api-web-tool.tiqets.com/).
+    
+        This tool will require your integration to be accessible from the web. To get user credentials contact connections@tiqets.com.
+    
+    2. **Command Tool**
+    
+        Python script that can be runned in local environment.
+        
+       How to install and commands can be found [here](https://github.com/Tiqets/supplier-api/tree/master/supplier_api_tester)
 
   contact:
     email: connections@tiqets.com
@@ -115,7 +126,7 @@ tags:
   - name: Availability
     description: |
       Availability related endpoints list the variants (ticket types) that are currently available for sale and what limits apply.
-      The provided values must be up-to-date.
+      The provided values must be up-to-date and always in the local time of the product/venue.
 
       These endpoints need to respond quickly as our cache building processes will hit them in large bursts when we are rebuilding the entire cache.
       Note that our cache is only used for customer experience reasons. Before placing orders we will always validate that the request dates and/or timeslots still offer availability.
@@ -343,10 +354,10 @@ paths:
       summary: Reservation
       description: |
         When a customer commits to the purchase of tickets, right before he enters the payment flow, Tiqets will reserve the tickets.
-        This reservation should be held **at least 15 minutes**.
+        This reservation should be held **at least 15 minutes**. If the customer confirms the booking later, Tiqets will create a new reservation and confirm it inmediately, but won't send a request to cancel the previous one.
 
         Note that the timeslot field is optional.
-        It is _only_ provided for products with timeslots and will contain the value of an existing timeslot's "start" value.
+        It is _only_ provided for products with timeslots and will contain the value of an existing timeslot's "start" value, using the local time of the product/venue.
 
       operationId: reservation
       parameters:
@@ -494,6 +505,8 @@ components:
       properties:
         id:
           type: string
+          maxLength: 64
+          description: Id of a single product. Must use printable ASCII characters.
         name:
           type: string
         description:
