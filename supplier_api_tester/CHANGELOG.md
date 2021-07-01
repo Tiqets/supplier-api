@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.7
+
+- Removing payload from the cancel booking call
+
 ## 1.4.6
 
 - Fix for reporting connection errors

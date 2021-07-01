@@ -216,7 +216,7 @@ def test_cancellation(api_url, api_key, product_id, timeslots: bool, version=1):
 
     # cancel booking that was already cancelled:
     url = f'{api_url}/v{version}/booking/{booking_id}'
-    raw_response, response = client(url, api_key, method=requests.delete, json_payload={"booking_id": booking_id})
+    raw_response, response = client(url, api_key, method=requests.delete)
 
     cancel_date_ok = (booking_for_time > cancellation_time)
     cancelled_before_cutoff = (product.cutoff_time == 0 or product.cutoff_time < hours_in_advance)
