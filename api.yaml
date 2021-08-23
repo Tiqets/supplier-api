@@ -572,10 +572,10 @@ components:
           end: "19:30"
           max_tickets: 200
           variants:
-            - id: "4458"
+            - id: "1"
               name: Adult
               max_tickets: 110
-            - id: "4459"
+            - id: "2"
               name: Child
               max_tickets: 77
       items:
