@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.8
+
+- Adding test for empty availability check
+
 ## 1.4.7
 
 - Removing payload from the cancel booking call
