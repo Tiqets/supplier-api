@@ -83,7 +83,7 @@ def huge_date_range(api_url, api_key, product_id, endpoint, version=1):
 
 
 def empty_availability(api_url, api_key, product_id, endpoint, version=1):
-    '''Checking availability with huge date range'''
+    '''Checking availability that is supposed to be empty'''
     today = datetime.utcnow().date()
     start = today + timedelta(days=300)
     end = start + timedelta(days=1)
