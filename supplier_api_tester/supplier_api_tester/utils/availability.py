@@ -82,6 +82,26 @@ def huge_date_range(api_url, api_key, product_id, endpoint, version=1):
     return check_api_error(raw_response, api_error, expected_error)
 
 
+def empty_availability(api_url, api_key, product_id, endpoint, version=1):
+    '''Checking availability with huge date range'''
+    today = datetime.utcnow().date()
+    start = today + timedelta(days=300)
+    end = start + timedelta(days=1)
+
+    raw_response, response = client(f'{api_url}/v{version}/products/{product_id}/{endpoint}', api_key, {
+        'start': start.isoformat(),
+        'end': end.isoformat(),
+    })
+    if not response:
+        return TestResult()
+    return TestResult(
+        status=1,
+        message=(
+            "Skipping that test because response is not empty."
+        )
+    )
+
+
 def test_missing_api_key(api_url, api_key, product_id, endpoint, version=1):
     '''Request without API-Key'''
     tomorrow = get_tomorrow()
