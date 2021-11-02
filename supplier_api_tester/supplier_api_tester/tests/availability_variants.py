@@ -73,7 +73,7 @@ def huge_date_range(api_url, api_key, product_id, version=1):
 
 @test_wrapper
 def empty_availability(api_url, api_key, product_id, version=1):
-    '''[Timeslots] Checking empty availability'''
+    '''[Variants] Checking empty availability'''
     return availability.empty_availability(api_url, api_key, product_id, 'variants', version=1)
 
 
