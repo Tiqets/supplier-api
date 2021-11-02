@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.9
+
+- Adding test for empty availability check for non timeslotted products
+
 ## 1.4.8
 
 - Adding test for empty availability check
