@@ -35,6 +35,7 @@ AVAILABILITY_TIMESLOTS_TEST = (
     availability_timeslots.end_before_start_error,
     availability_timeslots.past_start_date,
     availability_timeslots.huge_date_range,
+    availability_timeslots.empty_availability,
     availability_timeslots.not_allowed_method,
     availability_variants.invalid_product,
 )
