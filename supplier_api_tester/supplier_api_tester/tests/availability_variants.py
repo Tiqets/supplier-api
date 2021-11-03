@@ -72,6 +72,12 @@ def huge_date_range(api_url, api_key, product_id, version=1):
 
 
 @test_wrapper
+def empty_availability(api_url, api_key, product_id, version=1):
+    '''[Variants] Checking empty availability'''
+    return availability.empty_availability(api_url, api_key, product_id, 'variants', version=1)
+
+
+@test_wrapper
 def not_allowed_method(api_url, api_key, product_id, version=1):
     '''[Variants] Testing methods that are not allowed'''
     return availability.not_allowed_method(api_url, api_key, product_id, 'variants', version=1)

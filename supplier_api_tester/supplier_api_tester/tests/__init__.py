@@ -20,6 +20,7 @@ AVAILABILITY_VARIANTS_TEST = (
     availability_variants.end_before_start_error,
     availability_variants.past_start_date,
     availability_variants.huge_date_range,
+    availability_variants.empty_availability,
     availability_variants.not_allowed_method,
     availability_timeslots.invalid_product,
 )
