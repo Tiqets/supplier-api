@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.4
+
+- Fixing typo in error message
+- Using quotes when pointing to incorrect arguments
+- Fix for returning products without filtering by timeslots
+
 ## 1.4.3
 
 - Removing redundant "/dates" endpoint

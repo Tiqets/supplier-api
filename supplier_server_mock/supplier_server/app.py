@@ -18,9 +18,9 @@ app.register_error_handler(exceptions.BadRequest, error_handlers.bad_request)
 @app.route('/v1/products')
 @authorization_header
 def products():
-    use_timeslots = request.args.get('use_timeslots') == 'True'
+    use_timeslots = request.args.get('use_timeslots')
     if use_timeslots is not None:
-        return jsonify([p for p in constants.PRODUCTS if p['use_timeslots'] == use_timeslots])
+        return jsonify([p for p in constants.PRODUCTS if p['use_timeslots'] == use_timeslots == 'True'])
     return jsonify([p for p in constants.PRODUCTS])
 
 
@@ -33,7 +33,7 @@ def availability_no_timeslots(product_id: str):
     start = utils.get_date(request.args, 'start')
     end = utils.get_date(request.args, 'end')
     if start > end:
-        raise exceptions.BadRequest(2001, 'Incorrect date range', 'The end date cannot be earlier then start date')
+        raise exceptions.BadRequest(2001, 'Incorrect date range', 'The end date cannot be earlier than start date')
     today = date.today()
     if end < today:
         return jsonify([])
@@ -55,7 +55,7 @@ def availability_timeslots(product_id: str):
     start = utils.get_date(request.args, 'start')
     end = utils.get_date(request.args, 'end')
     if start > end:
-        raise exceptions.BadRequest(2001, 'Incorrect date range', 'The end date cannot be earlier then start date')
+        raise exceptions.BadRequest(2001, 'Incorrect date range', 'The end date cannot be earlier than start date')
     today = date.today()
     if end < today:
         return jsonify([])
@@ -91,16 +91,16 @@ def reservation(product_id: str):
     # booking date is different for timeslot and non timeslot strategies:
     if timeslot:
         reservation_date = datetime.fromisoformat(day.isoformat() + " " + timeslot)
-       
+
     else:
         reservation_date = day
 
     tickets = request.json.get('tickets')
     if not tickets:
-        raise exceptions.BadRequest(1000, 'Missing argument', 'Required argument tickets was not found')
+        raise exceptions.BadRequest(1000, 'Missing argument', 'Required argument "tickets" was not found')
     customer = request.json.get('customer')
     if not customer:
-        raise exceptions.BadRequest(1000, 'Missing argument', 'Required argument customer was not found')
+        raise exceptions.BadRequest(1000, 'Missing argument', 'Required argument "customer" was not found')
     availability = utils.get_availability(product_id, day)
     variant_quantity_map = {variant['id']: variant['max_tickets'] for variant in availability['variants']}
     for ticket in tickets:
@@ -121,9 +121,9 @@ def reservation(product_id: str):
 @app.route('/v1/booking', methods=['POST'])
 @authorization_header
 def booking():
-    reservation_id = request.json.get('reservation_id')    
+    reservation_id = request.json.get('reservation_id')
     if not reservation_id:
-        raise exceptions.BadRequest(1000, 'Missing argument', 'Required argument \'reservation_id\' was not found')
+        raise exceptions.BadRequest(1000, 'Missing argument', 'Required argument "reservation_id" was not found')
     try:
         expires_at, variant_quantity_map, product_id, booking_date = utils.decode_reservation_data(reservation_id)
     except:
@@ -160,7 +160,7 @@ def cancel_booking(booking_id):
     except binascii.Error:
         raise exceptions.BadRequest(1004, 'Missing booking', f"Booking with ID {booking_id} doesn't exist")
     product = [p for p in constants.PRODUCTS if p["id"]== product_id][0]
-    
+
     if not product["is_refundable"]:
         raise exceptions.BadRequest(3004, 'Cancellation not possible', 'The booking cannot be cancelled, the product does not allow cancellations')
 
@@ -176,8 +176,8 @@ def cancel_booking(booking_id):
         raise exceptions.BadRequest(2009, 'Incorrect date', f'The booking can only be cancelled {product["cutoff_time"]} hours in advance')
 
     if booking_id in product["cancelled_bookings"]:
-        raise exceptions.BadRequest(3003, 'Already cancelled', f'The booking with ID {booking_id} was already cancelled')    
-    
+        raise exceptions.BadRequest(3003, 'Already cancelled', f'The booking with ID {booking_id} was already cancelled')
+
     # if we want to test double cancellation, we need to store the cancelled booking id somewhere
     product["cancelled_bookings"].append(booking_id)
     return '', 204

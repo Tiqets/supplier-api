@@ -1,7 +1,10 @@
 import click
 
+from supplier_api_tester.client import client
+from supplier_api_tester.exceptions import FailedTest
+from supplier_api_tester.tests.product_catalog import get_catalog
 from supplier_api_tester.tester import SupplierApiTester
-from supplier_api_tester.printer import terminal_printer
+from supplier_api_tester.printer import results_printer, products_printer
 
 
 def print_title(title):
@@ -44,7 +47,7 @@ def supplier_tester(url, api_key, product_id, timeslots, availability, reservati
             timeslots=timeslots,
         )
         results = runner.run()
-        terminal_printer(results, no_colors)
+        results_printer(results, no_colors)
 
     if reservation:
         print_title('RESERVATION TESTS')
@@ -56,7 +59,7 @@ def supplier_tester(url, api_key, product_id, timeslots, availability, reservati
             timeslots=timeslots,
         )
         results = runner.run()
-        terminal_printer(results, no_colors)
+        results_printer(results, no_colors)
 
     if booking:
         print_title('BOOKING TESTS')
@@ -68,7 +71,7 @@ def supplier_tester(url, api_key, product_id, timeslots, availability, reservati
             timeslots=timeslots,
         )
         results = runner.run()
-        terminal_printer(results, no_colors)
+        results_printer(results, no_colors)
 
     if catalog:
         print_title('PRODUCT CATALOG')
@@ -80,4 +83,17 @@ def supplier_tester(url, api_key, product_id, timeslots, availability, reservati
             timeslots=timeslots,
         )
         results = runner.run()
-        terminal_printer(results, no_colors)
+        results_printer(results, no_colors)
+
+
+@click.command()
+@click.option('-u', '--url', required=True, prompt='Server URL', type=str)
+@click.option('-k', '--api-key', required=True, prompt='API Key', type=str)
+def supplier_products(url, api_key):
+    '''Shows the product catalog'''
+    try:
+        _, products = get_catalog(url, api_key, version=1)
+    except FailedTest as e:
+        print(f'Unable to get the products: {e.message}')
+        exit(1)
+    products_printer(products)

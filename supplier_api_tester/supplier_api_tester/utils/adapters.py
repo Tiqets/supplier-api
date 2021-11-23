@@ -19,6 +19,19 @@ def check_base64(item):
     except binascii.Error:
         return False
 
+
+def format_error_message(e: Exception) -> str:
+    '''
+    Method for enhancing the error messages from Dacite.
+    '''
+    if isinstance(e, dacite.exceptions.UnexpectedDataError):
+        return str(e).replace(
+            'to any data class field',
+            'to any field from the specification'
+        )
+    return str(e)
+
+
 def booking_pdf_validator(booking: Booking, raw_response:Request):
     if booking.barcode_position == 'order':
         if not check_base64(booking.barcode):
@@ -61,7 +74,7 @@ def get_variants(raw_response: Request, response) -> List[DailyVariants]:
         dacite.exceptions.UnexpectedDataError,
     ) as e:
         raise FailedTest(
-            message=f'Incorrect JSON format in response from the /variants endpoint ({e})',
+            message=f'Incorrect JSON format in response from the /variants endpoint: {format_error_message(e)}',
             response=raw_response,
         )
     return days
@@ -92,7 +105,7 @@ def get_timeslots(raw_response: Request, response) -> List[Timeslot]:
         dacite.exceptions.UnexpectedDataError,
     ) as e:
         raise FailedTest(
-            message=f'Incorrect JSON format in response from the /timeslots endpoint ({e})',
+            message=f'Incorrect JSON format in response from the /timeslots endpoint: {format_error_message(e)}',
             response=raw_response,
         )
     return days
@@ -119,7 +132,7 @@ def get_products(raw_response: Request, response) -> List[Product]:
         dacite.exceptions.UnexpectedDataError,
     ) as e:
         raise FailedTest(
-            message=f'Incorrect JSON format in response from the /products endpoint ({e})',
+            message=f'Incorrect JSON format in response from the /products endpoint: {format_error_message(e)}',
             response=raw_response,
         )
     return products
@@ -147,7 +160,7 @@ def get_reservation(raw_response: Request, response) -> Reservation:
         dacite.exceptions.UnexpectedDataError,
     ) as e:
         raise FailedTest(
-            message=f'Incorrect JSON format in response from the /reservation endpoint ({e})',
+            message=f'Incorrect JSON format in response from the /reservation endpoint: {format_error_message(e)}',
             response=raw_response,
         )
 
@@ -171,7 +184,7 @@ def get_booking(raw_response: Request, response) -> Booking:
         dacite.exceptions.UnexpectedDataError,
     ) as e:
         raise FailedTest(
-            message=f'Incorrect JSON format in response from the /booking endpoint ({e})',
+            message=f'Incorrect JSON format in response from the /booking endpoint: {format_error_message(e)}',
             response=raw_response,
         )
 
@@ -187,7 +200,7 @@ def get_booking(raw_response: Request, response) -> Booking:
 
     if booking.barcode_position not in ('order', 'ticket'):
         raise FailedTest(
-            message=f'Incorrect value in the barcode_position field ({booking.barcode_position})',
+            message=f'Incorrect value in the barcode_position field: {booking.barcode_position}',
             response=raw_response,
         )
     if booking.barcode_position == 'order' and not booking.barcode:
@@ -222,6 +235,6 @@ def get_api_error(raw_response: Request, response) -> ApiError:
         dacite.exceptions.UnexpectedDataError,
     ) as e:
         raise FailedTest(
-            message=f'Incorrect response format for 400 error ({e})',
+            message=f'Incorrect response format for 400 error: {format_error_message(e)}',
             response=raw_response,
         )

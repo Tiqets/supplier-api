@@ -1,4 +1,6 @@
 from textwrap import wrap
+from typing import List
+from supplier_api_tester.models import Product
 
 from terminaltables import AsciiTable
 
@@ -10,7 +12,7 @@ class Colors:
     ENDC = '\033[0m'
 
 
-def terminal_printer(results, no_colors=False):
+def results_printer(results, no_colors=False):
     any_message = any(bool(r.message) for r in results)
     headers = ['#', 'Time', 'Test name']
     detailed_report = False
@@ -88,3 +90,18 @@ def terminal_printer(results, no_colors=False):
                     print(f'\n{Colors.WARNING}RESPONSE{Colors.ENDC}')
                     print(result.response.body)
                 print()
+
+
+def products_printer(products: List[Product]) -> None:
+    rows = [['ID', 'Name', 'Timeslots', 'Refundable', 'Cutoff time']]
+    rows.extend([
+        [
+            p.id,
+            p.name,
+            p.use_timeslots,
+            p.is_refundable,
+            p.cutoff_time,
+        ] for p in products]
+    )
+    table = AsciiTable(rows)
+    print(table.table)

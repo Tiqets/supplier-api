@@ -11,7 +11,7 @@ def get_date(data, name, required=True):
     if not data_str:
         if not required:
             return None
-        raise BadRequest(1000, 'Missing argument', f"Required argument {name} was not found")
+        raise BadRequest(1000, 'Missing argument', f'Required argument "{name}" was not found')
     try:
         return date.fromisoformat(data_str)
     except ValueError:

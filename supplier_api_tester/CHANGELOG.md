@@ -1,4 +1,14 @@
 # Changelog
+
+## 1.5.0
+
+- Fix for showing response details
+- New command: `supplier_products`
+- Fixing typo in error message
+- Using quotes when pointing to incorrect error messages
+- Using cancellation endpoint only to check the error message if the product doesn't support cancellations
+- New method for getting the catalog
+
 ## 1.4.10
 
 - Adding tests for timeslots sanity check for timeslotted products
