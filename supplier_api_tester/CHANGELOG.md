@@ -1,5 +1,5 @@
 # Changelog
-## 1.5.0
+## 1.4.10
 
 - Adding tests for timeslots sanity check for timeslotted products
 
