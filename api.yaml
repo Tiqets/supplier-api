@@ -108,15 +108,15 @@ info:
     There are two options to test the implementation:
 
     1. **Web tool**
-    
+
         It can be accessed [here](https://supplier-api-web-tool.tiqets.com/).
-    
+
         This tool will require your integration to be accessible from the web. To get user credentials contact connections@tiqets.com.
-    
+
     2. **Command Tool**
-    
+
         Python script that can be runned in local environment.
-        
+
        How to install and commands can be found [here](https://github.com/Tiqets/supplier-api/tree/master/supplier_api_tester)
 
   contact:
@@ -142,7 +142,7 @@ tags:
           - API only has 2 months of availability
           - Expected output: Availability for those 2 months that can be provided, never an error.
 
-      
+
       The cache rebuilding process looks as follows:
 
       1. **Available Dates**
@@ -275,7 +275,7 @@ paths:
             |                1001 | Missing product               | Product with ID ID_NUMBER doesn't exist                                                  |
             |                1003 | Non-timeslot product expected | Requested non timeslot availability for timeslot product ID ID_NUMBER                    |
             |                2000 | Incorrect date format         | Incorrect date format xxx, please use the YYYY-MM-DD format                              |
-            |                2001 | Incorrect date range          | The end date cannot be earlier then start date                                           |
+            |                2001 | Incorrect date range          | The end date cannot be earlier than start date                                           |
             |                2009 | Incorrect date                | Eg. Cannot use the past date or Given date is too far ahead in the future (max 6 months) |
           content:
             application/json:
@@ -336,7 +336,7 @@ paths:
             |                1001 | Missing product           | Product with ID ID_NUMBER doesn't exist                                                  |
             |                1002 | Timeslot product expected | Requested timeslot availability for non timeslot product ID ID_NUMBER                    |
             |                2000 | Incorrect date format     | Incorrect date format xxx, please use the YYYY-MM-DD format                              |
-            |                2001 | Incorrect date range      | The end date cannot be earlier then start date                                           |
+            |                2001 | Incorrect date range      | The end date cannot be earlier than start date                                           |
             |                2009 | Incorrect date            | Eg. Cannot use the past date or Given date is too far ahead in the future (max 6 months) |
           content:
             application/json:

@@ -19,6 +19,6 @@ def check_api_error(raw_response: Response, api_error, expected_error) -> TestRe
     if not api_error.message.startswith(expected_error.message):
         return TestResult(
             status=1,
-            message=f'Incorrect message text ({api_error.message}). Expected text: {expected_error.message}',
+            message=f'Incorrect message text "{api_error.message}". Expected text should start with: "{expected_error.message}"',
         )
     return TestResult()

@@ -11,7 +11,7 @@ def test_wrapper(f):
     '''
     This wrapper is doing 3 things:
       - creates the TestResult if the FailedTest exception occurs while running test function
-      - adds the test tile from the test function docstring
+      - adds the test title from the test function docstring
       - measure the test duration in milliseconds
     '''
     @wraps(f)
@@ -31,7 +31,7 @@ def test_wrapper(f):
                     headers=e.response.headers,
                     payload=_format_json(e.response.request.body),
                     body=_format_json(e.response.text),
-                ) if e.response else None,
+                ) if e.response is not None else None,
             )
         test_result.title = f.__doc__
         test_result.duration = ns_to_ms(time.time_ns() - start)

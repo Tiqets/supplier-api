@@ -156,7 +156,7 @@ def test_missing_api_key(api_url, api_key, product_id, endpoint, version=1):
     }, headers={})
     if raw_response.status_code != 403:
         raise FailedTest(
-            message=f'Incorrect status code ({raw_response.status_code}) when calling the API wihout the API-Key. Expected status code: 403.',
+            message=f'Incorrect status code "{raw_response.status_code}" when calling the API wihout the API-Key. Expected status code: "403".',
             response=raw_response,
         )
 
@@ -164,8 +164,8 @@ def test_missing_api_key(api_url, api_key, product_id, endpoint, version=1):
         return TestResult(
             status=1,
             message=(
-                f'Incorrect text message ({raw_response.text}). '
-                'Expected message: Forbidden - Missing or incorrect API key'
+                f'Incorrect text message "{raw_response.text}". '
+                'Expected message: "Forbidden - Missing or incorrect API key".'
             )
         )
 
@@ -182,7 +182,7 @@ def test_incorrect_api_key(api_url, api_key, product_id, endpoint, version=1):
 
     if raw_response.status_code != 403:
         raise FailedTest(
-            message=f'Incorrect status code ({raw_response.status_code}) when calling the API wihout the API-Key. Expected status code: 403.',
+            message=f'Incorrect status code "{raw_response.status_code}" when calling the API wihout the API-Key. Expected status code: "403".',
             response=raw_response,
         )
 
@@ -190,8 +190,8 @@ def test_incorrect_api_key(api_url, api_key, product_id, endpoint, version=1):
         return TestResult(
             status=1,
             message=(
-                f'Incorrect text message ({raw_response.text}). '
-                'Expected message: Forbidden - Missing or incorrect API key'
+                f'Incorrect text message "{raw_response.text}". '
+                'Expected message: "Forbidden - Missing or incorrect API key".'
             )
         )
 
@@ -211,7 +211,7 @@ def test_missing_argument_error(api_url, api_key, product_id, endpoint, version=
     expected_error = ApiError(
         error_code=1000,
         error='Missing argument',
-        message="Required argument end was not found",
+        message='Required argument "end" was not found',
     )
     result = check_api_error(raw_response, api_error, expected_error)
     if result.is_warning:
@@ -225,7 +225,7 @@ def test_missing_argument_error(api_url, api_key, product_id, endpoint, version=
     expected_error = ApiError(
         error_code=1000,
         error='Missing argument',
-        message="Required argument start was not found",
+        message='Required argument "start" was not found',
     )
     result = check_api_error(raw_response, api_error, expected_error)
     if result.is_warning:
@@ -237,7 +237,7 @@ def test_missing_argument_error(api_url, api_key, product_id, endpoint, version=
     expected_error = ApiError(
         error_code=1000,
         error='Missing argument',
-        message="Required argument start was not found",
+        message='Required argument "start" was not found',
     )
     result = check_api_error(raw_response, api_error, expected_error)
     if result.is_warning:
@@ -313,7 +313,7 @@ def end_before_start_error(api_url, api_key, product_id, endpoint, version=1):
     expected_error = ApiError(
         error_code=2001,
         error='Incorrect date range',
-        message='The end date cannot be earlier then start date',
+        message='The end date cannot be earlier than start date',
     )
     return check_api_error(raw_response, api_error, expected_error)
 
@@ -329,7 +329,7 @@ def not_allowed_method(api_url, api_key, product_id, endpoint, version=1):
         status_code = getattr(raw_response, 'status_code', 200)
         if status_code != 405:
             raise FailedTest(
-                message=f'Incorrect status code ({status_code}) when calling the API via method {method.__name__.upper()}. Expected status code: 405.',
+                message=f'Incorrect status code "{status_code}" when calling the API via method {method.__name__.upper()}. Expected status code: "405".',
                 response=raw_response,
             )
     return TestResult()

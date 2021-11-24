@@ -6,7 +6,8 @@ import requests
 from ..client import client
 from ..decorators import test_wrapper
 from ..exceptions import FailedTest
-from ..models import TestResult, Timeslot, ApiError
+from ..models import TestResult, ApiError
+from ..tests.product_catalog import get_catalog
 from ..utils.adapters import get_reservation, get_booking, get_api_error, get_products
 from ..utils.reservation import get_payload_from_slot, get_reservation_slot
 from ..utils.errors import check_api_error
@@ -21,7 +22,7 @@ def test_missing_reservation_id(api_url, api_key, product_id, timeslots: bool, v
     expected_error = ApiError(
         error_code=1000,
         error='Missing argument',
-        message="Required argument end was not found",
+        message='Required argument "reservation_id" was not found',
     )
     check_api_error(raw_response, api_error, expected_error)
     return TestResult()
@@ -35,7 +36,7 @@ def test_missing_api_key(api_url, api_key, product_id, timeslots: bool, version=
 
     if raw_response.status_code != 403:
         raise FailedTest(
-            message=f'Incorrect status code ({raw_response.status_code}) when calling the API wihout the API-Key. Expected status code: 403.',
+            message=f'Incorrect status code "{raw_response.status_code}" when calling the API wihout the API-Key. Expected status code: "403".',
             response=raw_response,
         )
 
@@ -43,8 +44,8 @@ def test_missing_api_key(api_url, api_key, product_id, timeslots: bool, version=
         return TestResult(
             status=1,
             message=(
-                f'Incorrect text message ({raw_response.text}). '
-                'Expected message: Forbidden - Missing or incorrect API key'
+                f'Incorrect text message "{raw_response.text}". '
+                'Expected message: "Forbidden - Missing or incorrect API key".'
             )
         )
     return TestResult()
@@ -58,7 +59,7 @@ def test_incorrect_api_key(api_url, api_key, product_id, timeslots: bool, versio
 
     if raw_response.status_code != 403:
         raise FailedTest(
-            message=f'Incorrect status code ({raw_response.status_code}) when calling the API wihout the API-Key. Expected status code: 403.',
+            message=f'Incorrect status code "{raw_response.status_code}" when calling the API wihout the API-Key. Expected status code: "403".',
             response=raw_response,
         )
 
@@ -66,8 +67,8 @@ def test_incorrect_api_key(api_url, api_key, product_id, timeslots: bool, versio
         return TestResult(
             status=1,
             message=(
-                f'Incorrect text message ({raw_response.text}). '
-                'Expected message: Forbidden - Missing or incorrect API key'
+                f'Incorrect text message "{raw_response.text}". '
+                'Expected message: "Forbidden - Missing or incorrect API key".'
             )
         )
 
@@ -83,7 +84,7 @@ def test_not_allowed_method(api_url, api_key, product_id, timeslots: bool, versi
         status_code = getattr(raw_response, 'status_code', 200)
         if status_code != 405:
             raise FailedTest(
-                message=f'Incorrect status code ({status_code}) when calling the API via method {method.__name__.upper()}. Expected status code: 405.',
+                message=f'Incorrect status code "{status_code}" when calling the API via method {method.__name__.upper()}. Expected status code: "405".',
                 response=raw_response,
             )
     return TestResult()
@@ -164,16 +165,10 @@ def test_cancellation(api_url, api_key, product_id, timeslots: bool, version=1):
     booking = get_booking(raw_response, response)
     booking_id = booking.booking_id
 
-
     # check if product supports cancellations
-    url = f'{api_url}/v{version}/products'
-    # get a list of both timeslot and non timeslot products
-    raw_response, response = client(url, api_key, method=requests.get, params={'use_timeslots':'False'})
-    non_timeslot_products = get_products(raw_response, response)
-    raw_response, response = client(url, api_key, method=requests.get, params={'use_timeslots':'True'})
-    timeslot_products = get_products(raw_response, response)
-    products_all = timeslot_products + non_timeslot_products
-    product = [product for product in products_all if product.id == product_id][0]
+    _, products = get_catalog(api_url, api_key, version)
+    product = [product for product in products if product.id == product_id][0]
+
     # cancel existing booking
     url = f'{api_url}/v{version}/booking/{booking_id}'
     raw_response, response = client(url, api_key, method=requests.delete, json_payload={"booking_id": booking_id})
@@ -187,6 +182,12 @@ def test_cancellation(api_url, api_key, product_id, timeslots: bool, version=1):
             message='The booking cannot be cancelled, the product does not allow cancellations',
         )
         check_api_error(raw_response, api_error, expected_error)
+        return TestResult(
+            status=1,
+            message=(
+                "Skipping that test because the product does not support cancellations"
+            )
+        )
 
     # cancel booking in refundable product that cannot be cancelled due to cut_off time/being past date
     if product.use_timeslots:
