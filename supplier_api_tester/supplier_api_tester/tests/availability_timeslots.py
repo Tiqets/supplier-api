@@ -24,6 +24,17 @@ def test_next_30_days(api_url, api_key, product_id, version=1):
 
 
 @test_wrapper
+def test_30_days_single_timeslots(api_url, api_key, product_id, version=1):
+    '''[Timeslots] Performing single timeslot check in the next 30 days'''
+    return availability.test_30_days_single_timeslots(api_url, api_key, product_id, 'timeslots', get_timeslots, version=1)
+
+
+@test_wrapper
+def test_30_days_timeslots_duplicates(api_url, api_key, product_id, version=1):
+    '''[Timeslots] Performing duplicates check'''
+    return availability.test_30_days_timeslots_duplicates(api_url, api_key, product_id, 'timeslots', get_timeslots, version=1)
+
+@test_wrapper
 def test_missing_api_key(api_url, api_key, product_id, version=1):
     '''[Timeslots] Request without API-Key'''
     return availability.test_missing_api_key(api_url, api_key, product_id, 'timeslots', version=1)
