@@ -27,6 +27,8 @@ AVAILABILITY_VARIANTS_TEST = (
 
 AVAILABILITY_TIMESLOTS_TEST = (
     availability_timeslots.test_next_30_days,
+    availability_timeslots.test_30_days_single_timeslots,
+    availability_timeslots.test_30_days_timeslots_duplicates,
     availability_timeslots.test_response_format,
     availability_timeslots.test_missing_api_key,
     availability_timeslots.test_incorrect_api_key,

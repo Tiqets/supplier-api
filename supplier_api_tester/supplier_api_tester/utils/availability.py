@@ -1,4 +1,5 @@
-from datetime import date, datetime, timedelta
+from copy import deepcopy
+from datetime import date, datetime, time, timedelta
 
 from typing import List
 
@@ -27,7 +28,6 @@ def test_next_30_days(api_url, api_key, product_id, endpoint, adapter_func, vers
     '''Checking for any availability in the next 30 days'''
     start = datetime.utcnow().date()
     end = start + timedelta(days=30)
-
     raw_response, response = client(f'{api_url}/v{version}/products/{product_id}/{endpoint}', api_key, {
         'start': start.isoformat(),
         'end': end.isoformat(),
@@ -41,6 +41,51 @@ def test_next_30_days(api_url, api_key, product_id, endpoint, adapter_func, vers
             response=raw_response,
         )
 
+    return TestResult()
+
+def test_30_days_single_timeslots(api_url, api_key, product_id, endpoint, adapter_func, version=1):
+    '''Checking timeslots'''
+    start = datetime.utcnow().date()
+    end = start + timedelta(days=30)
+
+    raw_response, response = client(f'{api_url}/v{version}/products/{product_id}/{endpoint}', api_key, {
+        'start': start.isoformat(),
+        'end': end.isoformat(),
+    })
+    timeslots = adapter_func(raw_response, response)
+
+    dates = [t.date for t in timeslots]
+    unique_dates = set(dates)
+    if len(unique_dates) == len(dates):
+        unique_starts_ends = {f'{t.start}-{t.end}' for t in timeslots}
+        if len(unique_starts_ends) == 1:
+            raise FailedTest(
+            message='If a product contains only a single timeslot at the same time every day, then please implement it as a non-timesloted product',
+            response=raw_response,
+        )
+    return TestResult()
+
+
+def test_30_days_timeslots_duplicates(api_url, api_key, product_id, endpoint, adapter_func, version=1):
+    '''Checking timeslots'''
+    start = datetime.utcnow().date()
+    end = start + timedelta(days=30)
+
+    raw_response, response = client(f'{api_url}/v{version}/products/{product_id}/{endpoint}', api_key, {
+        'start': start.isoformat(),
+        'end': end.isoformat(),
+    })
+
+    timeslots = adapter_func(raw_response, response)
+    
+    unique_dates_starts_ends = {f'{t.date}-{t.start}-{t.end}' for t in timeslots}
+
+    if len(timeslots) != len(unique_dates_starts_ends):
+        raise FailedTest(
+            message='Timeslots cannot be duplicated',
+            response=raw_response,
+        )
+    
     return TestResult()
 
 
