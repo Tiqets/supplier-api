@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta
 from typing import Union
 
-from supplier_api_tester import cache
 from supplier_api_tester.client import client
 from supplier_api_tester.exceptions import FailedTest
 from supplier_api_tester.models import DailyVariants, Timeslot
@@ -10,8 +9,6 @@ from supplier_api_tester.utils.adapters import get_variants, get_timeslots
 
 def get_reservation_slot(api_url, api_key, product_id, timeslots: bool, version=1):
     '''Getting day of timeslot with at least one variant available.'''
-    if cache.reservation_slot_cache:
-        return cache.reservation_slot_cache
     start = datetime.utcnow().date()
     end = start + timedelta(days=30)
     if timeslots:
@@ -33,7 +30,6 @@ def get_reservation_slot(api_url, api_key, product_id, timeslots: bool, version=
         variants_max_tickets = [v.max_tickets for v in day.variants if v.max_tickets > 0]
         if len(variants_max_tickets) > 1:
             # got multi variant slot
-            cache.reservation_slot_cache = day
             return day
         if not single_variant_item:
             single_variant_item = day
@@ -43,7 +39,6 @@ def get_reservation_slot(api_url, api_key, product_id, timeslots: bool, version=
             message='There is no availability in the next 30 days to test a reservation.',
             response=raw_response,
         )
-    cache.reservation_slot_cache = single_variant_item
     return single_variant_item
 
 
