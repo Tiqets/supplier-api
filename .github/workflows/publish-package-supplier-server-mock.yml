@@ -37,3 +37,4 @@ jobs:
       with:
         user: __token__
         password: ${{ secrets.PYPI_API_TOKEN_SUPPLIER_SERVER_MOCK }}
+        packages_dir: supplier_server_mock/
