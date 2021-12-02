@@ -1,6 +1,7 @@
 # Changelog
 
 ## 1.5.1
+
 - Fix issue caused by unnecessary caching of the reservation test.
 
 ## 1.5.0
