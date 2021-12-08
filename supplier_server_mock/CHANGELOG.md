@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.5.0
+
+- Add new field `order_reference`.
+- Start requiring it from 13th of January 2022 otherwise raise error
+
 ## 1.4.4
 
 - Fixing typo in error message
