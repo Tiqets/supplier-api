@@ -122,8 +122,11 @@ def reservation(product_id: str):
 @authorization_header
 def booking():
     reservation_id = request.json.get('reservation_id')
+    order_reference = request.json.get('reference_id')
     if not reservation_id:
         raise exceptions.BadRequest(1000, 'Missing argument', 'Required argument "reservation_id" was not found')
+    if not order_reference and date.today() >= date(2022, 1, 13):
+        raise exceptions.BadRequest(1000, 'Missing argument', 'Required argument "order_reference" was not found')
     try:
         expires_at, variant_quantity_map, product_id, booking_date = utils.decode_reservation_data(reservation_id)
     except:
