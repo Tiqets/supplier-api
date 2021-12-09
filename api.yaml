@@ -695,9 +695,9 @@ components:
           type: string
           example: "12345678910"
           description: |
-          Per the **10th of January 2022** we will start sending our own order reference ID.
+            Per the **10th of January 2022** we will start sending our own order reference ID.
 
-          Value will contain a numerical value of up to 12 digits.
+            Value will contain a numerical value of up to 12 digits.
     BookingResponse:
       type: object
       example:
