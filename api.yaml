@@ -695,9 +695,9 @@ components:
           type: string
           example: "12345678910"
           description: |
-            Per the **10th of January 2022** we will start sending our own order reference ID.
-
-            Value will contain a numerical value of up to 12 digits.
+            Per the **10th of January 2022** we will start sending our order reference ID along with the request.  The value may consist of at most 12 digits.  
+            
+            You are encouraged to store this value as it allows for cross-referencing of the order administrations and facilitates locating orders in Tiqets' systems.
     BookingResponse:
       type: object
       example:
