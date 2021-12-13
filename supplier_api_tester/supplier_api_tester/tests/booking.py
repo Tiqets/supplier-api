@@ -124,6 +124,7 @@ def test_booking(api_url, api_key, product_id, timeslots: bool, version=1):
     url = f'{api_url}/v{version}/booking'
     raw_response, response = client(url, api_key, method=requests.post, json_payload={
         'reservation_id': reservation.reservation_id,
+        'order_reference': '12345678910',
     })
     booking = get_booking(raw_response, response)
     if booking.barcode_position == 'ticket':

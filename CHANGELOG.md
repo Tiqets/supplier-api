@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.6.0
+
+- Add new field `order_reference` to booking step.
+- Start requiring it from 13th of January 2022
+
 ## 1.4.2
 - Removing "/dates" endpoint as redundant
 
