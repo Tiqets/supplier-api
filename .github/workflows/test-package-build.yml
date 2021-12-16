@@ -6,13 +6,13 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: Upload Python Package
+name: Test package build
 
 on:
   push:
     paths:
       - supplier_api_tester/**
-    branches:
+    branches-ignore:
       - master
 
 jobs:
@@ -30,9 +30,5 @@ jobs:
         pip install build
     - name: Build package
       run: python -m build -s ./supplier_api_tester
-    - name: Publish supplier_api_tester
-      uses: pypa/gh-action-pypi-publish@27b31702a0e7fc50959f5ad993c78deac1bdfc29
-      with:
-        user: __token__
-        password: ${{ secrets.PYPI_API_TOKEN_SUPPLIER_API_TESTER }}
-        packages_dir: supplier_api_tester/dist/
+    - name: Validate output
+      run: ls -l ./supplier_api_tester/dist
