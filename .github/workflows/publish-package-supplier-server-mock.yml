@@ -29,7 +29,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install build
     - name: Build package
-      run: python -m build -s ./supplier_server_mock
+      run: python -m build -s ./supplier_server_mock -w
     - name: Publish supplier_server_mock
       uses: pypa/gh-action-pypi-publish@27b31702a0e7fc50959f5ad993c78deac1bdfc29
       with:
