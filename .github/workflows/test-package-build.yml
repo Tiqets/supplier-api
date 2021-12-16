@@ -29,6 +29,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install build
     - name: Build package
-      run: python -m build -s ./supplier_api_tester
+      run: python -m build -s ./supplier_api_tester -w
     - name: Validate output
       run: ls -l ./supplier_api_tester/dist
