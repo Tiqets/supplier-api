@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.6.1
+
+- Add no cache headers
+
 ## 1.6.0
 
 - Add new field `order_reference` to booking step.
