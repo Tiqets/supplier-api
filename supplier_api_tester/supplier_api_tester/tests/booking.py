@@ -1,5 +1,7 @@
-from datetime import datetime, timedelta, timezone
-from typing import Union
+# If multiple checks can be done using the same response
+# then they should be done under a single test case.
+
+from datetime import datetime
 
 import requests
 
@@ -8,7 +10,7 @@ from ..decorators import test_wrapper
 from ..exceptions import FailedTest
 from ..models import TestResult, ApiError
 from ..tests.product_catalog import get_catalog
-from ..utils.adapters import get_reservation, get_booking, get_api_error, get_products
+from ..utils.adapters import get_reservation, get_booking, get_api_error
 from ..utils.reservation import get_payload_from_slot, get_reservation_slot
 from ..utils.errors import check_api_error
 
@@ -95,7 +97,8 @@ def test_booking_incorrect_reservation_id(api_url, api_key, product_id, timeslot
     '''Booking with incorrect reservation ID.'''
     url = f'{api_url}/v{version}/booking'
     raw_response, response = client(url, api_key, method=requests.post, json_payload={
-        'reservation_id': 'Tk9OLUVYSVNUSU5HLUlECg!!', # NON-EXISTING-ID
+        'reservation_id': 'non-existing-ID',
+        'order_reference': '123456'
     })
     api_error = get_api_error(raw_response, response)
     expected_error = ApiError(
@@ -162,6 +165,7 @@ def test_cancellation(api_url, api_key, product_id, timeslots: bool, version=1):
     url = f'{api_url}/v{version}/booking'
     raw_response, response = client(url, api_key, method=requests.post, json_payload={
         'reservation_id': reservation.reservation_id,
+        'order_reference': '123456'
     })
     booking = get_booking(raw_response, response)
     booking_id = booking.booking_id

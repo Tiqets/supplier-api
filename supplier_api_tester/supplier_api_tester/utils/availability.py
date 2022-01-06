@@ -1,92 +1,52 @@
-from copy import deepcopy
-from datetime import date, datetime, time, timedelta
+from datetime import date, datetime, timedelta
 
-from typing import List
+from typing import List, Tuple
 
 import requests
+from requests.models import Response
 
 from supplier_api_tester.client import client
 from supplier_api_tester.exceptions import FailedTest
-from supplier_api_tester.models import ApiError, DailyVariants, TestResult
-from supplier_api_tester.utils.adapters import get_api_error
+from supplier_api_tester.models import ApiError, DailyVariants, TestResult, Timeslot
+from supplier_api_tester.utils.adapters import (
+    get_api_error,
+    parse_availability_variants,
+    parse_availability_timeslots,
+)
 from supplier_api_tester.utils.errors import check_api_error
 from supplier_api_tester.utils.date import get_tomorrow
 
 
-def test_response_format(api_url, api_key, product_id, endpoint, adapter_func, version=1):
-    '''Checking response format'''
-    today = datetime.utcnow().date()
-    raw_response, response = client(f'{api_url}/v{version}/products/{product_id}/{endpoint}', api_key, {
-        'start': today.isoformat(),
-        'end': today.isoformat(),
+def get_availability_variants(
+    api_url: str,
+    api_key: str,
+    product_id: str,
+    version: int,
+    start_date: date,
+    end_date: date,
+) -> Tuple[List[DailyVariants], Response]:
+    raw_response, response = client(f'{api_url}/v{version}/products/{product_id}/variants', api_key, {
+        'start': start_date.isoformat(),
+        'end': end_date.isoformat(),
     })
-    adapter_func(raw_response, response)
-    return TestResult()
+    days = parse_availability_variants(raw_response, response)
+    return days, raw_response
 
 
-def test_next_30_days(api_url, api_key, product_id, endpoint, adapter_func, version=1):
-    '''Checking for any availability in the next 30 days'''
-    start = datetime.utcnow().date()
-    end = start + timedelta(days=30)
-    raw_response, response = client(f'{api_url}/v{version}/products/{product_id}/{endpoint}', api_key, {
-        'start': start.isoformat(),
-        'end': end.isoformat(),
+def get_availability_timeslots(
+    api_url: str,
+    api_key: str,
+    product_id: str,
+    version: int,
+    start_date: date,
+    end_date: date,
+) -> Tuple[List[Timeslot], Response]:
+    raw_response, response = client(f'{api_url}/v{version}/products/{product_id}/timeslots', api_key, {
+        'start': start_date.isoformat(),
+        'end': end_date.isoformat(),
     })
-    days = adapter_func(raw_response, response)
-
-    max_tickets_sum = sum(day.max_tickets for day in days)
-    if max_tickets_sum <= 0:
-        raise FailedTest(
-            message='There is no availability for next 30 days',
-            response=raw_response,
-        )
-
-    return TestResult()
-
-def test_30_days_single_timeslots(api_url, api_key, product_id, endpoint, adapter_func, version=1):
-    '''Checking timeslots'''
-    start = datetime.utcnow().date()
-    end = start + timedelta(days=30)
-
-    raw_response, response = client(f'{api_url}/v{version}/products/{product_id}/{endpoint}', api_key, {
-        'start': start.isoformat(),
-        'end': end.isoformat(),
-    })
-    timeslots = adapter_func(raw_response, response)
-
-    dates = [t.date for t in timeslots]
-    unique_dates = set(dates)
-    if len(unique_dates) == len(dates):
-        unique_starts_ends = {f'{t.start}-{t.end}' for t in timeslots}
-        if len(unique_starts_ends) == 1:
-            raise FailedTest(
-            message='If a product contains only a single timeslot at the same time every day, then please implement it as a non-timesloted product',
-            response=raw_response,
-        )
-    return TestResult()
-
-
-def test_30_days_timeslots_duplicates(api_url, api_key, product_id, endpoint, adapter_func, version=1):
-    '''Checking timeslots'''
-    start = datetime.utcnow().date()
-    end = start + timedelta(days=30)
-
-    raw_response, response = client(f'{api_url}/v{version}/products/{product_id}/{endpoint}', api_key, {
-        'start': start.isoformat(),
-        'end': end.isoformat(),
-    })
-
-    timeslots = adapter_func(raw_response, response)
-    
-    unique_dates_starts_ends = {f'{t.date}-{t.start}-{t.end}' for t in timeslots}
-
-    if len(timeslots) != len(unique_dates_starts_ends):
-        raise FailedTest(
-            message='Timeslots cannot be duplicated',
-            response=raw_response,
-        )
-    
-    return TestResult()
+    days = parse_availability_timeslots(raw_response, response)
+    return days, raw_response
 
 
 def past_start_date(api_url, api_key, product_id, endpoint, version=1):

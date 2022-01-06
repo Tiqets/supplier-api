@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.6.2
+
+- Less calls for availability
+- More sanity checks for availability
+- Compatibility with python 3.7
+
 ## 1.6.1
 
 - Add no cache headers
@@ -11,7 +17,7 @@
 
 ## 1.5.1
 
-- Fix issue caused by unnecessary caching of the reservation test. 
+- Fix issue caused by unnecessary caching of the reservation test.
 
 ## 1.5.0
 

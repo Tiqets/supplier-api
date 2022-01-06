@@ -1,7 +1,6 @@
 import base64
 from base64 import b64encode, b64decode
 import binascii
-import json
 
 from datetime import date, datetime
 from typing import List
@@ -49,7 +48,7 @@ def booking_pdf_validator(booking: Booking, raw_response:Request):
                     )
 
 
-def get_variants(raw_response: Request, response) -> List[DailyVariants]:
+def parse_availability_variants(raw_response: Request, response) -> List[DailyVariants]:
     '''Getting and testing response from the /variants endpoint'''
     if type(response) is not list:
         raise FailedTest(
@@ -80,7 +79,7 @@ def get_variants(raw_response: Request, response) -> List[DailyVariants]:
     return days
 
 
-def get_timeslots(raw_response: Request, response) -> List[Timeslot]:
+def parse_availability_timeslots(raw_response: Request, response) -> List[Timeslot]:
     '''Getting and testing response from the /timeslots endpoint'''
     if type(response) is not list:
         raise FailedTest(
@@ -88,16 +87,16 @@ def get_timeslots(raw_response: Request, response) -> List[Timeslot]:
             response=raw_response,
         )
     try:
-        days = [
+        timeslots = [
             dacite.from_dict(
                 data_class=Timeslot,
-                data=day,
+                data=timeslot,
                 config=dacite.Config(
                     type_hooks={date: date.fromisoformat},
                     strict=True,
                 )
             )
-            for day in response
+            for timeslot in response
         ]
     except (
         dacite.exceptions.WrongTypeError,
@@ -108,7 +107,7 @@ def get_timeslots(raw_response: Request, response) -> List[Timeslot]:
             message=f'Incorrect JSON format in response from the /timeslots endpoint: {format_error_message(e)}',
             response=raw_response,
         )
-    return days
+    return timeslots
 
 
 def get_products(raw_response: Request, response) -> List[Product]:

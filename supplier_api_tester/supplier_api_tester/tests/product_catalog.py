@@ -1,3 +1,6 @@
+# If multiple checks can be done using the same response
+# then they should be done under a single test case.
+
 from typing import List, Optional, Tuple
 import requests
 from requests.models import Response
