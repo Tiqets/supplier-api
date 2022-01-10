@@ -1,10 +1,9 @@
-import base64
 import binascii
 from datetime import date, datetime, timedelta
 import werkzeug
 
 import arrow
-from flask import Flask, request, jsonify, make_response
+from flask import Flask, request, jsonify
 from .auth import authorization_header
 from .validation import date_range_validator
 from . import constants, error_handlers, exceptions, utils
@@ -122,7 +121,7 @@ def reservation(product_id: str):
 @authorization_header
 def booking():
     reservation_id = request.json.get('reservation_id')
-    order_reference = request.json.get('reference_id')
+    order_reference = request.json.get('order_reference')
     if not reservation_id:
         raise exceptions.BadRequest(1000, 'Missing argument', 'Required argument "reservation_id" was not found')
     if not order_reference:
@@ -130,7 +129,6 @@ def booking():
     try:
         expires_at, variant_quantity_map, product_id, booking_date = utils.decode_reservation_data(reservation_id)
     except:
-
         raise exceptions.BadRequest(3002, 'Incorrect reservation ID', 'Given reservation ID is incorrect')
     now = arrow.utcnow().datetime
     if now > expires_at:

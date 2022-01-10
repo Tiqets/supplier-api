@@ -4,7 +4,10 @@ from typing import Union
 from supplier_api_tester.client import client
 from supplier_api_tester.exceptions import FailedTest
 from supplier_api_tester.models import DailyVariants, Timeslot
-from supplier_api_tester.utils.adapters import get_variants, get_timeslots
+from supplier_api_tester.utils.availability import (
+    get_availability_timeslots,
+    get_availability_variants,
+)
 
 
 def get_reservation_slot(api_url, api_key, product_id, timeslots: bool, version=1):
@@ -12,17 +15,9 @@ def get_reservation_slot(api_url, api_key, product_id, timeslots: bool, version=
     start = datetime.utcnow().date()
     end = start + timedelta(days=30)
     if timeslots:
-        raw_response, response = client(f'{api_url}/v{version}/products/{product_id}/timeslots', api_key, {
-            'start': start.isoformat(),
-            'end': end.isoformat(),
-        })
-        days = get_timeslots(raw_response, response)
+        days, raw_response = get_availability_timeslots(api_url, api_key, product_id, version, start, end)
     else:
-        raw_response, response = client(f'{api_url}/v{version}/products/{product_id}/variants', api_key, {
-            'start': start.isoformat(),
-            'end': end.isoformat(),
-        })
-        days = get_variants(raw_response, response)
+        days, raw_response = get_availability_variants(api_url, api_key, product_id, version, start, end)
 
     days = [day for day in days if day.variants and day.max_tickets > 0]
     single_variant_item = None

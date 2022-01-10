@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.5.1
+
+- Fix for checking the `order_reference`
+
 ## 1.5.0
 
 - Add new field `order_reference`.

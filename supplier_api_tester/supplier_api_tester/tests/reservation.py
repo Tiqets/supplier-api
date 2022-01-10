@@ -1,3 +1,6 @@
+# If multiple checks can be done using the same response
+# then they should be done under a single test case.
+
 from datetime import datetime, timedelta, timezone
 from typing import Union
 
