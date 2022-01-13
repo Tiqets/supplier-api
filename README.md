@@ -1,16 +1,14 @@
 # Tiqets Supplier API
 
-The Tiqets Supplier API specification was created to allow suppliers to take charge control of the implementation process and turnaround times.
+The Tiqets Supplier API Specification allows Tour Operators and Venues to sell their tickets on [Tiqets.com](https://www.tiqets.com/).
 
-[Online documentation](https://tiqets.github.io/supplier-api/)
+Take control and get connected.
 
-
-## Supplier API mock server
-
-To check how the Supplier API server may work you can install and play with our [mock server](https://github.com/Tiqets/supplier-api/tree/master/supplier_server_mock).
+Refer to [https://www.tiqets.com/venues](https://www.tiqets.com/venues) for more information on how or why you should become a supplier.
 
 
-## Supplier API testing tool
+## API Documentation
 
-Testing your implementation can be done using a [special tool](https://github.com/Tiqets/supplier-api/tree/master/supplier_api_tester) that we developed for this purpose.
-It requires Python to be installed on your system.
+Our [online documentation](https://tiqets.github.io/supplier-api/) (OpenAPI / Swagger) details what interfaces you need to add to your servers and [how to test](https://tiqets.github.io/supplier-api/#section/Development-tools) your implementation.
+
+[![Documentation screenshot](docs/spec.png)](https://tiqets.github.io/supplier-api/)

@@ -2,6 +2,8 @@
 
 Mock server on which you can test the [Supplier API](https://tiqets.github.io/supplier-api/) implementation.
 
+![Mock server screenshot](../docs/mockserver.png)
+
 ## Requirements
 
 Python 3.7+
