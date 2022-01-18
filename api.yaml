@@ -106,27 +106,42 @@ info:
     * **2xxx** - Invalid input
     * **3xxx** - Request processing failed
 
-    # Testing tools
 
-    **Mock server**
+    # Development tools
 
-    To check how the Supplier API server may work you can install and play with our [mock server](https://github.com/Tiqets/supplier-api/tree/master/supplier_server_mock).
+    Tiqets offers several tools to facilitate your development process.
 
-    **Testing tool**
+    ## Integration Testing
 
-    There are two options to test the implementation:
+    To ensure you have correctly implemented the Tiqets Supplier API Specification on your server we offer an integration testing tool. This tool simulates many happy and unhappy flows and checks if each of those is handled properly.
 
-    1. **Web tool**
+    Only if ALL tests pass without any errors your integration is ready.
 
-        It can be accessed [here](https://supplier-api-web-tool.tiqets.com/).
+    ### Web tool
 
-        This tool will require your integration to be accessible from the web. To get user credentials contact connections@tiqets.com.
+    If your development environment can be accessed from the web (directly or via a tunneling service like [ngrok](https://ngrok.com/)) then [**our online test tool**](https://supplier-api-web-tool.tiqets.com/) is the way to go.
 
-    2. **Command Tool**
+    If you haven’t received the credentials yet please request them via connections@tiqets.com
 
-        Python script that can be runned in local environment.
+    [![webtool screenshot](https://raw.githubusercontent.com/Tiqets/supplier-api/master/docs/webtool.png)](https://supplier-api-web-tool.tiqets.com/)
 
-       How to install and commands can be found [here](https://github.com/Tiqets/supplier-api/tree/master/supplier_api_tester)
+    ### Command Line tool
+
+    For development environments that can not be accessed from the web please refer to [**our CLI tool**](https://github.com/Tiqets/supplier-api/tree/master/supplier_api_tester).
+    Less user friendly than our online tool but performs the exact same tests.
+
+    Requires Python to be installed on your development environment.
+
+    [![cli tool screenshot](https://raw.githubusercontent.com/Tiqets/supplier-api/master/docs/clitool.png)](https://github.com/Tiqets/supplier-api/tree/master/supplier_api_tester)
+
+
+    ## Mock server
+
+    Need more examples? Play with [**our mock server**](https://github.com/Tiqets/supplier-api/tree/master/supplier_server_mock) to see some examples of expected behavior.
+
+    Requires Python to be installed on your development environment.
+
+    [![mock server screenshot](https://raw.githubusercontent.com/Tiqets/supplier-api/master/docs/mockserver.png)](https://github.com/Tiqets/supplier-api/tree/master/supplier_server_mock)
 
   contact:
     email: connections@tiqets.com
@@ -710,8 +725,8 @@ components:
           type: string
           example: "12345678910"
           description: |
-            Per the **10th of January 2022** we will start sending our order reference ID along with the request.  The value may consist of at most 12 digits.  
-            
+            Per the **10th of January 2022** we will start sending our order reference ID along with the request.  The value may consist of at most 12 digits.
+
             You are encouraged to store this value as it allows for cross-referencing of the order administrations and facilitates locating orders in Tiqets' systems.
     BookingResponse:
       type: object
