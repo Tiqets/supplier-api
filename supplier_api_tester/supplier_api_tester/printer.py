@@ -1,6 +1,6 @@
 from textwrap import wrap
 from typing import List
-from supplier_api_tester.models import Product
+from .models import Product
 
 from terminaltables import AsciiTable
 
@@ -10,6 +10,21 @@ class Colors:
     WARNING = '\033[93m'
     FAIL = '\033[91m'
     ENDC = '\033[0m'
+
+
+def error_printer(error: str, no_colors: bool = False) -> None:
+    rows = [['Error']]
+    if no_colors:
+        data_row = [
+            error,
+        ]
+    else:
+        data_row = [
+            f'{Colors.FAIL}{error}{Colors.ENDC}',
+        ]
+    rows.extend([data_row])
+    table = AsciiTable(rows)
+    print(table.table)
 
 
 def results_printer(results, no_colors=False):
@@ -52,6 +67,10 @@ def results_printer(results, no_colors=False):
         if not detailed_report and result.response:
             detailed_report = True
     table = AsciiTable(table_data)
+    if not table.ok:
+        error_printer('Terminal width is not big enough to display result', no_colors)
+        return
+
     if any_message:
         columns_count = len(headers) - 1
         message_size = table.column_max_width(columns_count)

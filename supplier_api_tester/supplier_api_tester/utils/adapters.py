@@ -6,7 +6,7 @@ from datetime import date, datetime
 from typing import List
 
 import dacite
-from requests.models import Request
+from requests.models import Request, Response
 
 from ..exceptions import FailedTest
 from ..models import ApiError, Booking, DailyVariants, Product, Reservation, Timeslot
@@ -31,7 +31,7 @@ def format_error_message(e: Exception) -> str:
     return str(e)
 
 
-def booking_pdf_validator(booking: Booking, raw_response:Request):
+def booking_pdf_validator(booking: Booking, raw_response: Response):
     if booking.barcode_position == 'order':
         if not check_base64(booking.barcode):
             raise FailedTest(
@@ -48,7 +48,7 @@ def booking_pdf_validator(booking: Booking, raw_response:Request):
                     )
 
 
-def parse_availability_variants(raw_response: Request, response) -> List[DailyVariants]:
+def parse_availability_variants(raw_response: Response, response) -> List[DailyVariants]:
     '''Getting and testing response from the /variants endpoint'''
     if type(response) is not list:
         raise FailedTest(
@@ -79,7 +79,7 @@ def parse_availability_variants(raw_response: Request, response) -> List[DailyVa
     return days
 
 
-def parse_availability_timeslots(raw_response: Request, response) -> List[Timeslot]:
+def parse_availability_timeslots(raw_response: Response, response) -> List[Timeslot]:
     '''Getting and testing response from the /timeslots endpoint'''
     if type(response) is not list:
         raise FailedTest(
@@ -110,7 +110,7 @@ def parse_availability_timeslots(raw_response: Request, response) -> List[Timesl
     return timeslots
 
 
-def get_products(raw_response: Request, response) -> List[Product]:
+def get_products(raw_response: Response, response) -> List[Product]:
     '''Getting and testing response from the /products endpoint'''
     if type(response) is not list:
         raise FailedTest(
@@ -137,7 +137,7 @@ def get_products(raw_response: Request, response) -> List[Product]:
     return products
 
 
-def get_reservation(raw_response: Request, response) -> Reservation:
+def get_reservation(raw_response: Response, response) -> Reservation:
     '''Getting and testing response from the /reservation endpoint'''
     if type(response) is not dict:
         raise FailedTest(
@@ -164,7 +164,7 @@ def get_reservation(raw_response: Request, response) -> Reservation:
         )
 
 
-def get_booking(raw_response: Request, response) -> Booking:
+def get_booking(raw_response: Response, response) -> Booking:
     '''Getting and testing response from the /booking endpoint'''
     if type(response) is not dict:
         raise FailedTest(
@@ -215,7 +215,7 @@ def get_booking(raw_response: Request, response) -> Booking:
     return booking
 
 
-def get_api_error(raw_response: Request, response) -> ApiError:
+def get_api_error(raw_response: Response, response) -> ApiError:
     '''Unpacking 400 error JSON structure'''
     if type(response) is not dict:
         raise FailedTest(
