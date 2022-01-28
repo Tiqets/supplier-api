@@ -1,10 +1,10 @@
 import click
 
-from supplier_api_tester.client import client
-from supplier_api_tester.exceptions import FailedTest
-from supplier_api_tester.tests.product_catalog import get_catalog
-from supplier_api_tester.tester import SupplierApiTester
-from supplier_api_tester.printer import results_printer, products_printer
+from .client import client
+from .exceptions import FailedTest
+from .tests.product_catalog import get_catalog
+from .tester import SupplierApiTester
+from .printer import results_printer, products_printer
 
 
 def print_title(title):
