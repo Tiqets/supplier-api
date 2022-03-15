@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.6.5
+
+- Using time-based reference_id for booking
+
 ## 1.6.4
 
 - security related update 
