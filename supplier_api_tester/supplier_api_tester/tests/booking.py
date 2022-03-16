@@ -2,6 +2,7 @@
 # then they should be done under a single test case.
 
 from datetime import datetime
+import time
 
 import requests
 
@@ -13,6 +14,10 @@ from ..tests.product_catalog import get_catalog
 from ..utils.adapters import get_reservation, get_booking, get_api_error
 from ..utils.reservation import get_payload_from_slot, get_reservation_slot
 from ..utils.errors import check_api_error
+
+
+def reference_id() -> str:
+    return str(time.time_ns())
 
 
 @test_wrapper
@@ -98,7 +103,7 @@ def test_booking_incorrect_reservation_id(api_url, api_key, product_id, timeslot
     url = f'{api_url}/v{version}/booking'
     raw_response, response = client(url, api_key, method=requests.post, json_payload={
         'reservation_id': 'non-existing-ID',
-        'order_reference': '123456'
+        'order_reference': reference_id(),
     })
     api_error = get_api_error(raw_response, response)
     expected_error = ApiError(
@@ -127,7 +132,7 @@ def test_booking(api_url, api_key, product_id, timeslots: bool, version=1):
     url = f'{api_url}/v{version}/booking'
     raw_response, response = client(url, api_key, method=requests.post, json_payload={
         'reservation_id': reservation.reservation_id,
-        'order_reference': '12345678910',
+        'order_reference': reference_id(),
     })
     booking = get_booking(raw_response, response)
     if booking.barcode_position == 'ticket':
@@ -165,7 +170,7 @@ def test_cancellation(api_url, api_key, product_id, timeslots: bool, version=1):
     url = f'{api_url}/v{version}/booking'
     raw_response, response = client(url, api_key, method=requests.post, json_payload={
         'reservation_id': reservation.reservation_id,
-        'order_reference': '123456'
+        'order_reference': reference_id(),
     })
     booking = get_booking(raw_response, response)
     booking_id = booking.booking_id
