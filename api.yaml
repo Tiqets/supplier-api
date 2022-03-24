@@ -511,13 +511,13 @@ components:
         - id: "687345694"
           name: "Example Tour"
           use_timeslots: true
-          is_refundable: true,
+          is_refundable: true
           cutoff_time: 0
         - id: "345678900-345678"
           name: "Example Museum"
           description: "All day entry to Example Museum."
           use_timeslots: false
-          is_refundable: true,
+          is_refundable: true
           cutoff_time: 0
       items:
         type: object
