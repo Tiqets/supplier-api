@@ -1,4 +1,4 @@
-openapi: 3.0.1
+openapi: 3.0.3
 info:
   title: Tiqets Supplier API
   description: |
@@ -121,7 +121,7 @@ info:
 
     If your development environment can be accessed from the web (directly or via a tunneling service like [ngrok](https://ngrok.com/)) then [**our online test tool**](https://supplier-api-web-tool.tiqets.com/) is the way to go.
 
-    If you haven’t received the credentials yet please request them via connections@tiqets.com
+    If you haven't received the credentials yet please request them via connections@tiqets.com
 
     [![webtool screenshot](https://raw.githubusercontent.com/Tiqets/supplier-api/master/docs/webtool.png)](https://supplier-api-web-tool.tiqets.com/)
 
@@ -145,82 +145,30 @@ info:
 
   contact:
     email: connections@tiqets.com
-  version: 1.6.0
+  version: 2.0.0
 tags:
   - name: Availability
     description: |
-      Availability related endpoints list the variants (ticket types) that are currently available for sale and what limits apply.
-      The provided values must be up-to-date and always in the local time of the product/venue.
+      The availability endpoint lists the variants (commonly referred to by the industry as "ticket types" or "Discounts") that are currently available at which quantities and optionally at what price.
+      The returned values must be up-to-date and always in the local time of the product/venue.
 
-      These endpoints need to respond quickly as our cache building processes will hit them in large bursts when we are rebuilding the entire cache.
-      Note that our cache is only used for customer experience reasons. Before placing orders we will always validate that the request dates and/or timeslots still offer availability.
+      Tiqets will typically query the availability for 1 particular date or for a full month and populate its availability cache with the response.
 
-      The availability endpoints should behave as follows:
-        - The request will be for the next 6 natural months from the day of the request (not more, not less in the current version). This means that depending on the month it could be a different total amount of days.
-        - At least 2 months should be provided. In case the request for availability is for more days in advance than are actually able to be provided, the API should not fail but just send the amount of days available (the only error we expect on this regard is if we make a request for more than 6 natural months).
+      Expected behavior:
+        - Only availability within the requested date range is returned
+        - When there is no availability for the requested and existing product an empty array (`[]`)shall be returned
+        - True ................................................
 
       Example request:
         - Parameters:
-          - start_date: 20/01/2020
-          - end_date: 20/07/2020
-          - API only has 2 months of availability
+          - start_date: 2020-01-20
+          - end_date: 2020-07-20
+          - Queried product only has 2 months of availability
           - Expected output: Availability for those 2 months that can be provided, never an error.
 
 
-      The cache rebuilding process looks as follows:
 
-      1. **Available Dates**
 
-          We fetch all dates that the venue has tickets available to quickly populate the calendar.
-
-      1. **Fetch Variants**
-
-          Per available date we will fetch the variants that you have available for that date.
-
-      1. **Fetch Timeslots**
-
-          If applicable, we will fetch the available timeslots and the variants that are available for that timeslot.
-
-      A word on "availability"
-      The max_tickets value specify the maximum amount of tickets that can be added to an order for that specific element.
-      See the tree structure below.
-
-      * **Example with timeslots**
-
-        Tree:
-        ```
-        ┏ Dates (20)
-        ┗┳━ Timeslots (15)
-          ┗┳━━ Variants (20)
-            ┗┳━━ Adult (10)
-              ┗━━ Child (10)
-        ```
-
-        Explanation:
-        * At most 15 items in one order.
-          The timeslot-level limit is the lowest.
-        * The sum of the individual variants exceeds the timeslot-level limit
-
-        Example limits:
-        * Adding 8 adult tickets leaves room 7 for more child tickets.
-
-      * **Example without timeslots**
-
-        Tree:
-        ```
-        ┏ Dates (10)
-        ┗┳━ Variants (99)
-          ┗┳━━ Adult (10)
-            ┗━━ Child (2)
-        ```
-
-        Explanation:
-        * At most 10 items in one order.
-          The dates-level limit is the lowest.
-        * The sum of the individual variants exceeds the timeslot-level limit
-
-        Example limits:
-        * Adding 8 adults tickets leaves room for 2 child tickets.
 paths:
   "/v1/products":
     get:
@@ -229,13 +177,6 @@ paths:
       summary: A catalog of available products.
       description: Returns a list of available products.
       operationId: getProducts
-      parameters:
-        - name: use_timeslots
-          in: query
-          description: Filter products that use or not use timeslots (allowed values - True or False)
-          schema:
-            type: string
-            example: "True"
       responses:
         "200":
           description: List of products
@@ -243,81 +184,17 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Products"
-        "501":
-          description: Returned when this endpoint is Not Implemented
-          content: {}
       security:
         - authorization_header: []
-  "/v1/products/{product_id}/variants":
+  "/v1/products/{product_id}/availability":
     get:
       tags:
         - Availability
-      summary: Availability without timeslots
+      summary: Availability
       description: |
-        Returns the variants that are available for the requested date range and what limits apply.
-        If your venue has unlimited availability, limits will still need to be set.
-      operationId: getVariants
-      parameters:
-        - name: product_id
-          in: path
-          description: ID of a single product
-          required: true
-          schema:
-            type: string
-        - name: start
-          in: query
-          description: Start of the date range in ISO format YYYY-MM-DD
-          required: true
-          schema:
-            type: string
-            format: date
-            example: "2019-06-21"
-        - name: end
-          in: query
-          description: End of the date range in ISO format YYYY-MM-DD
-          required: true
-          schema:
-            type: string
-            format: date
-            example: "2019-06-21"
-      responses:
-        "200":
-          description: List of variants per day
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Variants"
-        "400":
-          description: |
-            Bad request
-
-            ## Internal error codes
-
-            | Internal error code |             Error             |                                         Message                                          |
-            |---------------------|-------------------------------|------------------------------------------------------------------------------------------|
-            |                1000 | Missing argument              | Required argument ATTRIBUTE_NAME was not found                                           |
-            |                1001 | Missing product               | Product with ID ID_NUMBER doesn't exist                                                  |
-            |                1003 | Non-timeslot product expected | Requested non timeslot availability for timeslot product ID ID_NUMBER                    |
-            |                2000 | Incorrect date format         | Incorrect date format xxx, please use the YYYY-MM-DD format                              |
-            |                2001 | Incorrect date range          | The end date cannot be earlier than start date                                           |
-            |                2009 | Incorrect date                | Eg. Cannot use the past date or Given date is too far ahead in the future (max 6 months) |
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/BadRequest"
-        "501":
-          description: Returned when this endpoint is Not Implemented
-          content: {}
-      security:
-        - authorization_header: []
-  "/v1/products/{product_id}/timeslots":
-    get:
-      tags:
-        - Availability
-      summary: Availability with timeslots
-      description: |
-        Returns the various timeslots and their variants for the days within the requested date range.
-      operationId: getTimeslots
+        Returns the ticket availability of the variants within the requested date range.
+        The same data structure is used regardless of whether timeslots apply. For non-timeslotted tickets (whole day or open-dated) a "fake timeslot" titled `no-timeslots` should be returned.
+      operationId: getAvailability
       parameters:
         - name: product_id
           in: path
@@ -347,7 +224,117 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Timeslots"
+                $ref: "#/components/schemas/AvailabilityResponse"
+              examples:
+                timeslotted:
+                  summary: Product with timeslots
+                  value:
+                    "2022-12-19":
+                      "11:00":
+                        id: "timeslot-356"
+                        available_tickets: 0
+                        variants:
+                          - id: "1"
+                            name: Adult
+                            available_tickets: 0
+                            price:
+                              face_value: 3.20
+                              currency: EUR
+                          - id: "2"
+                            name: Child
+                            available_tickets: 0
+                            price:
+                              face_value: 1.10
+                              currency: EUR
+                      "16:30":
+                        id: "timeslot-357"
+                        available_tickets: 100
+                        variants:
+                          - id: "1"
+                            name: Adult
+                            available_tickets: 100
+                            price:
+                              face_value: 10
+                              currency: EUR
+                          - id: "2"
+                            name: Child
+                            available_tickets: 100
+                            price:
+                              face_value: 5.75
+                              currency: EUR
+                      "17:30":
+                        id: "timeslot-358"
+                        available_tickets: 63
+                        variants:
+                          - id: "1"
+                            name: Adult
+                            available_tickets: 63
+                            price:
+                              face_value: 10
+                              currency: EUR
+                          - id: "2"
+                            name: Child
+                            available_tickets: 63
+                            price:
+                              face_value: 5.75
+                              currency: EUR
+                single_timeslot:
+                  summary: Product with a recurring single timeslot
+                  value:
+                    "2022-12-28":
+                      "11:00":
+                        id: "timeslot-721"
+                        available_tickets: 0
+                        variants:
+                          - id: "1"
+                            name: Adult
+                            available_tickets: 0
+                            price:
+                              face_value: 10
+                              currency: EUR
+                          - id: "2"
+                            name: Child
+                            available_tickets: 0
+                            price:
+                              face_value: 5.75
+                              currency: EUR
+                    "2022-12-29":
+                      "11:00":
+                        id: "timeslot-722"
+                        available_tickets: 24
+                        variants:
+                          - id: "1"
+                            name: Adult
+                            available_tickets: 24
+                            price:
+                              face_value: 10
+                              currency: EUR
+                          - id: "2"
+                            name: Child
+                            available_tickets: 10
+                            price:
+                              face_value: 5.75
+                              currency: EUR
+                non_timeslotted:
+                  summary: Product without timeslots
+                  value:
+                    "2022-12-19":
+                      "no-timeslots":
+                        id: "2022-12-19"
+                        available_tickets: 92
+                        variants:
+                          - id: "1"
+                            name: Adult
+                            available_tickets: 92
+                            price:
+                              face_value: 4.20
+                              currency: EUR
+                          - id: "2"
+                            name: Child
+                            available_tickets: 92
+                            price:
+                              face_value: 2.10
+                              currency: EUR
         "400":
           description: |
             Bad request
@@ -396,6 +383,66 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/Reservation"
+            examples:
+              without_visitor_data:
+                summary: Reservation without sending visitor data
+                value:
+                  date: "2019-06-26"
+                  timeslot_id: "timeslot-474"
+                  tickets:
+                    - variant_id: "1"
+                      quantity: 2
+                    - variant_id: "2"
+                      quantity: 1
+                  customer:
+                    first_name: "Jon"
+                    last_name: "Snow"
+                    email: "jon@snow.com"
+                    phone: "+48 555 555 555"
+                    country: "nl"
+              without_timeslot:
+                summary: Reservation without timeslot
+                value:
+                  date: "2019-06-26"
+                  tickets:
+                    - variant_id: "1"
+                      quantity: 2
+                    - variant_id: "2"
+                      quantity: 1
+                  customer:
+                    first_name: "Jon"
+                    last_name: "Snow"
+                    email: "jon@snow.com"
+                    phone: "+48 555 555 555"
+                    country: "nl"
+              with_additional_data:
+                summary: Reservation containing additional data
+                value:
+                  date: "2019-06-26"
+                  timeslot_id: "timeslot-474"
+                  tickets:
+                    - variant_id: "1"
+                      quantity: 2
+                      visitor_data:
+                        - FULL_NAME: "Jon Snow"
+                          EMAIL: "jon@snow.com"
+                        - FULL_NAME: "Tyrion Lannister"
+                          EMAIL: "tyrion@casterlyrock.com"
+                    - variant_id: "2"
+                      quantity: 1
+                      visitor_data:
+                          - FULL_NAME: "Arya Stark"
+                            EMAIL: "arya@north.com"
+                  customer:
+                    first_name: "Jon"
+                    last_name: "Snow"
+                    email: "jon@snow.com"
+                    phone: "+48 555 555 555"
+                    country: "nl"
+                  required_order_data:
+                    PICKUP_LOCATION: "Porto Azzurro Aparthotel, Malta"
+                    ZIP_CODE: "68005"
+                    NATIONALITY: "USA"
         required: true
       responses:
         "200":
@@ -410,25 +457,27 @@ paths:
 
             ## Internal error codes
 
-            | Internal error code |             Error              |                                            Message                                            |
-            |---------------------|--------------------------------|-----------------------------------------------------------------------------------------------|
-            |                1000 | Missing argument               | Required argument ATTRIBUTE_NAME was not found                                                |
-            |                1001 | Missing product                | Product with ID ID_NUMBER doesn't exist                                                       |
-            |                2000 | Incorrect date format          | Incorrect date format xxx, please use the YYYY-MM-DD format                                   |
-            |                2002 | Wrong time slot ID             | Given timeslot_id doesn't belong to given date (YYYY-MM-DD)                                   |
-            |                2003 | Wrong variant ID               | Given variant_id doesn't belong to given timeslot_id (TIMESLOT_ID)                            |
-            |                2004 | Incorrect type                 | Expected ATTRIBUTE_NAME to be a string, got TYPE instead                                      |
-            |                2005 | Invalid Value                  | Eg. The phone number must not contain dots.                                                   |
-            |                2006 | Superfluous timeslot parameter | This product doesn't use timeslots.                                                           |
-            |                2009 | Incorrect date                 | Eg. Cannot use the past date or Given date is too far ahead in the future (max 6 months)      |
-            |                3000 | Availability error             | Quantity (3) is not available anymore for a given variant (id: 4337) and time slot (id: 5567) |
+            | Internal error code |             Error               |                                            Message                                            |
+            |---------------------|---------------------------------|-----------------------------------------------------------------------------------------------|
+            |                1000 | Missing argument                | Required argument ATTRIBUTE_NAME was not found                                                |
+            |                1001 | Missing product                 | Product with ID ID_NUMBER doesn't exist                                                       |
+            |                1003 | Missing required fields         | Eg. Missing data for field FULL_NAME                                                          |
+            |                2000 | Incorrect date format           | Incorrect date format xxx, please use the YYYY-MM-DD format                                   |
+            |                2002 | Wrong timeslot                  | Given timeslot doesn't belong to given date (YYYY-MM-DD)                                      |
+            |                2003 | Wrong variant ID                | Given variant_id doesn't belong to given timeslot_id (TIMESLOT_ID)                            |
+            |                2004 | Incorrect type                  | Expected ATTRIBUTE_NAME to be a string, got TYPE instead                                      |
+            |                2005 | Invalid Value                   | Eg. The phone number must not contain dots.                                                   |
+            |                2006 | Superfluous timeslot parameter  | This product doesn't use timeslots.                                                           |
+            |                2009 | Incorrect date                  | Eg. Cannot use the past date or Given date is too far ahead in the future (max 6 months)      |
+            |                2010 | Invalid value of required field | Eg. Incorrect value of field EMAIL                                                            |
+            |                3000 | Availability error              | Quantity (3) is not available anymore for a given variant (id: 4337) and timeslot (id: 5567)  |
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/BadRequest"
       security:
         - authorization_header: []
-  /v1/booking:
+  "/v1/booking":
     post:
       tags:
         - Booking
@@ -436,6 +485,14 @@ paths:
       description: |
         After the customer has paid, Tiqets will confirm the earlier made reservation by providing your reservation ID.
       operationId: booking
+      parameters:
+        - name: TIQETS-TEST-ORDER
+          in: header
+          description: The header that is being sent by the testing tool. Can be used to mark test bookings in your system.
+          required: false
+          example: "true"
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
@@ -512,15 +569,24 @@ components:
           name: "Example Tour"
           use_timeslots: true
           is_refundable: true
-          cutoff_time: 0
+          cutoff_time: 30
         - id: "345678900-345678"
           name: "Example Museum"
           description: "All day entry to Example Museum."
           use_timeslots: false
           is_refundable: true
           cutoff_time: 0
+          max_tickets_per_order: 20
+        - id: "564456324"
+          name: "Private Tour"
+          description: "Special individual tour"
+          use_timeslots: true
+          is_refundable: true
+          cutoff_time: 120
+          required_visitor_data:
+            - FULL_NAME
+            - PHONE
       items:
-        type: object
         $ref: "#/components/schemas/Product"
     Product:
       type: object
@@ -534,7 +600,7 @@ components:
         id:
           type: string
           maxLength: 64
-          description: Id of a single product. Must use printable ASCII characters.
+          description: Permanent and unique ID of a single product. Must use printable ASCII characters. If applicable, consider concatenating or base64 encoding a set of values that are meaningful for your system.
         name:
           type: string
         description:
@@ -546,87 +612,81 @@ components:
           description: Product supports cancellations
         cutoff_time:
           type: integer
-          description: The minimal number of hours before the booking date/time for the cancellation to be successful. 0 means no limit.
-    Variants:
-      type: array
-      example:
-        - date: "2019-06-26"
-          max_tickets: 200
-          variants:
-            - id: "1"
-              name: Adult
-              max_tickets: 100
-            - id: "2"
-              name: Child
-              max_tickets: 70
-        - date: "2019-06-27"
-          max_tickets: 200
-          variants:
-            - id: "1"
-              name: Adult
-              max_tickets: 110
-            - id: "2"
-              name: Child
-              max_tickets: 77
-      items:
+          description: The minimum number of minutes before the booking date/time for the cancellation to be successful. 0 means no limit.
+        max_tickets_per_order:
+          type: integer
+          description: Specify the maximum amount of tickets that can be added to a single order. The absence of this field will mean that the product doesn't have such limits.
+        required_order_data:
+          type: array
+          description: List of additional fields that need to be provided while creating a reservation. Each field will contain a piece of information about the whole order.
+          items:
+            $ref: "#/components/schemas/RequiredOrderData"
+        required_visitor_data:
+          type: array
+          description: List of additional fields that need to be provided while creating a reservation. Each field will contain a piece of information about each visitor.
+          items:
+            $ref: "#/components/schemas/RequiredVisitorData"
+    VisitorData:
         type: object
+        required:
+          - field
+          - value
         properties:
-          date:
+          field:
             type: string
-            format: date
-            example: "2019-06-27"
-            description: date in ISO format YYYY-MM-DD
-          max_tickets:
-            type: integer
-          variants:
-            type: array
-            items:
-              $ref: "#/components/schemas/Variant"
-    Timeslots:
-      type: array
-      example:
-        - date: "2019-06-26"
-          start: "17:30"
-          end: "18:30"
-          max_tickets: 200
-          variants:
-            - id: "1"
-              name: Adult
-              max_tickets: 100
-            - id: "2"
-              name: Child
-              max_tickets: 70
-        - date: "2019-06-27"
-          start: "18:30"
-          end: "19:30"
-          max_tickets: 200
-          variants:
-            - id: "1"
-              name: Adult
-              max_tickets: 110
-            - id: "2"
-              name: Child
-              max_tickets: 77
-      items:
+            enum:
+              - FULL_NAME
+              - EMAIL
+              - PHONE
+              - ADDRESS
+              - PASSPORT_ID
+              - DATE_OF_BIRTH
+          value:
+            type: string
+    RequiredOrderData:
+        type: string
+        description: List of additional fields that need to be provided while creating a reservation. Each field will contain a piece of information about the whole order.
+        enum:
+          - PICKUP_LOCATION
+          - DROPOFF_LOCATION
+          - NATIONALITY
+          - FLIGHT_NUMBER
+          - PASSPORT_ID
+    RequiredVisitorData:
+        type: string
+        description: List of additional fields that need to be provided while creating a reservation. Each field will contain a piece of information about each visitor.
+        enum:
+          - FULL_NAME
+          - EMAIL
+          - PHONE
+          - ADDRESS
+          - PASSPORT_ID
+          - DATE_OF_BIRTH
+    AvailabilityResponse:
+      type: object
+      description: Date in ISO format YYYY-MM-DD
+      additionalProperties:
+
         type: object
-        properties:
-          date:
-            type: string
-            format: date
-            example: "2019-06-27"
-            description: ISO format YYYY-MM-DD
-          start:
-            type: string
-            description: Time string in format HH:MM
-          end:
-            type: string
-            description: Time string in format HH:MM
-          max_tickets:
-            type: integer
-          variants:
-            type: array
-            items:
-              $ref: "#/components/schemas/Variant"
+        description: Time string in format HH:MM or "no-timeslots" in case of products without timeslots
+        additionalProperties:
+          $ref: "#/components/schemas/Availability"
+    Availability:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "timeslot-721"
+          description: Unique ID for this particular timeslot for this particular product. It is also perfectly fine to use an ID like "2022-12-31 13:00" if you do not have (unique) IDs for your timeslots. If applicable, consider concatenating or base64 encoding a set of values that are meaningful for your system.
+        available_tickets:
+          type: integer
+          example: 15
+          description: Number of available tickets
+        variants:
+          type: array
+          description: List of variants available in this timeslot
+          items:
+            $ref: "#/components/schemas/Variant"
     Variant:
       type: object
       properties:
@@ -634,8 +694,17 @@ components:
           type: string
         name:
           type: string
-        max_tickets:
+        available_tickets:
           type: integer
+        price:
+          type: object
+          properties:
+            face_value:
+              type: number
+              example: 3.20
+            currency:
+              type: string
+              example: EUR
     OrderItem:
       type: object
       required:
@@ -648,22 +717,15 @@ components:
         quantity:
           type: integer
           example: 2
+        required_visitor_data:
+          type: array
+          description: Additional details per visitor. Will only be provided if Tiqets has enabled these questions in their checkout flow for this product so be sure to list all the requred fields in the product catalog. Each object in the array will contain the number of required fields per visitor. So if the product requires both `FULL_NAME` and `EMAIL` and `quantity` equals 2 then 2 objects with 2 fields each will be provided (see the payload example).
+          items:
+            type: object
+            additionalProperties:
+              type: string
     Reservation:
       type: object
-      example:
-        date: "2019-06-26"
-        timeslot: "09:30"
-        tickets:
-          - variant_id: "1"
-            quantity: 2
-          - variant_id: "2"
-            quantity: 1
-        customer:
-          first_name: "Jon"
-          last_name: "Snow"
-          email: "jon@snow.com"
-          phone: "+48 555 555 555"
-          country: "nl"
       required:
         - date
         - tickets
@@ -673,10 +735,10 @@ components:
           type: string
           example: "2019-06-26"
           description: ISO format YYYY-MM-DD
-        timeslot:
+        timeslot_id:
           type: string
-          description: start time of the time slot in format HH:MM
-          example: "09:30"
+          description: The timeslot ID
+          example: "timeslot-357"
         tickets:
           type: array
           items:
@@ -705,6 +767,10 @@ components:
             country:
               type: string
               example: "nl"
+        required_order_data:
+          type: object
+          additionalProperties:
+            type: string
     ReservationResponse:
       type: object
       properties:
@@ -729,7 +795,7 @@ components:
           type: string
           example: "12345678910"
           description: |
-            Per the **10th of January 2022** we will start sending our order reference ID along with the request.  The value may consist of at most 12 digits.
+            Tiqets own order reference ID.  The value may consist of at most 12 digits.
 
             You are encouraged to store this value as it allows for cross-referencing of the order administrations and facilitates locating orders in Tiqets' systems.
     BookingResponse:
@@ -795,14 +861,6 @@ components:
         message:
           type: string
           example: Required argument start was not found
-    Cancellation:
-      type: object
-      required:
-        - booking_id
-      properties:
-        booking_id:
-          type: string
-          example: "9887"
   securitySchemes:
     authorization_header:
       type: apiKey

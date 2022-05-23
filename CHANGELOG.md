@@ -1,5 +1,34 @@
 # Changelog
 
+## 2.0.0
+
+#### Product catalog
+
+- Endpoint with product catalog becomes required
+- `use_timeslots` query parameter has been dropped
+- new product fields:
+  - `max_tickets_per_order` - each product can set a limit for a number of tickets in the order
+  - `required_visitor_data` - each product can describe a list of additional data that are required required from each visitor (full name, email, phone, address, passport id, date of birth)
+  - `required_order_data` - data that is required to be delivered on the order level (not per visitor, eg. pickup location, nationality, zip code)
+
+#### Availability
+
+- Timesloted and non-timesloted endpoints has been merged into a single endpoint `/v1/availability`
+- Same response format for timesloted and non-timesloted products
+- Each variant might return information about the current price
+- `timeslot_id` query parameter has been dropped
+
+#### Reservation
+
+- New error code `1003` that can be return if required visitor data wasn't delivered
+- New fields:
+  - `required_visitor_data`
+  - `required_order_data`
+
+#### Booking
+
+- New optional header `TIQETS-TEST-ORDER`
+
 ## 1.6.0
 
 - Add new field `order_reference` to booking step.
