@@ -2,46 +2,51 @@ openapi: 3.0.3
 info:
   title: Tiqets Supplier API
   description: |
-    The Tiqets Supplier API specification was created to allow suppliers to take charge control of the implementation process and turnaround times.
-
-
-    It is loosely based on REST.
+    The Tiqets Supplier API Specification allows Tiqets' Supply Partners to connect their booking systems to Tiqets.com if they aren't connected already.
+    
+    It is loosely based on reservation.
+    The endpoints described here are to be exposed on the Supply Partners own systems for Tiqets' systems to consume.
+    In other words: Tiqets initiates HTTP calls to the Supply Partners' systems and the Supply Partner's system must respond.
+    
     You format GET or POST requests in JSON and you will receive either a JSON-formatted response or an HTTP error.
 
     # Data sharing
-    Tiqets does not share personal information of its customers with third parties, unless explicitly agreed otherwise. The API does however provide the means to share personal information, but will default to placeholder values.
+    Tiqets does not share personal information of its customers (PII) with third parties, unless explicitly agreed otherwise.
+    This API Specification does however provide the structure to share (PII) but our systems will default to sending placeholder values.
 
-    Any personal information received is to be treated according to the rules laid out in the European Union's "General Data Protection Regulation (GDPR)"
+    Any PII received is to be treated according to the rules laid out in the European Union's "General Data Protection Regulation (GDPR)"
 
     # Generic requirements
 
     ### Optional endpoints
-    The functionality behind some endpoints isn't required to be implemented.
-    Optional endpoints are documented to allow an HTTP 501 response.
+    There are no optional endpoints.
+    All endpoints must be implemented.
+    Failing to do so will block integrators from being certified and allows to go to production.
 
     ### Response times
 
     Maximum response times of the various API endpoints:
-
       * Under 5 seconds.
-      * Availability calls with a data range of just 1 day: under 200ms
+      * Availability calls with a data range of just 1 day: < 200ms
 
     # Concepts
 
     ### Product
 
-    The attraction, event or tour one is buying a ticket for.
+    The attraction, event or tour the Supply Partner sells tickets for.
 
     Example:
 
     * Entrance to the Louvre
     * Hop-on Hop-off bus ticket
 
-    Product IDs must remain the same regardless of dates.
+    Product IDs may not change and must be a stable identifier regardless of dates, prices, etc.
 
-    ### Variants
+    ### Variant
 
-    At the variant level one can differentiate price points and inclusions, such as:
+    A "Variant" (in the business often called "ticket types") covers certain price points and inclusions.  
+    Each Product must offer at least 1 variant.
+    Eg.:
 
     * Adult
     * Child
@@ -53,7 +58,7 @@ info:
     Variant IDs must:
 
     * Remain the same regardless of dates and timeslots.
-    If you use different IDs in your own systems (based on date/time), make sure the ID that Tiqets receives from you remains the same.
+    (If you use fluctuating IDs in your own systems you must ensure that Tiqets receives a constant, non-varying value.)
     * Be strings that comply with the following regular expression: /[A-Za-z0-9_\-]{1,16}/
     Examples:
       * "1"
@@ -64,14 +69,14 @@ info:
 
     ### Date ranges
 
-    Date range parameters are inclusive. This means that:
-
+    Endpoints that support date ranges must consider those parameters to be "inclusive".  
+    This means that:
     * A range that starts on 2019-12-29 and that ends on 2019-12-31 covers 3 whole days.
     * A range that starts on 2019-12-29 and that ends on 2019-12-29 covers 1 day.
 
-    # Shared HTTP error status codes
+    # Generic HTTP error status codes
 
-    Those status code are the same for every endpoint.
+    These status code are the same for every endpoint.
 
     | Status code |                          Message                          |
     |-------------|-----------------------------------------------------------|
@@ -79,9 +84,10 @@ info:
     |         405 | Method Not Allowed - Incorrect method was used (GET/POST) |
     |         500 | Service Error - Please report that                        |
 
-    # Internal errors
+    # Context specific errors
 
-    Each request besides the status codes can return an internal error (400 - Bad request) described with this JSON structure:
+    Each request besides the status codes can return context specific errors.  
+    The HTTP status code must be ```400 - Bad request``` and the response body must contain this JSON structure:
 
     ```
     {
@@ -100,7 +106,7 @@ info:
     }
     ```
 
-    Internal errors are divided into those categories:
+    Contect specific errors are divided into these categories:
 
     * **1xxx** - Missing input
     * **2xxx** - Invalid input
@@ -109,7 +115,7 @@ info:
 
     # Development tools
 
-    Tiqets offers several tools to facilitate your development process.
+    Tiqets offers the following tools to facilitate the development process.
 
     ## Integration Testing
 
@@ -121,16 +127,16 @@ info:
 
     If your development environment can be accessed from the web (directly or via a tunneling service like [ngrok](https://ngrok.com/)) then [**our online test tool**](https://supplier-api-web-tool.tiqets.com/) is the way to go.
 
-    If you haven't received the credentials yet please request them via connections@tiqets.com
+    If you haven’t received the credentials yet please request them via apisupport@tiqets.com
 
     [![webtool screenshot](https://raw.githubusercontent.com/Tiqets/supplier-api/master/docs/webtool.png)](https://supplier-api-web-tool.tiqets.com/)
 
     ### Command Line tool
 
     For development environments that can not be accessed from the web please refer to [**our CLI tool**](https://github.com/Tiqets/supplier-api/tree/master/supplier_api_tester).
-    Less user friendly than our online tool but performs the exact same tests.
+    This tool runs from the Command Line and is much less user friendly than our online tool but it performs the exact same tests.
 
-    Requires Python to be installed on your development environment.
+    Python must be installed on your development environment.
 
     [![cli tool screenshot](https://raw.githubusercontent.com/Tiqets/supplier-api/master/docs/clitool.png)](https://github.com/Tiqets/supplier-api/tree/master/supplier_api_tester)
 
@@ -139,12 +145,12 @@ info:
 
     Need more examples? Play with [**our mock server**](https://github.com/Tiqets/supplier-api/tree/master/supplier_server_mock) to see some examples of expected behavior.
 
-    Requires Python to be installed on your development environment.
+    Python must be installed on your development environment.
 
     [![mock server screenshot](https://raw.githubusercontent.com/Tiqets/supplier-api/master/docs/mockserver.png)](https://github.com/Tiqets/supplier-api/tree/master/supplier_server_mock)
 
   contact:
-    email: connections@tiqets.com
+    email: apisupport@tiqets.com
   version: 2.0.0
 tags:
   - name: Availability
@@ -156,19 +162,16 @@ tags:
 
       Expected behavior:
         - Only availability within the requested date range is returned
-        - When there is no availability for the requested and existing product an empty array (`[]`)shall be returned
-        - True ................................................
+        - When there is no availability for the requested and existing product an empty array (`[]`) shall be returned 
 
-      Example request:
-        - Parameters:
-          - start_date: 2020-01-20
-          - end_date: 2020-07-20
-          - Queried product only has 2 months of availability
-          - Expected output: Availability for those 2 months that can be provided, never an error.
+      Example #1 to illustrate the above:  
+        - A availability request is made for an existing Product and a date range of 7 months (20-01-2023 - 20-07-2023) is requested.  
+        - The queried product only has 2 months of availability defined in the system.  
+        - **Expected response:** Availability for the 2 months that can be provided, never an error.
 
-
-
-
+      Example #2 to illustrate the above:  
+        - An availability request is made for an existing Product and a date range that isn't defined yet in the Supplier Partner's system.
+        - **Expected response**: An empty array (```[]```).
 paths:
   "/v1/products":
     get:
@@ -366,9 +369,6 @@ paths:
       description: |
         When a customer commits to the purchase of tickets, right before he enters the payment flow, Tiqets will reserve the tickets.
         This reservation should be held **at least 15 minutes**. If the customer confirms the booking later, Tiqets will create a new reservation and confirm it inmediately, but won't send a request to cancel the previous one.
-
-        Note that the timeslot field is optional.
-        It is _only_ provided for products with timeslots and will contain the value of an existing timeslot's "start" value, using the local time of the product/venue.
 
       operationId: reservation
       parameters:
@@ -728,6 +728,7 @@ components:
       type: object
       required:
         - date
+        - timeslot_id
         - tickets
         - customer
       properties:
@@ -737,7 +738,7 @@ components:
           description: ISO format YYYY-MM-DD
         timeslot_id:
           type: string
-          description: The timeslot ID
+          description: The timeslot ID.
           example: "timeslot-357"
         tickets:
           type: array
