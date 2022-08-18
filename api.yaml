@@ -78,11 +78,11 @@ info:
 
     These status code are the same for every endpoint.
 
-    | Status code |                          Message                          |
-    |-------------|-----------------------------------------------------------|
-    |         403 | Forbidden - Missing or incorrect API key                  |
-    |         405 | Method Not Allowed - Incorrect method was used (GET/POST) |
-    |         500 | Service Error - Please report that                        |
+    | Status code   |                          Message                          |
+    |---------------|-----------------------------------------------------------|
+    |         `403` | Forbidden - Missing or incorrect API key                  |
+    |         `405` | Method Not Allowed - Incorrect method was used (GET/POST) |
+    |         `500` | Service Error - Please report that                        |
 
     # Context specific errors
 
@@ -108,9 +108,9 @@ info:
 
     Contect specific errors are divided into these categories:
 
-    * **1xxx** - Missing input
-    * **2xxx** - Invalid input
-    * **3xxx** - Request processing failed
+    * **`1xxx`** - Missing input
+    * **`2xxx`** - Invalid input
+    * **`3xxx`** - Request processing failed
 
 
     # Development tools
@@ -172,11 +172,20 @@ tags:
       Example #2 to illustrate the above:  
         - An availability request is made for an existing Product and a date range that isn't defined yet in the Supplier Partner's system.
         - **Expected response**: An empty array (```[]```).
+  - name: Product Catalog
+    description: |
+      The product catalog endpoints allow Tiqets to retrieve the attractions, events or tours offered by our Supply Partners.
+  - name: Reservation
+    description: |
+      The reservation endpoints allow Tiqets to reserve tickets purchased by customers.
+  - name: Booking
+    description: |
+      The booking endpoints allow Tiqets to create bookings by confirming reservations and, to cancel previous bookings.
 paths:
-  "/v1/products":
+  "/v2/products":
     get:
       tags:
-        - "Product catalog"
+        - Product Catalog
       summary: A catalog of available products.
       description: Returns a list of available products.
       operationId: getProducts
@@ -189,7 +198,7 @@ paths:
                 $ref: "#/components/schemas/Products"
       security:
         - authorization_header: []
-  "/v1/products/{product_id}/availability":
+  "/v2/products/{product_id}/availability":
     get:
       tags:
         - Availability
@@ -261,7 +270,7 @@ paths:
                               currency: EUR
                           - id: "2"
                             name: Child
-                            available_tickets: 100
+                            available_tickets: 10
                             price:
                               face_value: 5.75
                               currency: EUR
@@ -271,13 +280,13 @@ paths:
                         variants:
                           - id: "1"
                             name: Adult
-                            available_tickets: 63
+                            available_tickets: 53
                             price:
                               face_value: 10
                               currency: EUR
                           - id: "2"
                             name: Child
-                            available_tickets: 63
+                            available_tickets: 10
                             price:
                               face_value: 5.75
                               currency: EUR
@@ -304,11 +313,11 @@ paths:
                     "2022-12-29":
                       "11:00":
                         id: "timeslot-722"
-                        available_tickets: 24
+                        available_tickets: 14
                         variants:
                           - id: "1"
                             name: Adult
-                            available_tickets: 24
+                            available_tickets: 14
                             price:
                               face_value: 10
                               currency: EUR
@@ -328,13 +337,13 @@ paths:
                         variants:
                           - id: "1"
                             name: Adult
-                            available_tickets: 92
+                            available_tickets: 82
                             price:
                               face_value: 4.20
                               currency: EUR
                           - id: "2"
                             name: Child
-                            available_tickets: 92
+                            available_tickets: 10
                             price:
                               face_value: 2.10
                               currency: EUR
@@ -361,7 +370,7 @@ paths:
           content: {}
       security:
         - authorization_header: []
-  "/v1/products/{product_id}/reservation":
+  "/v2/products/{product_id}/reservation":
     post:
       tags:
         - Reservation
@@ -369,7 +378,6 @@ paths:
       description: |
         When a customer commits to the purchase of tickets, right before he enters the payment flow, Tiqets will reserve the tickets.
         This reservation should be held **at least 15 minutes**. If the customer confirms the booking later, Tiqets will create a new reservation and confirm it inmediately, but won't send a request to cancel the previous one.
-
       operationId: reservation
       parameters:
         - name: product_id
@@ -441,7 +449,24 @@ paths:
                     country: "nl"
                   required_order_data:
                     PICKUP_LOCATION: "Porto Azzurro Aparthotel, Malta"
-                    ZIP_CODE: "68005"
+                    NATIONALITY: "USA"
+              with_additional_order_data:
+                summary: Reservation with additional order data but without visitor data.
+                value:
+                  date: "2019-06-26"
+                  tickets:
+                    - variant_id: "1"
+                      quantity: 2
+                    - variant_id: "2"
+                      quantity: 1
+                  customer:
+                    first_name: "Jon"
+                    last_name: "Snow"
+                    email: "jon@snow.com"
+                    phone: "+48 555 555 555"
+                    country: "nl"
+                  required_order_data:
+                    PICKUP_LOCATION: "Porto Azzurro Aparthotel, Malta"
                     NATIONALITY: "USA"
         required: true
       responses:
@@ -477,7 +502,7 @@ paths:
                 $ref: "#/components/schemas/BadRequest"
       security:
         - authorization_header: []
-  "/v1/booking":
+  "/v2/booking":
     post:
       tags:
         - Booking
@@ -506,6 +531,47 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/BookingResponse"
+              examples:
+                one_barcode_per_visitor:
+                  summary: An order with one barcode per visitor
+                  value:
+                    booking_id: "657788"
+                    barcode_format: "QRCODE"
+                    barcode_scope: ticket
+                    barcode: ""
+                    tickets:
+                      "variant_1_id":
+                        - barcode1
+                        - barcode2
+                      "variant_2_id":
+                        - barcode3
+                one_barcode_per_order:
+                  summary: An order with a single barcode for all visitors
+                  value:
+                    booking_id: "657789"
+                    barcode_format: "QRCODE"
+                    barcode_scope: order
+                    barcode: "barcode1"
+                one_pdf_barcode_per_order:
+                  summary: An order with a single PDF barcode for all visitors
+                  value:
+                    booking_id: "657787"
+                    barcode_format: "PDF"
+                    barcode_scope: order
+                    barcode: "ZXhhbXBsZS1iYXJjb2RlLXBlci1vcmRlci0x"
+                one_pdf_barcode_per_visitor:
+                  summary: An order with one PDF barcode per visitor
+                  value:
+                    booking_id: "657787"
+                    barcode_format: "PDF"
+                    barcode_scope: ticket
+                    barcode: ""
+                    tickets:
+                      "variant_1_id":
+                        - "ZXhhbXBsZS12aXNpdG9yLWJhcmNvZGUtMQ=="
+                        - "ZXhhbXBsZS12aXNpdG9yLWJhcmNvZGUtMg=="
+                      "variant_2_id":
+                        - "ZXhhbXBsZS12aXNpdG9yLWJhcmNvZGUtMw=="
         "400":
           description: |
             Bad request
@@ -524,7 +590,7 @@ paths:
                 $ref: "#/components/schemas/BadRequest"
       security:
         - authorization_header: []
-  "/v1/booking/{booking_id}":
+  "/v2/booking/{booking_id}":
     delete:
       tags:
         - Booking
@@ -586,6 +652,27 @@ components:
           required_visitor_data:
             - FULL_NAME
             - PHONE
+        - id: "564456325"
+          name: "Children Tour"
+          description: "Special individual tour for children"
+          use_timeslots: true
+          is_refundable: true
+          cutoff_time: 120
+          required_visitor_data:
+            - FULL_NAME
+          required_order_data:
+            - PICKUP_LOCATION
+            - PASSPORT_ID
+        - id: "564456326"
+          name: "Adults Tour"
+          description: "Special individual tour for adults"
+          use_timeslots: true
+          is_refundable: true
+          cutoff_time: 60
+          required_order_data:
+            - PICKUP_LOCATION
+            - PASSPORT_ID
+            - FLIGHT_NUMBER
       items:
         $ref: "#/components/schemas/Product"
     Product:
@@ -666,7 +753,6 @@ components:
       type: object
       description: Date in ISO format YYYY-MM-DD
       additionalProperties:
-
         type: object
         description: Time string in format HH:MM or "no-timeslots" in case of products without timeslots
         additionalProperties:
@@ -681,7 +767,7 @@ components:
         available_tickets:
           type: integer
           example: 15
-          description: Number of available tickets
+          description: Number of available tickets for a given timeslot. This is the maximum number of tickets available for the timeslot.
         variants:
           type: array
           description: List of variants available in this timeslot
@@ -692,10 +778,15 @@ components:
       properties:
         id:
           type: string
+          description: "The ID of the variant. See the **Concepts** section above for details on the requirements of variant
+          IDs."
         name:
           type: string
+          description: The name of the variant
         available_tickets:
           type: integer
+          example: 10
+          description: Number of available tickets for the variant in the given timeslot.
         price:
           type: object
           properties:
@@ -724,6 +815,7 @@ components:
             type: object
             additionalProperties:
               type: string
+              description: "Accepted fields are: `FULL_NAME`, `EMAIL`, `PHONE`, `ADDRESS`, `PASSPORT_ID` and `DATE_OF_BIRTH`. See the payload in the examples."
     Reservation:
       type: object
       required:
@@ -770,8 +862,10 @@ components:
               example: "nl"
         required_order_data:
           type: object
+          description: The additional fields that need to be provided while creating a reservation. Each field will contain a piece of information about the whole order.
           additionalProperties:
             type: string
+            description: "Accepted fields are: `PICKUP_LOCATION`, `DROPOFF_LOCATION`, `NATIONALITY`, `FLIGHT_NUMBER` and `PASSPORT_ID`. See the payload in the examples."
     ReservationResponse:
       type: object
       properties:
@@ -801,17 +895,6 @@ components:
             You are encouraged to store this value as it allows for cross-referencing of the order administrations and facilitates locating orders in Tiqets' systems.
     BookingResponse:
       type: object
-      example:
-        booking_id: "657788"
-        barcode_format: "QRCODE"
-        barcode_position: ticket
-        barcode: ""
-        tickets:
-          "variant_1_id":
-            - barcode1
-            - barcode2
-          "variant_2_id":
-            - barcode3
       properties:
         booking_id:
           type: string
@@ -825,24 +908,25 @@ components:
             - DATAMATRIX
             - EAN13
             - PDF
-        barcode_position:
+        barcode_scope:
           type: string
           description: |
-            Set this to "order" to generate only one barcode.
+            Set this to `"order"` if your system generates a single barcode for the entire order.
 
-            Set this to "ticket" to generate multiple barcodes.
+            Set this to `"ticket"` if your system generates 1 barcode per visitor.
+            **Important**: all the barcodes included in the order must be unique. See the example payloads for details.
           enum:
             - order
             - ticket
         barcode:
           type: string
           description: |
-            If "barcode_format" is set to "PDF" then include a base64 encoded PDF.
+            If `"barcode_format"` is set to `"PDF"` then include a base64 encoded PDF.
 
-            Can be omitted if barcode_position is set to ticket.
+            Can be omitted if `"barcode_scope"` is set to ticket.
         tickets:
           type: object
-          description: Can be omitted if barcode_position is set to order
+          description: Can be omitted if `"barcode_scope"` is set to order
           properties:
             variant_id:
               type: array

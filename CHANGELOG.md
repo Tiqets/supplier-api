@@ -2,21 +2,26 @@
 
 ## 2.0.0
 
-#### Product catalog
+#### Product Catalog
 
 - Endpoint with product catalog becomes required
 - `use_timeslots` query parameter has been dropped
-- new product fields:
+- New product fields:
   - `max_tickets_per_order` - each product can set a limit for a number of tickets in the order
-  - `required_visitor_data` - each product can describe a list of additional data that are required required from each visitor (full name, email, phone, address, passport id, date of birth)
+  - `required_visitor_data` - each product can describe a list of additional data that are required from each visitor (full name, email, phone, address, passport id, date of birth)
   - `required_order_data` - data that is required to be delivered on the order level (not per visitor, eg. pickup location, nationality, zip code)
+- Update the `/products` endpoint's response example to include examples of products with `required_visitor_data` and `required_order_data`.
+- List the possible values for `required_order_data` and `required_visitor_data`.
+- Update the endpoints' prefix from `v1/` to `v2/`.
 
 #### Availability
 
-- Timesloted and non-timesloted endpoints has been merged into a single endpoint `/v1/availability`
+- Timesloted and non-timesloted endpoints has been merged into a single endpoint `/v2/availability`
 - Same response format for timesloted and non-timesloted products
 - Each variant might return information about the current price
-- `timeslot_id` query parameter has been dropped
+- `timeslot_id` query parameter has been dropped.
+- Provide a better explanation of the meaning of the attribute `available_tickets`.
+- Update the endpoints' prefix from `v1/` to `v2/`.
 
 #### Reservation
 
@@ -24,10 +29,16 @@
 - New fields:
   - `required_visitor_data`
   - `required_order_data`
+- List the possible values for `required_order_data` and `required_visitor_data`.
+- Update the `/reservation` endpoint's response examples to include examples with `required_order_data`.
+- Update the endpoints' prefix from `v1/` to `v2/`.
 
 #### Booking
 
 - New optional header `TIQETS-TEST-ORDER`
+- Rename attribute `barcode_position` in the endpoint's response to `barcode_scope`. Update the description of the attribute to make it easier to understand.
+- Update the `/booking` endpoint's response examples to include examples of PDF barcodes and barcodes at `order` and `ticket` scope.
+- Update the endpoints' prefix from `v1/` to `v2/`.
 
 ## 1.6.0
 
