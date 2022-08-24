@@ -22,6 +22,9 @@
 - `timeslot_id` query parameter has been dropped.
 - Provide a better explanation of the meaning of the attribute `available_tickets`.
 - Update the endpoints' prefix from `v1/` to `v2/`.
+- Deprecate the use of error code `2009`.
+- Add examples to show how to treat dates in the past while making requests to the availability endpoint.
+- Remove attribute `id` from the availability endpoint's response schema.
 
 #### Reservation
 
@@ -32,6 +35,9 @@
 - List the possible values for `required_order_data` and `required_visitor_data`.
 - Update the `/reservation` endpoint's response examples to include examples with `required_order_data`.
 - Update the endpoints' prefix from `v1/` to `v2/`.
+- Remove `timeslot_id` and `date` attributes.
+- Add a new attribute `datetime` to the endpoint's payload to replace the attributes `timeslot_id` and `date`.
+- Update the examples to include payloads with the new attribute `datetime`.
 
 #### Booking
 
@@ -39,6 +45,10 @@
 - Rename attribute `barcode_position` in the endpoint's response to `barcode_scope`. Update the description of the attribute to make it easier to understand.
 - Update the `/booking` endpoint's response examples to include examples of PDF barcodes and barcodes at `order` and `ticket` scope.
 - Update the endpoints' prefix from `v1/` to `v2/`.
+
+#### Concepts
+
+- Add a section on Date and Times to explain the use of date/times across the API.
 
 ## 1.6.0
 

@@ -67,6 +67,13 @@ info:
       * "a3_cd-E22331"
       * "1234567890123456789012"
 
+    ### Date and Time Values
+
+    The date/time values supported by the different endpoints must always be interpreted in the product/venue's
+    timezone. For example, a request to make a reservation for a product like "The Empire State Building" in the New York,
+    that specifies a `datetime` value of `2022-12-26T15:30` means that the customer plans to visit the venue on
+    `2022-12-26` at `15:30` ET.
+
     ### Date ranges
 
     Endpoints that support date ranges must consider those parameters to be "inclusive".  
@@ -205,7 +212,11 @@ paths:
       summary: Availability
       description: |
         Returns the ticket availability of the variants within the requested date range.
-        The same data structure is used regardless of whether timeslots apply. For non-timeslotted tickets (whole day or open-dated) a "fake timeslot" titled `no-timeslots` should be returned.
+        The same data structure is used regardless of whether timeslots apply. For non-timeslotted tickets (whole day
+        or open-dated) a "fake timeslot" titled `no-timeslots` should be returned.
+
+        Dates in the past must be supported without returning an error response. Instead, the endpoint should return an
+        availability without data for the dates in the past.
       operationId: getAvailability
       parameters:
         - name: product_id
@@ -232,7 +243,7 @@ paths:
             example: "2019-06-21"
       responses:
         "200":
-          description: List of timeslots per day
+          description: Available variants by date and timeslots
           content:
             application/json:
               schema:
@@ -243,7 +254,6 @@ paths:
                   value:
                     "2022-12-19":
                       "11:00":
-                        id: "timeslot-356"
                         available_tickets: 0
                         variants:
                           - id: "1"
@@ -259,7 +269,6 @@ paths:
                               face_value: 1.10
                               currency: EUR
                       "16:30":
-                        id: "timeslot-357"
                         available_tickets: 100
                         variants:
                           - id: "1"
@@ -275,7 +284,6 @@ paths:
                               face_value: 5.75
                               currency: EUR
                       "17:30":
-                        id: "timeslot-358"
                         available_tickets: 63
                         variants:
                           - id: "1"
@@ -295,7 +303,6 @@ paths:
                   value:
                     "2022-12-28":
                       "11:00":
-                        id: "timeslot-721"
                         available_tickets: 0
                         variants:
                           - id: "1"
@@ -312,7 +319,6 @@ paths:
                               currency: EUR
                     "2022-12-29":
                       "11:00":
-                        id: "timeslot-722"
                         available_tickets: 14
                         variants:
                           - id: "1"
@@ -332,7 +338,6 @@ paths:
                   value:
                     "2022-12-19":
                       "no-timeslots":
-                        id: "2022-12-19"
                         available_tickets: 92
                         variants:
                           - id: "1"
@@ -347,6 +352,23 @@ paths:
                             price:
                               face_value: 2.10
                               currency: EUR
+                past_date:
+                  summary: Request availability for date in the past
+                  value: {}
+                date_range_with_past_date:
+                  summary: Request availability on 2022-12-02 from 2022-12-01 until 2022-12-03
+                  value:
+                    "2022-12-02":
+                      "11:00":
+                        available_tickets: 0
+                        variants:
+                          - id: "1"
+                            name: Adult
+                            available_tickets: 0
+                            price:
+                              face_value: 3.20
+                              currency: EUR
+                    "2022-12-03": {}
         "400":
           description: |
             Bad request
@@ -360,7 +382,6 @@ paths:
             |                1002 | Timeslot product expected | Requested timeslot availability for non timeslot product ID ID_NUMBER                    |
             |                2000 | Incorrect date format     | Incorrect date format xxx, please use the YYYY-MM-DD format                              |
             |                2001 | Incorrect date range      | The end date cannot be earlier than start date                                           |
-            |                2009 | Incorrect date            | Eg. Cannot use the past date or Given date is too far ahead in the future (max 6 months) |
           content:
             application/json:
               schema:
@@ -395,8 +416,7 @@ paths:
               without_visitor_data:
                 summary: Reservation without sending visitor data
                 value:
-                  date: "2019-06-26"
-                  timeslot_id: "timeslot-474"
+                  datetime: "2022-12-26T15:30"
                   tickets:
                     - variant_id: "1"
                       quantity: 2
@@ -411,7 +431,22 @@ paths:
               without_timeslot:
                 summary: Reservation without timeslot
                 value:
-                  date: "2019-06-26"
+                  datetime: "2022-12-26T00:00"
+                  tickets:
+                    - variant_id: "1"
+                      quantity: 2
+                    - variant_id: "2"
+                      quantity: 1
+                  customer:
+                    first_name: "Jon"
+                    last_name: "Snow"
+                    email: "jon@snow.com"
+                    phone: "+48 555 555 555"
+                    country: "nl"
+              with_timeslot:
+                summary: Reservation with timeslot
+                value:
+                  datetime: "2022-12-26T17:00"
                   tickets:
                     - variant_id: "1"
                       quantity: 2
@@ -426,8 +461,7 @@ paths:
               with_additional_data:
                 summary: Reservation containing additional data
                 value:
-                  date: "2019-06-26"
-                  timeslot_id: "timeslot-474"
+                  datetime: "2022-12-26T15:30"
                   tickets:
                     - variant_id: "1"
                       quantity: 2
@@ -453,7 +487,7 @@ paths:
               with_additional_order_data:
                 summary: Reservation with additional order data but without visitor data.
                 value:
-                  date: "2019-06-26"
+                  datetime: "2022-12-26T23:30"
                   tickets:
                     - variant_id: "1"
                       quantity: 2
@@ -751,19 +785,15 @@ components:
           - DATE_OF_BIRTH
     AvailabilityResponse:
       type: object
-      description: Date in ISO format YYYY-MM-DD
+      description: Date in ISO format `YYYY-MM-DD`
       additionalProperties:
         type: object
-        description: Time string in format HH:MM or "no-timeslots" in case of products without timeslots
+        description: Time string in format `HH:MM` or `"no-timeslots"` in case of products without timeslots
         additionalProperties:
           $ref: "#/components/schemas/Availability"
     Availability:
       type: object
       properties:
-        id:
-          type: string
-          example: "timeslot-721"
-          description: Unique ID for this particular timeslot for this particular product. It is also perfectly fine to use an ID like "2022-12-31 13:00" if you do not have (unique) IDs for your timeslots. If applicable, consider concatenating or base64 encoding a set of values that are meaningful for your system.
         available_tickets:
           type: integer
           example: 15
@@ -819,19 +849,17 @@ components:
     Reservation:
       type: object
       required:
-        - date
-        - timeslot_id
+        - datetime
         - tickets
         - customer
       properties:
-        date:
+        datetime:
           type: string
-          example: "2019-06-26"
-          description: ISO format YYYY-MM-DD
-        timeslot_id:
-          type: string
-          description: The timeslot ID.
-          example: "timeslot-357"
+          example: "2019-06-26T15:30"
+          description: "ISO format `YYYY-MM-DDTHH:MM`. If a product requires/supports timeslots then the `datetime`
+          attribute must be parsed to extract the specific timeslot for the reservation. If, on the other hand, a product
+          does not support/require timeslots then the time component of this attribute will be set to `T00:00` and can be
+          safely ignore. See the payload examples for details."
         tickets:
           type: array
           items:
