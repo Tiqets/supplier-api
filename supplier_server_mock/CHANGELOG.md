@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.5.2
+
+- bump `arrow` to version `0.15.1`
+
 ## 1.5.1
 
 - Fix for checking the `order_reference`
