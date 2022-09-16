@@ -24,7 +24,7 @@
 - Update the endpoints' prefix from `v1/` to `v2/`.
 - Deprecate the use of error code `2009`.
 - Add examples to show how to treat dates in the past while making requests to the availability endpoint.
-- Remove attribute `id` from the availability endpoint's response schema.
+- Remove attribute `id` for every timeslot from the availability endpoint's response schema.
 
 #### Reservation
 

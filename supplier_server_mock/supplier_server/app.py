@@ -14,156 +14,201 @@ app.register_error_handler(werkzeug.exceptions.InternalServerError, error_handle
 app.register_error_handler(exceptions.BadRequest, error_handlers.bad_request)
 
 
-@app.route('/v1/products')
+@app.route('/v2/products')
 @authorization_header
 def products():
-    use_timeslots = request.args.get('use_timeslots')
-    if use_timeslots is not None:
-        return jsonify([p for p in constants.PRODUCTS if p['use_timeslots'] == use_timeslots == 'True'])
     return jsonify([p for p in constants.PRODUCTS])
 
 
-@app.route('/v1/products/<product_id>/variants')
+@app.route('/v2/products/<product_id>/availability')
 @authorization_header
 @date_range_validator
-def availability_no_timeslots(product_id: str):
+def availability(product_id: str):
     utils.check_product_id(product_id)
-    utils.check_non_timeslot_product(product_id)
     start = utils.get_date(request.args, 'start')
     end = utils.get_date(request.args, 'end')
     if start > end:
         raise exceptions.BadRequest(2001, 'Incorrect date range', 'The end date cannot be earlier than start date')
     today = date.today()
     if end < today:
-        return jsonify([])
+        return jsonify({})
     start = max(today, start)
-    result = []
+    result = {}
     day = start
     while day <= end:
-        result.append(utils.get_availability(product_id, day))
+        result[str(day)] = utils.get_availability(product_id, day)
         day = day + timedelta(days=1)
     return jsonify(result)
 
 
-@app.route('/v1/products/<product_id>/timeslots')
-@authorization_header
-@date_range_validator
-def availability_timeslots(product_id: str):
-    utils.check_product_id(product_id)
-    utils.check_timeslot_product(product_id)
-    start = utils.get_date(request.args, 'start')
-    end = utils.get_date(request.args, 'end')
-    if start > end:
-        raise exceptions.BadRequest(2001, 'Incorrect date range', 'The end date cannot be earlier than start date')
-    today = date.today()
-    if end < today:
-        return jsonify([])
-    start = max(today, start)
-    results = []
-    day = start
-    while day <= end:
-        for timeslot in ('17:30', '19:30'):
-            result = utils.get_availability(product_id, day)
-            result['start'] = timeslot
-            result['end'] = arrow.get(f'2000-01-01 {timeslot}').shift(hours=1).strftime('%H:%M')
-            results.append(result)
-        day = day + timedelta(days=1)
-    return jsonify(results)
-
-
-@app.route('/v1/products/<product_id>/reservation', methods=['POST'])
+@app.route('/v2/products/<product_id>/reservation', methods=['POST'])
 @authorization_header
 def reservation(product_id: str):
     utils.check_product_id(product_id)
-    day = utils.get_date(request.json, 'date')
+
+    datetime_parameter_value = request.json.get('datetime')
+    if not datetime_parameter_value:
+        raise exceptions.BadRequest(1000, 'Missing argument', 'Required argument "datetime" was not found')
+
+    tickets = request.json.get('tickets')
+    if not tickets:
+        raise exceptions.BadRequest(1000, 'Missing argument', 'Required argument "tickets" was not found')
+
+    customer = request.json.get('customer')
+    if not customer:
+        raise exceptions.BadRequest(1000, 'Missing argument', 'Required argument "customer" was not found')
+
+    # get the additional order-level information required by this product
+    product_requires_additional_order_data = utils.product_required_additional_order_data(product_id)
+    required_order_data = request.json.get('required_order_data')
+    if product_requires_additional_order_data:
+        if not required_order_data or set(product_requires_additional_order_data) != set(required_order_data.keys()):
+            raise exceptions.BadRequest(
+                1003,
+                'Missing required fields',
+                f'Missing required additional order data: {",".join(product_requires_additional_order_data)}',
+            )
+
+    # get the additional visitors-level information required by this product
+    product_requires_additional_visitors_data = utils.product_required_additional_visitors_data(product_id)
+
+    # extract date and timeslot information from datetime attribute
+    try:
+        datetime_parameter = datetime.strptime(request.json.get('datetime'), '%Y-%m-%dT%H:%M')
+        day = datetime_parameter.date()
+        timeslot: str = datetime_parameter.time().strftime('%H:%M')
+    except ValueError:
+        raise exceptions.BadRequest(
+            2000,
+            'Incorrect date format',
+            f'Expected datetime attribute with format YYYY-MM-DDTHH:MM'
+        )
+
     today_utc = datetime.utcnow().date()
     if day < today_utc:
         raise exceptions.BadRequest(2009, 'Incorrect date', 'Cannot use the past date')
+
     if day > arrow.get(today_utc).shift(months=constants.MAX_DATE_RANGE).date():
         raise exceptions.BadRequest(
             2009,
             'Incorrect date',
             f'This date is too far ahead in the future. You can book max {constants.MAX_DATE_RANGE} months ahead.'
         )
-    timeslot = request.json.get('timeslot')
 
-    # booking date is different for timeslot and non timeslot strategies:
-    if timeslot:
-        reservation_date = datetime.fromisoformat(day.isoformat() + " " + timeslot)
+    reservation_date = datetime.fromisoformat(day.isoformat() + " " + timeslot)
 
-    else:
-        reservation_date = day
+    timeslot_availability_key = timeslot if utils.product_supports_timeslot(product_id) else 'no-timeslots'
 
-    tickets = request.json.get('tickets')
-    if not tickets:
-        raise exceptions.BadRequest(1000, 'Missing argument', 'Required argument "tickets" was not found')
-    customer = request.json.get('customer')
-    if not customer:
-        raise exceptions.BadRequest(1000, 'Missing argument', 'Required argument "customer" was not found')
-    availability = utils.get_availability(product_id, day)
-    variant_quantity_map = {variant['id']: variant['max_tickets'] for variant in availability['variants']}
+    product_availability = utils.get_availability(product_id, day)
+    variant_quantity_map = {
+        variant['id']: variant['available_tickets']
+        for variant in product_availability.get(timeslot_availability_key, {}).get('variants', [])
+    }
+
     for ticket in tickets:
-        if ticket['quantity'] > variant_quantity_map[ticket['variant_id']]:
+        if (
+                not variant_quantity_map.get(ticket['variant_id'])
+                or (ticket['quantity'] > variant_quantity_map.get(ticket['variant_id']))
+        ):
             raise exceptions.BadRequest(
                 3000,
                 'Availability error',
                 f'Quantity ({ticket["quantity"]}) is not available anymore'
                 f' for a given variant (id: {ticket["variant_id"]})'
             )
+
+        if product_requires_additional_visitors_data:
+            required_visitor_data = ticket.get('required_visitor_data', [])
+
+            if not required_visitor_data or len(required_visitor_data) != ticket['quantity']:
+                raise exceptions.BadRequest(
+                    1003,
+                    'Missing required fields',
+                    f'Missing required additional visitor data: {",".join(product_requires_additional_visitors_data)}'
+                )
+
+            if not all(set(v.keys()) == set(product_requires_additional_visitors_data) for v in required_visitor_data):
+                raise exceptions.BadRequest(
+                    1003,
+                    'Missing required fields',
+                    f'Missing required additional visitor data: {",".join(product_requires_additional_visitors_data)}'
+                )
+
     expires_at = arrow.utcnow().shift(minutes=30)
-    return {
-        'reservation_id': utils.encode_reservation_id(expires_at, tickets, product_id, reservation_date),
-        'expires_at': expires_at.isoformat(),
-    }
+
+    return jsonify(
+        {
+            'reservation_id': utils.encode_reservation_id(expires_at, tickets, product_id, reservation_date),
+            'expires_at': expires_at.isoformat(),
+        }
+    )
 
 
-@app.route('/v1/booking', methods=['POST'])
+@app.route('/v2/booking', methods=['POST'])
 @authorization_header
 def booking():
     reservation_id = request.json.get('reservation_id')
     order_reference = request.json.get('order_reference')
+
     if not reservation_id:
         raise exceptions.BadRequest(1000, 'Missing argument', 'Required argument "reservation_id" was not found')
+
     if not order_reference:
         raise exceptions.BadRequest(1000, 'Missing argument', 'Required argument "order_reference" was not found')
+
     try:
         expires_at, variant_quantity_map, product_id, booking_date = utils.decode_reservation_data(reservation_id)
-    except:
+    except Exception:
         raise exceptions.BadRequest(3002, 'Incorrect reservation ID', 'Given reservation ID is incorrect')
+
     now = arrow.utcnow().datetime
     if now > expires_at:
         minutes_ago = round((now - expires_at).seconds / 60)
-        raise exceptions.BadRequest(3001, 'Reservation expired', f'Your reservation has expired {minutes_ago} minutes ago')
+        raise exceptions.BadRequest(
+            3001, 'Reservation expired', f'Your reservation has expired {minutes_ago} minutes ago'
+        )
+
     tickets = {}
     product = [p for p in constants.PRODUCTS if p["id"] == product_id][0]
+
     for variant_id, quantity in variant_quantity_map.items():
         if product["ticket_content_type"] == "PDF":
             barcodes = [utils.encode_barcode(f'{reservation_id}{variant_id}{i}') for i in range(quantity)]
         else:
             barcodes = [str(utils.str_to_int(f'{reservation_id}{variant_id}{i}', 10)) for i in range(quantity)]
         tickets[variant_id] = barcodes
+
     booking_id = utils.encode_booking_id(booking_date.isoformat(), product_id)
+
     if booking_id in product['cancelled_bookings']:
         del product['cancelled_bookings'][product['cancelled_bookings'].index(booking_id)]
-    return {
-        'booking_id': booking_id,
-        'barcode_format': product["ticket_content_type"],
-        'barcode_position': 'ticket',
-        'tickets': tickets,
-    }
+
+    return jsonify(
+        {
+            'booking_id': booking_id,
+            'barcode_format': product["ticket_content_type"],
+            'barcode_scope': 'ticket',
+            'barcode': '',
+            'tickets': tickets,
+        }
+    )
 
 
-@app.route('/v1/booking/<booking_id>', methods=['DELETE'])
+@app.route('/v2/booking/<booking_id>', methods=['DELETE'])
 @authorization_header
 def cancel_booking(booking_id):
     try:
         booked_for, product_id = utils.decode_booking_data(booking_id)
     except binascii.Error:
         raise exceptions.BadRequest(1004, 'Missing booking', f"Booking with ID {booking_id} doesn't exist")
-    product = [p for p in constants.PRODUCTS if p["id"]== product_id][0]
+    product = [p for p in constants.PRODUCTS if p["id"] == product_id][0]
 
     if not product["is_refundable"]:
-        raise exceptions.BadRequest(3004, 'Cancellation not possible', 'The booking cannot be cancelled, the product does not allow cancellations')
+        raise exceptions.BadRequest(
+            3004,
+            'Cancellation not possible',
+            'The booking cannot be cancelled, the product does not allow cancellations',
+        )
 
     booking_for_time = datetime.fromisoformat(booked_for)
     cancellation_time = datetime.utcnow()
@@ -182,7 +227,6 @@ def cancel_booking(booking_id):
     # if we want to test double cancellation, we need to store the cancelled booking id somewhere
     product["cancelled_bookings"].append(booking_id)
     return '', 204
-
 
 
 def run():
