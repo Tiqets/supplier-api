@@ -3,7 +3,6 @@ from datetime import date, datetime
 import json
 from decimal import Decimal
 from typing import Dict, Optional
-from typing import List
 from typing import Set
 
 from .constants import PRODUCTS, VARIANTS, PRODUCTS_CURRENCIES
@@ -75,10 +74,12 @@ def get_availability(product_id: str, day: date) -> Dict:
         return result
 
     number_of_digits = 1 if day.isoweekday() % 3 == 0 else 2
-    max_tickets = str_to_int(day.isoformat(), number_of_digits)
-    tickets_left = max_tickets
 
     for timeslot in timeslots:
+        max_tickets = str_to_int(day.isoformat(), number_of_digits)
+        tickets_left = max_tickets
+        timeslot_available_tickets = 0
+
         variants = []
         for i, variant in enumerate(VARIANTS, 1):
             if i == len(VARIANTS):
@@ -100,8 +101,11 @@ def get_availability(product_id: str, day: date) -> Dict:
                 },
             })
 
+            if variant_max_ticket > timeslot_available_tickets:
+                timeslot_available_tickets = variant_max_ticket
+
         result[timeslot] = {
-            'available_tickets': max_tickets,
+            'available_tickets': timeslot_available_tickets,
             'variants': variants,
         }
 
