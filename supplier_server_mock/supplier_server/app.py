@@ -1,5 +1,8 @@
 import binascii
 from datetime import date, datetime, timedelta
+from typing import Dict
+from typing import List
+
 import werkzeug
 
 import arrow
@@ -60,17 +63,16 @@ def reservation(product_id: str):
 
     # get the additional order-level information required by this product
     product_requires_additional_order_data = utils.product_required_additional_order_data(product_id)
-    required_order_data = request.json.get('required_order_data')
     if product_requires_additional_order_data:
-        if not required_order_data or set(product_requires_additional_order_data) != set(required_order_data.keys()):
+        required_order_data = request.json.get('required_order_data', {})
+        required_order_data_keys = required_order_data.keys()
+        missing_fields = product_requires_additional_order_data.difference(required_order_data_keys)
+        if not required_order_data or missing_fields:
             raise exceptions.BadRequest(
                 1003,
                 'Missing required fields',
-                f'Missing required additional order data: {",".join(product_requires_additional_order_data)}',
+                f'Missing required additional order data: {sorted(missing_fields)}',
             )
-
-    # get the additional visitors-level information required by this product
-    product_requires_additional_visitors_data = utils.product_required_additional_visitors_data(product_id)
 
     # extract date and timeslot information from datetime attribute
     try:
@@ -105,6 +107,9 @@ def reservation(product_id: str):
         for variant in product_availability.get(timeslot_availability_key, {}).get('variants', [])
     }
 
+    # get the additional visitors-level information required by this product
+    product_requires_additional_visitors_data = utils.product_required_additional_visitors_data(product_id)
+
     for ticket in tickets:
         if (
                 not variant_quantity_map.get(ticket['variant_id'])
@@ -118,21 +123,22 @@ def reservation(product_id: str):
             )
 
         if product_requires_additional_visitors_data:
-            required_visitor_data = ticket.get('required_visitor_data', [])
+            required_visitor_data: List[Dict] = ticket.get('required_visitor_data', [])
 
             if not required_visitor_data or len(required_visitor_data) != ticket['quantity']:
+                missing_qty = ticket['quantity'] - len(required_visitor_data)
                 raise exceptions.BadRequest(
-                    1003,
-                    'Missing required fields',
-                    f'Missing required additional visitor data: {",".join(product_requires_additional_visitors_data)}'
+                    1003, 'Missing required fields', f'Missing visitor information for {missing_qty} visitors',
                 )
 
-            if not all(set(v.keys()) == set(product_requires_additional_visitors_data) for v in required_visitor_data):
-                raise exceptions.BadRequest(
-                    1003,
-                    'Missing required fields',
-                    f'Missing required additional visitor data: {",".join(product_requires_additional_visitors_data)}'
-                )
+            for visitor_data in required_visitor_data:
+                missing_fields = product_requires_additional_visitors_data.difference(visitor_data.keys())
+                if missing_fields:
+                    raise exceptions.BadRequest(
+                        1003,
+                        'Missing required fields',
+                        f'Missing required additional visitor data: {missing_fields}'
+                    )
 
     expires_at = arrow.utcnow().shift(minutes=30)
 

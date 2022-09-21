@@ -4,6 +4,7 @@ import json
 from decimal import Decimal
 from typing import Dict, Optional
 from typing import List
+from typing import Set
 
 from .constants import PRODUCTS, VARIANTS, PRODUCTS_CURRENCIES
 from .exceptions import BadRequest
@@ -30,18 +31,18 @@ def product_supports_timeslot(product_id: str) -> bool:
     return product_id in [p['id'] for p in PRODUCTS if p['use_timeslots']]
 
 
-def product_required_additional_order_data(product_id: str) -> List[str]:
+def product_required_additional_order_data(product_id: str) -> Set[str]:
     for p in PRODUCTS:
         if p['id'] == product_id:
-            return p.get('required_order_data', [])
-    return []
+            return set(p.get('required_order_data', []))
+    return set()
 
 
-def product_required_additional_visitors_data(product_id: str) -> List[str]:
+def product_required_additional_visitors_data(product_id: str) -> Set[str]:
     for p in PRODUCTS:
         if p['id'] == product_id:
-            return p.get('required_visitor_data', [])
-    return []
+            return set(p.get('required_visitor_data', []))
+    return set()
 
 
 def str_to_int(some_str, number_of_digits) -> int:
@@ -68,7 +69,7 @@ def get_availability(product_id: str, day: date) -> Dict:
     if day.isoweekday() == 7:
         for timeslot in timeslots:
             result[timeslot] = {
-                'available_tickets': 1,
+                'available_tickets': 0,
                 'variants': [],
             }
         return result
@@ -100,7 +101,7 @@ def get_availability(product_id: str, day: date) -> Dict:
             })
 
         result[timeslot] = {
-            'available_tickets': 1,
+            'available_tickets': max_tickets,
             'variants': variants,
         }
 
