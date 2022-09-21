@@ -1,5 +1,6 @@
 import binascii
 from datetime import date, datetime, timedelta
+from datetime import timezone
 from typing import Dict
 from typing import List
 
@@ -137,7 +138,7 @@ def reservation(product_id: str):
                     raise exceptions.BadRequest(
                         1003,
                         'Missing required fields',
-                        f'Missing required additional visitor data: {missing_fields}'
+                        f'Missing required additional visitor data: {",".join(missing_fields)}'
                     )
 
     expires_at = arrow.utcnow().shift(minutes=30)
@@ -217,8 +218,7 @@ def cancel_booking(booking_id):
         )
 
     booking_for_time = datetime.fromisoformat(booked_for)
-    cancellation_time = datetime.utcnow()
-
+    cancellation_time = datetime.now(timezone.utc)
     if booking_for_time < cancellation_time:
         raise exceptions.BadRequest(2009, 'Incorrect date', 'Cannot use the past date')
 
