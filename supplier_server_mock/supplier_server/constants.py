@@ -50,6 +50,7 @@ PRODUCTS = [
         'cutoff_time': 10,
         'ticket_content_type': 'PDF',
         'required_visitor_data': ['EMAIL', 'DATE_OF_BIRTH'],
+        'required_order_data': [],
         'cancelled_bookings': [],
         'timeslot_available_tickets_as_sum': False
     },
@@ -61,6 +62,7 @@ PRODUCTS = [
         'cutoff_time': 0,
         'ticket_content_type': 'CODE128',
         'max_tickets_per_order': 5,
+        'required_visitor_data': [],
         'required_order_data': ['NATIONALITY'],
         'cancelled_bookings': [],
         'timeslot_available_tickets_as_sum': False
