@@ -21,7 +21,8 @@ app.register_error_handler(exceptions.BadRequest, error_handlers.bad_request)
 @app.route('/v2/products')
 @authorization_header
 def products():
-    return jsonify([p for p in constants.PRODUCTS])
+    # expose public attributes only
+    return jsonify([{k: p[k] for k in p.keys() if not k.startswith('_')} for p in constants.PRODUCTS])
 
 
 @app.route('/v2/products/<product_id>/availability')
@@ -179,7 +180,7 @@ def booking():
     product = [p for p in constants.PRODUCTS if p["id"] == product_id][0]
 
     for variant_id, quantity in variant_quantity_map.items():
-        if product["ticket_content_type"] == "PDF":
+        if product["_ticket_content_type"] == "PDF":
             barcodes = [utils.encode_barcode(f'{reservation_id}{variant_id}{i}') for i in range(quantity)]
         else:
             barcodes = [str(utils.str_to_int(f'{reservation_id}{variant_id}{i}', 10)) for i in range(quantity)]
@@ -187,13 +188,13 @@ def booking():
 
     booking_id = utils.encode_booking_id(booking_date.isoformat(), product_id)
 
-    if booking_id in product['cancelled_bookings']:
-        del product['cancelled_bookings'][product['cancelled_bookings'].index(booking_id)]
+    if booking_id in product['_cancelled_bookings']:
+        del product['_cancelled_bookings'][product['_cancelled_bookings'].index(booking_id)]
 
     return jsonify(
         {
             'booking_id': booking_id,
-            'barcode_format': product["ticket_content_type"],
+            'barcode_format': product["_ticket_content_type"],
             'barcode_scope': 'ticket',
             'barcode': '',
             'tickets': tickets,
@@ -225,13 +226,17 @@ def cancel_booking(booking_id):
     difference = booking_for_time - cancellation_time
     hours_in_advance = round(difference.total_seconds()/3600)
     if product["cutoff_time"] != 0 and product["cutoff_time"] > hours_in_advance:
-        raise exceptions.BadRequest(2009, 'Incorrect date', f'The booking can only be cancelled {product["cutoff_time"]} hours in advance')
+        raise exceptions.BadRequest(
+            2009, 'Incorrect date', f'The booking can only be cancelled {product["cutoff_time"]} hours in advance'
+        )
 
-    if booking_id in product["cancelled_bookings"]:
-        raise exceptions.BadRequest(3003, 'Already cancelled', f'The booking with ID {booking_id} was already cancelled')
+    if booking_id in product["_cancelled_bookings"]:
+        raise exceptions.BadRequest(
+            3003, 'Already cancelled', f'The booking with ID {booking_id} was already cancelled'
+        )
 
     # if we want to test double cancellation, we need to store the cancelled booking id somewhere
-    product["cancelled_bookings"].append(booking_id)
+    product["_cancelled_bookings"].append(booking_id)
     return '', 204
 
 

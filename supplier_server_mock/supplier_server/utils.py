@@ -47,7 +47,7 @@ def product_required_additional_visitors_data(product_id: str) -> Set[str]:
 def timeslot_available_tickets_is_sum(product_id: str) -> bool:
     for p in PRODUCTS:
         if p['id'] == product_id:
-            return p.get('timeslot_available_tickets_as_sum')
+            return p.get('_timeslot_available_tickets_as_sum')
     return False
 
 
