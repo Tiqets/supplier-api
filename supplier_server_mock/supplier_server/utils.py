@@ -44,6 +44,13 @@ def product_required_additional_visitors_data(product_id: str) -> Set[str]:
     return set()
 
 
+def timeslot_available_tickets_is_sum(product_id: str) -> bool:
+    for p in PRODUCTS:
+        if p['id'] == product_id:
+            return p.get('timeslot_available_tickets_as_sum')
+    return False
+
+
 def str_to_int(some_str, number_of_digits) -> int:
     return int(str(abs(hash(some_str)) % (10 ** 8))[:number_of_digits])
 
@@ -105,7 +112,7 @@ def get_availability(product_id: str, day: date) -> Dict:
                 timeslot_available_tickets = variant_max_ticket
 
         result[timeslot] = {
-            'available_tickets': timeslot_available_tickets,
+            'available_tickets': max_tickets if timeslot_available_tickets_is_sum else timeslot_available_tickets,
             'variants': variants,
         }
 
