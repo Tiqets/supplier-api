@@ -237,7 +237,7 @@ def cancel_booking(booking_id):
 
     # if we want to test double cancellation, we need to store the cancelled booking id somewhere
     product["_cancelled_bookings"].append(booking_id)
-    return '', 204
+    return jsonify({}), 204
 
 
 def run():
