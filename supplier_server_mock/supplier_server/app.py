@@ -73,12 +73,12 @@ def reservation(product_id: str):
             raise exceptions.BadRequest(
                 1003,
                 'Missing required fields',
-                f'Missing required additional order data: {sorted(missing_fields)}',
+                f'Missing required additional order data: {",".join(missing_fields)}',
             )
 
     # extract date and timeslot information from datetime attribute
     try:
-        datetime_parameter = datetime.strptime(request.json.get('datetime'), '%Y-%m-%dT%H:%M')
+        datetime_parameter = datetime.strptime(datetime_parameter_value, '%Y-%m-%dT%H:%M')
         day = datetime_parameter.date()
         timeslot: str = datetime_parameter.time().strftime('%H:%M')
     except ValueError:
@@ -99,8 +99,7 @@ def reservation(product_id: str):
             f'This date is too far ahead in the future. You can book max {constants.MAX_DATE_RANGE} months ahead.'
         )
 
-    reservation_date = datetime.fromisoformat(day.isoformat() + " " + timeslot)
-
+    # ignore the timeslot component of the `datetime` attribute in the payload if the product doesn't support timeslots
     timeslot_availability_key = timeslot if utils.product_supports_timeslot(product_id) else 'no-timeslots'
 
     product_availability = utils.get_availability(product_id, day)
@@ -143,6 +142,7 @@ def reservation(product_id: str):
                     )
 
     expires_at = arrow.utcnow().shift(minutes=30)
+    reservation_date = datetime.fromisoformat(day.isoformat() + " " + timeslot)
 
     return jsonify(
         {
