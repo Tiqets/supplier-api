@@ -136,7 +136,7 @@ def encode_booking_id(booking_date_str, product_id):
 
 def decode_booking_data(booking_id: str):
     json_content = json.loads(b64decode(booking_id.replace('!', '=')).decode())
-    return json_content[0], json_content[2]
+    return json_content[0], json_content[1]
 
 
 def decode_reservation_data(reservation_id: str) -> tuple:
