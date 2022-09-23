@@ -218,7 +218,7 @@ def cancel_booking(booking_id):
             'The booking cannot be cancelled, the product does not allow cancellations',
         )
 
-    booking_for_time = datetime.fromisoformat(booked_for)
+    booking_for_time = datetime.fromisoformat(booked_for).replace(tzinfo=timezone.utc)
     cancellation_time = datetime.now(timezone.utc)
     if booking_for_time < cancellation_time:
         raise exceptions.BadRequest(2009, 'Incorrect date', 'Cannot use the past date')
