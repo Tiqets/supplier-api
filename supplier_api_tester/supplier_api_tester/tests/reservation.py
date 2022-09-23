@@ -2,24 +2,25 @@
 # then they should be done under a single test case.
 
 from datetime import datetime, timedelta, timezone
-from typing import Union
+from typing import List
 
 import requests
 
 from ..client import client
 from ..decorators import test_wrapper
 from ..exceptions import FailedTest
-from ..models import TestResult, Timeslot, ApiError
+from ..models import TestResult, ApiError
 from ..utils.adapters import get_api_error
 from ..utils.date import get_tomorrow
 from ..utils.adapters import get_reservation
 from ..utils.errors import check_api_error
-from ..utils.reservation import get_payload_from_slot, get_reservation_slot
+from ..utils.reservation import get_payload_for_reservation
+from ..utils.reservation import get_reservation_slot
 
 
 @test_wrapper
-def test_missing_api_key(api_url, api_key, product_id, timeslots: bool, version=1):
-    '''Request without API-Key'''
+def test_missing_api_key(api_url, api_key, product_id, timeslots: bool, version=2):
+    """Request without API-Key"""
     raw_response, _ = client(f'{api_url}/v{version}/products/{product_id}/reservation', api_key, method=requests.post, json_payload={}, headers={})
 
     if raw_response.status_code != 403:
@@ -41,9 +42,8 @@ def test_missing_api_key(api_url, api_key, product_id, timeslots: bool, version=
 
 
 @test_wrapper
-def test_incorrect_api_key(api_url, api_key, product_id, timeslots: bool, version=1):
-    '''Request with incorrect API-Key'''
-
+def test_incorrect_api_key(api_url, api_key, product_id, timeslots: bool, version=2):
+    """Request with incorrect API-Key"""
     raw_response, _ = client(f'{api_url}/v{version}/products/{product_id}/reservation', api_key, method=requests.post, json_payload={}, headers={
         'API-Key': 'NON-EXISTING-API-KEY',
     })
@@ -67,28 +67,38 @@ def test_incorrect_api_key(api_url, api_key, product_id, timeslots: bool, versio
 
 
 @test_wrapper
-def test_missing_argument_error(api_url, api_key, product_id, timeslots: bool, version=1):
-    '''Testing missing argument errors'''
+def test_missing_argument_error(api_url, api_key, product_id, timeslots: bool, version=2):
+    """Testing missing argument errors"""
     tomorrow = get_tomorrow()
     warnings: List[str] = []
     slot = get_reservation_slot(api_url, api_key, product_id, timeslots)
 
     # payload is empty
     json_payload = {}
-    raw_response, response = client(f'{api_url}/v{version}/products/{product_id}/reservation', api_key, method=requests.post, json_payload=json_payload)
+    raw_response, response = client(
+        f'{api_url}/v{version}/products/{product_id}/reservation',
+        api_key,
+        method=requests.post,
+        json_payload=json_payload,
+    )
     api_error = get_api_error(raw_response, response)
     expected_error = ApiError(
         error_code=1000,
         error='Missing argument',
-        message='Required argument "date" was not found',
+        message='Required argument "datetime" was not found',
     )
     result = check_api_error(raw_response, api_error, expected_error)
     if result.is_warning:
         warnings.append(result.message)
 
     # no tickets
-    json_payload['date'] = tomorrow.isoformat()
-    raw_response, response = client(f'{api_url}/v{version}/products/{product_id}/reservation', api_key, method=requests.post, json_payload=json_payload)
+    json_payload['datetime'] = f'{tomorrow.isoformat()}T00:00'
+    raw_response, response = client(
+        f'{api_url}/v{version}/products/{product_id}/reservation',
+        api_key,
+        method=requests.post,
+        json_payload=json_payload,
+    )
     api_error = get_api_error(raw_response, response)
     expected_error = ApiError(
         error_code=1000,
@@ -104,7 +114,12 @@ def test_missing_argument_error(api_url, api_key, product_id, timeslots: bool, v
         'variant_id': slot.variants[0].id,
         'quantity': 1,
     }]
-    raw_response, response = client(f'{api_url}/v{version}/products/{product_id}/reservation', api_key, method=requests.post, json_payload=json_payload)
+    raw_response, response = client(
+        f'{api_url}/v{version}/products/{product_id}/reservation',
+        api_key,
+        method=requests.post,
+        json_payload=json_payload,
+    )
     api_error = get_api_error(raw_response, response)
     expected_error = ApiError(
         error_code=1000,
@@ -124,13 +139,17 @@ def test_missing_argument_error(api_url, api_key, product_id, timeslots: bool, v
 
 
 @test_wrapper
-def test_error_for_non_existing_product(api_url, api_key, product_id, timeslots: bool, version=1):
-    '''Testing reservation for non-existing product'''
+def test_error_for_non_existing_product(api_url, api_key, product_id, timeslots: bool, version=2):
+    """Testing reservation for non-existing product"""
     url = f'{api_url}/v{version}/products/NON-EXISTING-PRODUCT-ID/reservation'
     slot = get_reservation_slot(api_url, api_key, product_id, timeslots)
-    json_payload = get_payload_from_slot(slot)
+    json_payload = get_payload_for_reservation(api_url, api_key, product_id, slot)
     if timeslots:
-        json_payload['timeslot'] = slot.start
+        json_payload['datetime'] = (
+            f'{slot.date.isoformat()}T{slot.timeslot}'
+            if slot.timeslot != 'no-timeslots'
+            else f'{slot.date.isoformat()}T00:00'
+        )
     raw_response, response = client(url, api_key, method=requests.post, json_payload=json_payload)
     api_error = get_api_error(raw_response, response)
     expected_error = ApiError(
@@ -143,36 +162,40 @@ def test_error_for_non_existing_product(api_url, api_key, product_id, timeslots:
 
 
 @test_wrapper
-def test_incorrect_date_format(api_url, api_key, product_id, timeslots: bool, version=1):
-    '''Testing reservation with incorrect date format'''
+def test_incorrect_date_format(api_url, api_key, product_id, timeslots: bool, version=2):
+    """Testing reservation with incorrect date format"""
     url = f'{api_url}/v{version}/products/{product_id}/reservation'
     bad_date_format = '05/05/2020'
     slot = get_reservation_slot(api_url, api_key, product_id, timeslots)
-    json_payload = get_payload_from_slot(slot)
-    json_payload['date'] = bad_date_format
+    json_payload = get_payload_for_reservation(api_url, api_key, product_id, slot)
+    json_payload['datetime'] = bad_date_format
     if timeslots:
-        json_payload['timeslot'] = slot.start
+        json_payload['datetime'] = f'{bad_date_format}T{slot.timeslot}'
     raw_response, response = client(url, api_key, method=requests.post, json_payload=json_payload)
     api_error = get_api_error(raw_response, response)
     expected_error = ApiError(
         error_code=2000,
         error='Incorrect date format',
-        message=f'Incorrect date format {bad_date_format}, please use the YYYY-MM-DD format',
+        message=f'Incorrect date format {bad_date_format}, please use the YYYY-MM-DDTHH:MM format',
     )
     check_api_error(raw_response, api_error, expected_error)
     return TestResult()
 
 
 @test_wrapper
-def test_past_date(api_url, api_key, product_id, timeslots: bool, version=1):
-    '''Testing reservation with past date'''
+def test_past_date(api_url, api_key, product_id, timeslots: bool, version=2):
+    """Testing reservation with past date"""
     url = f'{api_url}/v{version}/products/{product_id}/reservation'
     slot = get_reservation_slot(api_url, api_key, product_id, timeslots)
-    json_payload = get_payload_from_slot(slot)
+    json_payload = get_payload_for_reservation(api_url, api_key, product_id, slot)
     yesterday = datetime.utcnow().date() - timedelta(days=1)
-    json_payload['date'] = yesterday.isoformat()
+    json_payload['datetime'] = f'{yesterday.isoformat()}T00:00'
     if timeslots:
-        json_payload['timeslot'] = slot.start
+        json_payload['datetime'] = (
+            f'{yesterday.isoformat()}T{slot.timeslot}'
+            if slot.timeslot != 'no-timeslots'
+            else f'{yesterday.isoformat()}T00:00'
+        )
     raw_response, response = client(url, api_key, method=requests.post, json_payload=json_payload)
     api_error = get_api_error(raw_response, response)
     expected_error = ApiError(
@@ -185,13 +208,17 @@ def test_past_date(api_url, api_key, product_id, timeslots: bool, version=1):
 
 
 @test_wrapper
-def test_not_allowed_method(api_url, api_key, product_id, timeslots: bool, version=1):
-    '''Testing methods that are not allowed'''
+def test_not_allowed_method(api_url, api_key, product_id, timeslots: bool, version=2):
+    """Testing methods that are not allowed"""
     url = f'{api_url}/v{version}/products/{product_id}/reservation'
     slot = get_reservation_slot(api_url, api_key, product_id, timeslots)
-    json_payload = get_payload_from_slot(slot)
+    json_payload = get_payload_for_reservation(api_url, api_key, product_id, slot)
     if timeslots:
-        json_payload['timeslot'] = slot.start
+        json_payload['datetime'] = (
+            f'{slot.date.isoformat()}T{slot.timeslot}'
+            if slot.timeslot != 'no-timeslots'
+            else f'{slot.date.isoformat()}T00:00'
+        )
     for method in (requests.get, requests.put, requests.patch, requests.delete):
         raw_response, _ = client(url, api_key, method=method, json_payload=json_payload)
         status_code = getattr(raw_response, 'status_code', 200)
@@ -204,13 +231,17 @@ def test_not_allowed_method(api_url, api_key, product_id, timeslots: bool, versi
 
 
 @test_wrapper
-def test_reservation(api_url, api_key, product_id, timeslots: bool, version=1):
-    '''Reserving tickets for at least 1 variant'''
+def test_reservation(api_url, api_key, product_id, timeslots: bool, version=2):
+    """Reserving tickets for at least 1 variant"""
     url = f'{api_url}/v{version}/products/{product_id}/reservation'
     slot = get_reservation_slot(api_url, api_key, product_id, timeslots)
-    json_payload = get_payload_from_slot(slot)
+    json_payload = get_payload_for_reservation(api_url, api_key, product_id, slot)
     if timeslots:
-        json_payload['timeslot'] = slot.start
+        json_payload['datetime'] = (
+            f'{slot.date.isoformat()}T{slot.timeslot}'
+            if slot.timeslot != 'no-timeslots'
+            else f'{slot.date.isoformat()}T00:00'
+        )
     raw_response, response = client(url, api_key, method=requests.post, json_payload=json_payload)
     reservation = get_reservation(raw_response, response)
     if not reservation.reservation_id:

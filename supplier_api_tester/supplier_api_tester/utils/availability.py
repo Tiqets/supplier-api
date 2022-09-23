@@ -7,17 +7,16 @@ from requests.models import Response
 
 from supplier_api_tester.client import client
 from supplier_api_tester.exceptions import FailedTest
-from supplier_api_tester.models import ApiError, DailyVariants, TestResult, Timeslot
+from supplier_api_tester.models import ApiError, DailyVariants, TestResult
 from supplier_api_tester.utils.adapters import (
     get_api_error,
     parse_availability_variants,
-    parse_availability_timeslots,
 )
 from supplier_api_tester.utils.errors import check_api_error
 from supplier_api_tester.utils.date import get_tomorrow
 
 
-def get_availability_variants(
+def get_availability(
     api_url: str,
     api_key: str,
     product_id: str,
@@ -25,32 +24,16 @@ def get_availability_variants(
     start_date: date,
     end_date: date,
 ) -> Tuple[List[DailyVariants], Response]:
-    raw_response, response = client(f'{api_url}/v{version}/products/{product_id}/variants', api_key, {
+    raw_response, response = client(f'{api_url}/v{version}/products/{product_id}/availability', api_key, {
         'start': start_date.isoformat(),
         'end': end_date.isoformat(),
     })
-    days = parse_availability_variants(raw_response, response)
+    days: List[DailyVariants] = parse_availability_variants(raw_response, response)
     return days, raw_response
 
 
-def get_availability_timeslots(
-    api_url: str,
-    api_key: str,
-    product_id: str,
-    version: int,
-    start_date: date,
-    end_date: date,
-) -> Tuple[List[Timeslot], Response]:
-    raw_response, response = client(f'{api_url}/v{version}/products/{product_id}/timeslots', api_key, {
-        'start': start_date.isoformat(),
-        'end': end_date.isoformat(),
-    })
-    days = parse_availability_timeslots(raw_response, response)
-    return days, raw_response
-
-
-def past_start_date(api_url, api_key, product_id, endpoint, version=1):
-    '''Checking availability with start date from the past'''
+def past_start_date(api_url, api_key, product_id, endpoint, version=2):
+    """Checking availability with start date from the past"""
     today = datetime.utcnow().date()
     start = today - timedelta(days=1)
     end = today
@@ -59,17 +42,20 @@ def past_start_date(api_url, api_key, product_id, endpoint, version=1):
         'start': start.isoformat(),
         'end': end.isoformat(),
     })
-    api_error = get_api_error(raw_response, response)
-    expected_error = ApiError(
-        error_code=2009,
-        error='Incorrect date',
-        message='Cannot use the past date',
-    )
-    return check_api_error(raw_response, api_error, expected_error)
+    if not response:
+        return TestResult()
+
+    if start in response:
+        raise FailedTest(
+            message=f'Returned availability for date in the past: {start}',
+            response=raw_response,
+        )
+
+    return TestResult()
 
 
-def huge_date_range(api_url, api_key, product_id, endpoint, version=1):
-    '''Checking availability with huge date range'''
+def huge_date_range(api_url, api_key, product_id, endpoint, version=2):
+    """Checking availability with huge date range"""
     today = datetime.utcnow().date()
     start = today
     end = today + timedelta(days=365 * 10)
@@ -78,17 +64,12 @@ def huge_date_range(api_url, api_key, product_id, endpoint, version=1):
         'start': start.isoformat(),
         'end': end.isoformat(),
     })
-    api_error = get_api_error(raw_response, response)
-    expected_error = ApiError(
-        error_code=2009,
-        error='Incorrect date',
-        message='Maximum date range is',
-    )
-    return check_api_error(raw_response, api_error, expected_error)
+    return TestResult()
 
 
-def empty_availability(api_url, api_key, product_id, endpoint, version=1):
-    '''Checking availability that is supposed to be empty'''
+# TODO this no longer needed in v2 because the API error 2009 was removed. Check that the response is not 2009 error
+def empty_availability(api_url, api_key, product_id, endpoint, version=2):
+    """Checking availability that is supposed to be empty"""
     today = datetime.utcnow().date()
     start = today + timedelta(days=300)
     end = start + timedelta(days=1)
@@ -107,8 +88,8 @@ def empty_availability(api_url, api_key, product_id, endpoint, version=1):
     )
 
 
-def test_missing_api_key(api_url, api_key, product_id, endpoint, version=1):
-    '''Request without API-Key'''
+def test_missing_api_key(api_url, api_key, product_id, endpoint, version=2):
+    """Request without API-Key"""
     tomorrow = get_tomorrow()
     raw_response, _ = client(f'{api_url}/v{version}/products/{product_id}/{endpoint}', api_key, {
         'start': tomorrow.isoformat(),
@@ -132,8 +113,8 @@ def test_missing_api_key(api_url, api_key, product_id, endpoint, version=1):
     return TestResult()
 
 
-def test_incorrect_api_key(api_url, api_key, product_id, endpoint, version=1):
-    '''Request with incorrect API-Key'''
+def test_incorrect_api_key(api_url, api_key, product_id, endpoint, version=2):
+    """Request with incorrect API-Key"""
     tomorrow = get_tomorrow()
     raw_response, _ = client(f'{api_url}/v{version}/products/{product_id}/{endpoint}', api_key, {
         'start': tomorrow.isoformat(),
@@ -158,8 +139,8 @@ def test_incorrect_api_key(api_url, api_key, product_id, endpoint, version=1):
     return TestResult()
 
 
-def test_missing_argument_error(api_url, api_key, product_id, endpoint, version=1):
-    '''Testing missing argument errors'''
+def test_missing_argument_error(api_url, api_key, product_id, endpoint, version=2):
+    """Testing missing argument errors"""
     tomorrow = get_tomorrow()
     warnings: List[str] = []
 
@@ -211,8 +192,8 @@ def test_missing_argument_error(api_url, api_key, product_id, endpoint, version=
     return TestResult()
 
 
-def test_error_for_non_existing_product(api_url, api_key, product_id, endpoint, version=1):
-    '''Testing availability for non existing product'''
+def test_error_for_non_existing_product(api_url, api_key, product_id, endpoint, version=2):
+    """Testing availability for non existing product"""
     tomorrow = get_tomorrow()
     raw_response, response = client(f'{api_url}/v{version}/products/NON-EXISTING-PRODUCT-ID/{endpoint}', api_key, {
         'start': tomorrow.isoformat(),
@@ -227,8 +208,8 @@ def test_error_for_non_existing_product(api_url, api_key, product_id, endpoint, 
     return check_api_error(raw_response, api_error, expected_error)
 
 
-def incorrect_date_format(api_url, api_key, product_id, endpoint, version=1):
-    '''Checking incorrect date format'''
+def incorrect_date_format(api_url, api_key, product_id, endpoint, version=2):
+    """Checking incorrect date format"""
     tomorrow = get_tomorrow()
     bad_date_format = tomorrow.strftime('%d-%m-%Y')
 
@@ -261,8 +242,8 @@ def incorrect_date_format(api_url, api_key, product_id, endpoint, version=1):
     return TestResult()
 
 
-def end_before_start_error(api_url, api_key, product_id, endpoint, version=1):
-    '''Checking incorrect range error'''
+def end_before_start_error(api_url, api_key, product_id, endpoint, version=2):
+    """Checking incorrect range error"""
     tomorrow = get_tomorrow()
     next_week = tomorrow + timedelta(days=7)
     raw_response, response = client(f'{api_url}/v{version}/products/{product_id}/{endpoint}', api_key, {
@@ -278,8 +259,8 @@ def end_before_start_error(api_url, api_key, product_id, endpoint, version=1):
     return check_api_error(raw_response, api_error, expected_error)
 
 
-def not_allowed_method(api_url, api_key, product_id, endpoint, version=1):
-    '''Testing methods that are not allowed'''
+def not_allowed_method(api_url, api_key, product_id, endpoint, version=2):
+    """Testing methods that are not allowed"""
     tomorrow = get_tomorrow()
     for method in (requests.post, requests.put, requests.patch, requests.delete):
         raw_response, response = client(f'{api_url}/v{version}/products/{product_id}/{endpoint}', api_key, {
@@ -295,33 +276,17 @@ def not_allowed_method(api_url, api_key, product_id, endpoint, version=1):
     return TestResult()
 
 
-def test_error_for_non_timeslot_product(api_url, api_key, product_id, endpoint, version=1):
-    '''Testing timeslot availability for non timeslot product'''
-    tomorrow = get_tomorrow()
-    raw_response, response = client(f'{api_url}/v{version}/products/{product_id}/{endpoint}', api_key, {
-        'start': tomorrow.isoformat(),
-        'end': tomorrow.isoformat(),
-    })
-    api_error = get_api_error(raw_response, response)
-    expected_error = ApiError(
-        error_code=1002,
-        error='Timeslot product expected',
-        message=f'Requested timeslot availability for non timeslot product ID {product_id}',
-    )
-    return check_api_error(raw_response, api_error, expected_error)
-
-
-def test_error_for_timeslot_product(api_url, api_key, product_id, endpoint, version=1):
-    '''Testing variant availability for timeslot product'''
-    tomorrow = get_tomorrow()
-    raw_response, response = client(f'{api_url}/v{version}/products/{product_id}/{endpoint}', api_key, {
-        'start': tomorrow.isoformat(),
-        'end': tomorrow.isoformat(),
-    })
-    api_error = get_api_error(raw_response, response)
-    expected_error = ApiError(
-        error_code=1003,
-        error='Non-timeslot product expected',
-        message=f'Requested non timeslot availability for timeslot product ID {product_id}',
-    )
-    return check_api_error(raw_response, api_error, expected_error)
+# def test_error_for_non_timeslot_product(api_url, api_key, product_id, endpoint, version=2):
+#     '''Testing timeslot availability for non timeslot product'''
+#     tomorrow = get_tomorrow()
+#     raw_response, response = client(f'{api_url}/v{version}/products/{product_id}/{endpoint}', api_key, {
+#         'start': tomorrow.isoformat(),
+#         'end': tomorrow.isoformat(),
+#     })
+#     api_error = get_api_error(raw_response, response)
+#     expected_error = ApiError(
+#         error_code=1002,
+#         error='Timeslot product expected',
+#         message=f'Requested timeslot availability for non timeslot product ID {product_id}',
+#     )
+#     return check_api_error(raw_response, api_error, expected_error)

@@ -40,6 +40,7 @@ class TestResult:
     def is_error(self):
         return self.status == 2
 
+
 @dataclass
 class Product:
     id: str
@@ -48,19 +49,29 @@ class Product:
     description: Optional[str]
     is_refundable: bool
     cutoff_time: int
+    required_order_data: Optional[List[str]] = None
+    required_visitor_data: Optional[List[str]] = None
+
+
+@dataclass
+class VariantPrice:
+    currency: str
+    face_value: str
 
 
 @dataclass
 class Variant:
     id: str
-    max_tickets: int
     name: str
+    available_tickets: int
+    price: VariantPrice
 
 
 @dataclass
 class DailyVariants:
     date: date
-    max_tickets: int
+    timeslot: str
+    available_tickets: int
     variants: List[Variant]
 
 
@@ -90,6 +101,6 @@ class Reservation:
 class Booking:
     booking_id: str
     barcode_format: str
-    barcode_position: str
+    barcode_scope: str
     barcode: Optional[str]
     tickets: Optional[Dict[str, List[str]]]

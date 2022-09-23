@@ -1,10 +1,9 @@
 import click
 
-from .client import client
 from .exceptions import FailedTest
-from .tests.product_catalog import get_catalog
 from .tester import SupplierApiTester
 from .printer import results_printer, products_printer
+from .utils.catalog import get_catalog
 
 
 def print_title(title):
@@ -26,7 +25,7 @@ def print_title(title):
 @click.option('-c', '--catalog', is_flag=True, default=False, help='Run product catalog tests')
 @click.option('-nc', '--no-colors', is_flag=True, default=False, help='Not using colors on output')
 def supplier_tester(url, api_key, product_id, timeslots, availability, reservation, booking, catalog, no_colors):
-    '''Test you Supplier API implementation'''
+    """Test you Supplier API implementation"""
 
     if not any((availability, reservation, booking, catalog)):
         availability = True
@@ -90,9 +89,9 @@ def supplier_tester(url, api_key, product_id, timeslots, availability, reservati
 @click.option('-u', '--url', required=True, prompt='Server URL', type=str)
 @click.option('-k', '--api-key', required=True, prompt='API Key', type=str)
 def supplier_products(url, api_key):
-    '''Shows the product catalog'''
+    """Shows the product catalog"""
     try:
-        _, products = get_catalog(url, api_key, version=1)
+        _, products = get_catalog(url, api_key, version=2)
     except FailedTest as e:
         print(f'Unable to get the products: {e.message}')
         exit(1)

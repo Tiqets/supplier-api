@@ -1,15 +1,15 @@
 import base64
-from base64 import b64encode, b64decode
 import binascii
 
 from datetime import date, datetime
+from typing import Dict
 from typing import List
 
 import dacite
-from requests.models import Request, Response
+from requests.models import Response
 
 from ..exceptions import FailedTest
-from ..models import ApiError, Booking, DailyVariants, Product, Reservation, Timeslot
+from ..models import ApiError, Booking, DailyVariants, Product, Reservation
 
 
 def check_base64(item):
@@ -32,13 +32,13 @@ def format_error_message(e: Exception) -> str:
 
 
 def booking_pdf_validator(booking: Booking, raw_response: Response):
-    if booking.barcode_position == 'order':
+    if booking.barcode_scope == 'order':
         if not check_base64(booking.barcode):
             raise FailedTest(
-                message = "Error while decoding (base64) PDF voucher for the order",
+                message="Error while decoding (base64) PDF voucher for the order",
                 response=raw_response
         )
-    elif booking.barcode_position == 'ticket':
+    elif booking.barcode_scope == 'ticket':
         for variant, barcodes in booking.tickets.items():
             for barcode in barcodes:
                 if not check_base64(barcode):
@@ -48,70 +48,51 @@ def booking_pdf_validator(booking: Booking, raw_response: Response):
                     )
 
 
-def parse_availability_variants(raw_response: Response, response) -> List[DailyVariants]:
-    '''Getting and testing response from the /variants endpoint'''
-    if type(response) is not list:
+def parse_availability_variants(raw_response: Response, response: Dict) -> List[DailyVariants]:
+    """Getting and testing response from the /availability endpoint"""
+    if type(response) is not dict:
         raise FailedTest(
-            message='The response should be a JSON Array',
+            message='The response should be a JSON Object',
             response=raw_response,
         )
+
+    available_variants: List[DailyVariants] = []
     try:
-        days = [
-            dacite.from_dict(
-                data_class=DailyVariants,
-                data=day,
-                config=dacite.Config(
-                    type_hooks={date: date.fromisoformat},
-                    strict=True,
+        for day, day_availability in response.items():
+            for timeslot, timeslot_availability in day_availability.items():
+                available_variants.append(
+                    dacite.from_dict(
+                        data_class=DailyVariants,
+                        data={
+                            'date': day,
+                            'timeslot': timeslot,
+                            'available_tickets': timeslot_availability.get('available_tickets'),
+                            'variants': [
+                                {**v}
+                                for v in timeslot_availability.get('variants', [])
+                            ]
+                        },
+                        config=dacite.Config(
+                            type_hooks={date: date.fromisoformat},
+                            strict=True,
+                        )
+                    )
                 )
-            )
-            for day in response
-        ]
     except (
         dacite.exceptions.WrongTypeError,
         dacite.exceptions.MissingValueError,
         dacite.exceptions.UnexpectedDataError,
     ) as e:
         raise FailedTest(
-            message=f'Incorrect JSON format in response from the /variants endpoint: {format_error_message(e)}',
+            message=f'Incorrect JSON format in response from the /availability endpoint: {format_error_message(e)}',
             response=raw_response,
         )
-    return days
+
+    return available_variants
 
 
-def parse_availability_timeslots(raw_response: Response, response) -> List[Timeslot]:
-    '''Getting and testing response from the /timeslots endpoint'''
-    if type(response) is not list:
-        raise FailedTest(
-            message='The response should be a JSON Array',
-            response=raw_response,
-        )
-    try:
-        timeslots = [
-            dacite.from_dict(
-                data_class=Timeslot,
-                data=timeslot,
-                config=dacite.Config(
-                    type_hooks={date: date.fromisoformat},
-                    strict=True,
-                )
-            )
-            for timeslot in response
-        ]
-    except (
-        dacite.exceptions.WrongTypeError,
-        dacite.exceptions.MissingValueError,
-        dacite.exceptions.UnexpectedDataError,
-    ) as e:
-        raise FailedTest(
-            message=f'Incorrect JSON format in response from the /timeslots endpoint: {format_error_message(e)}',
-            response=raw_response,
-        )
-    return timeslots
-
-
-def get_products(raw_response: Response, response) -> List[Product]:
-    '''Getting and testing response from the /products endpoint'''
+def get_products(raw_response: Response, response: Dict) -> List[Product]:
+    """Getting and testing response from the /products endpoint"""
     if type(response) is not list:
         raise FailedTest(
             message='The response should be a JSON Array',
@@ -197,17 +178,17 @@ def get_booking(raw_response: Response, response) -> Booking:
     if booking.barcode_format == 'PDF':
         booking_pdf_validator(booking, raw_response)
 
-    if booking.barcode_position not in ('order', 'ticket'):
+    if booking.barcode_scope not in ('order', 'ticket'):
         raise FailedTest(
-            message=f'Incorrect value in the barcode_position field: {booking.barcode_position}',
+            message=f'Incorrect value in the barcode_scope field: {booking.barcode_scope}',
             response=raw_response,
         )
-    if booking.barcode_position == 'order' and not booking.barcode:
+    if booking.barcode_scope == 'order' and not booking.barcode:
         raise FailedTest(
             message='Barcode for the whole order is empty',
             response=raw_response,
         )
-    if booking.barcode_position == 'ticket' and not booking.tickets:
+    if booking.barcode_scope == 'ticket' and not booking.tickets:
         raise FailedTest(
             message='Tickets Array is empty',
             response=raw_response,

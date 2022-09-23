@@ -112,7 +112,17 @@ def results_printer(results, no_colors=False):
 
 
 def products_printer(products: List[Product]) -> None:
-    rows = [['ID', 'Name', 'Timeslots', 'Refundable', 'Cutoff time']]
+    rows = [
+        [
+            'ID',
+            'Name',
+            'Timeslots',
+            'Refundable',
+            'Cutoff time',
+            'Required Additional Order Data',
+            'Required Additional Visitors Data',
+        ]
+    ]
     rows.extend([
         [
             p.id,
@@ -120,6 +130,8 @@ def products_printer(products: List[Product]) -> None:
             p.use_timeslots,
             p.is_refundable,
             p.cutoff_time,
+            ','.join(p.required_order_data),
+            ','.join(p.required_visitor_data),
         ] for p in products]
     )
     table = AsciiTable(rows)
