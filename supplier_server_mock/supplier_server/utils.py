@@ -103,7 +103,7 @@ def get_availability(product_id: str, day: date) -> Dict:
                 'name': variant,
                 'available_tickets': variant_max_ticket,
                 'price': {
-                    'face_value': Decimal('12.45') * i,
+                    'face_value': f"{Decimal('12.45') * i}",
                     'currency': PRODUCTS_CURRENCIES.get(product_id, 'EUR'),
                 },
             })

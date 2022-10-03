@@ -173,16 +173,16 @@ tags:
 
       Expected behavior:
         - Only availability within the requested date range is returned
-        - When there is no availability for the requested and existing product an empty array (`[]`) shall be returned 
+        - When there is no availability for the requested and existing product an empty object (`{}`) shall be returned
 
       Example #1 to illustrate the above:  
-        - A availability request is made for an existing Product and a date range of 7 months (20-01-2023 - 20-07-2023) is requested.  
+        - An availability request is made for an existing Product and a date range of 7 months (20-01-2023 - 20-07-2023) is requested.
         - The queried product only has 2 months of availability defined in the system.  
         - **Expected response:** Availability for the 2 months that can be provided, never an error.
 
       Example #2 to illustrate the above:  
         - An availability request is made for an existing Product and a date range that isn't defined yet in the Supplier Partner's system.
-        - **Expected response**: An empty array (```[]```).
+        - **Expected response**: An empty object (```{}```).
   - name: Product Catalog
     description: |
       The product catalog endpoints allow Tiqets to retrieve the attractions, events or tours offered by our Supply Partners.
@@ -264,13 +264,13 @@ paths:
                             name: Adult
                             available_tickets: 0
                             price:
-                              face_value: 3.20
+                              face_value: "3.20"
                               currency: EUR
                           - id: "2"
                             name: Child
                             available_tickets: 0
                             price:
-                              face_value: 1.10
+                              face_value: "1.10"
                               currency: EUR
                       "16:30":
                         available_tickets: 100
@@ -279,13 +279,13 @@ paths:
                             name: Adult
                             available_tickets: 100
                             price:
-                              face_value: 10
+                              face_value: "10"
                               currency: EUR
                           - id: "2"
                             name: Child
                             available_tickets: 10
                             price:
-                              face_value: 5.75
+                              face_value: "5.75"
                               currency: EUR
                       "17:30":
                         available_tickets: 63
@@ -294,13 +294,13 @@ paths:
                             name: Adult
                             available_tickets: 53
                             price:
-                              face_value: 10
+                              face_value: "10"
                               currency: EUR
                           - id: "2"
                             name: Child
                             available_tickets: 10
                             price:
-                              face_value: 5.75
+                              face_value: "5.75"
                               currency: EUR
                 single_timeslot:
                   summary: Product with a recurring single timeslot
@@ -313,13 +313,13 @@ paths:
                             name: Adult
                             available_tickets: 0
                             price:
-                              face_value: 10
+                              face_value: "10"
                               currency: EUR
                           - id: "2"
                             name: Child
                             available_tickets: 0
                             price:
-                              face_value: 5.75
+                              face_value: "5.75"
                               currency: EUR
                     "2022-12-29":
                       "11:00":
@@ -329,13 +329,13 @@ paths:
                             name: Adult
                             available_tickets: 14
                             price:
-                              face_value: 10
+                              face_value: "10"
                               currency: EUR
                           - id: "2"
                             name: Child
                             available_tickets: 10
                             price:
-                              face_value: 5.75
+                              face_value: "5.75"
                               currency: EUR
                 non_timeslotted:
                   summary: Product without timeslots
@@ -348,13 +348,13 @@ paths:
                             name: Adult
                             available_tickets: 82
                             price:
-                              face_value: 4.20
+                              face_value: "4.20"
                               currency: EUR
                           - id: "2"
                             name: Child
                             available_tickets: 10
                             price:
-                              face_value: 2.10
+                              face_value: "2.10"
                               currency: EUR
                 past_date:
                   summary: Request availability for date in the past
@@ -370,7 +370,7 @@ paths:
                             name: Adult
                             available_tickets: 0
                             price:
-                              face_value: 3.20
+                              face_value: "3.20"
                               currency: EUR
                     "2022-12-03": {}
         "400":
@@ -519,19 +519,19 @@ paths:
 
             ## Internal error codes
 
-            | Internal error code |             Error               |                                            Message                                            |
-            |---------------------|---------------------------------|-----------------------------------------------------------------------------------------------|
-            |                1000 | Missing argument                | Required argument `ATTRIBUTE_NAME` was not found                                              |
-            |                1001 | Missing product                 | Product with ID `ID_NUMBER` doesn't exist                                                     |
-            |                1003 | Missing required fields         | Eg. Missing data for field `FULL_NAME`                                                        |
-            |                2000 | Incorrect date format           | Incorrect date format xxx, please use the `YYYY-MM-DDTHH:MM` format                           |
-            |                2002 | Wrong timeslot                  | Given timeslot doesn't belong to given date (`YYYY-MM-DD`)                                    |
-            |                2003 | Wrong variant ID                | Given variant_id doesn't belong to given timeslot_id (`TIMESLOT_ID`)                          |
-            |                2004 | Incorrect type                  | Expected `ATTRIBUTE_NAME` to be a string, got `TYPE` instead                                  |
-            |                2005 | Invalid Value                   | Eg. The phone number must not contain dots.                                                   |
-            |                2009 | Incorrect date                  | Eg. Cannot use the past date or Given date is too far ahead in the future (max 6 months)      |
-            |                2010 | Invalid value of required field | Eg. Incorrect value of field `EMAIL`                                                          |
-            |                3000 | Availability error              | Quantity (3) is not available anymore for a given variant (id: 4337) and timeslot (id: 5567)  |
+            | Internal error code |             Error               |                                            Message                                                   |
+            |---------------------|---------------------------------|------------------------------------------------------------------------------------------------------|
+            |                1000 | Missing argument                | Required argument `ATTRIBUTE_NAME` was not found                                                     |
+            |                1001 | Missing product                 | Product with ID `ID_NUMBER` doesn't exist                                                            |
+            |                1003 | Missing required fields         | Eg. Missing data for field `FULL_NAME`                                                               |
+            |                2000 | Incorrect date format           | Incorrect date format xxx, please use the `YYYY-MM-DDTHH:MM` format                                  |
+            |                2002 | Wrong timeslot                  | Given timeslot doesn't belong to given date (`YYYY-MM-DD`)                                           |
+            |                2003 | Wrong variant ID                | Given variant_id doesn't belong to given timeslot_id (`TIMESLOT_ID`)                                 |
+            |                2004 | Incorrect type                  | Expected `ATTRIBUTE_NAME` to be a string, got `TYPE` instead                                         |
+            |                2005 | Invalid Value                   | Eg. The phone number must not contain dots.                                                          |
+            |                2009 | Incorrect date                  | Eg. Cannot use a date in the past or, the given date is too far ahead in the future (max 6 months).  |
+            |                2010 | Invalid value of required field | Eg. Incorrect value of field `EMAIL`.                                                                |
+            |                3000 | Availability error              | Quantity (3) is not available anymore for a given variant (id: 4337) and timeslot (id: 5567)         |
           content:
             application/json:
               schema:
@@ -802,7 +802,7 @@ components:
           description: Number of available tickets for a given timeslot. This is the maximum number of tickets available for the timeslot.
         variants:
           type: array
-          description: List of variants available in this timeslot
+          description: List of variants available in this date and timeslot combination.
           items:
             $ref: "#/components/schemas/Variant"
     Variant:
@@ -823,8 +823,8 @@ components:
           type: object
           properties:
             face_value:
-              type: number
-              example: 3.20
+              type: string
+              example: "3.20"
             currency:
               type: string
               example: EUR
