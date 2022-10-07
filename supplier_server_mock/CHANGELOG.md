@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.0.0
+
+- add support for the Supplier API v2.0
+- remove support for the Supplier API v1.x
+
 ## 1.5.2
 
 - bump `arrow` to version `0.15.1`

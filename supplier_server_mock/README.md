@@ -30,5 +30,5 @@ make run
 ## Example request
 
 ```
-curl -H "API-Key: secret" http://localhost:8000/v1/products
+curl -H "API-Key: secret" http://localhost:8000/v2/products
 ```
