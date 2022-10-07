@@ -10,11 +10,11 @@ from ..utils import availability
 
 
 @test_wrapper
-def test_next_30_days(api_url, api_key, product_id, version=1):
-    '''[Variants] Checking availability for the next 30 days'''
+def test_next_30_days(api_url, api_key, product_id, version=2):
+    """[Availability] Checking availability for the next 30 days"""
     start_date = datetime.utcnow().date()
     end_date = start_date + timedelta(days=30)
-    days, raw_response = availability.get_availability_variants(
+    days, raw_response = availability.get_availability(
         api_url,
         api_key,
         product_id,
@@ -24,7 +24,7 @@ def test_next_30_days(api_url, api_key, product_id, version=1):
     )
 
     # non-zero availability check
-    max_tickets_sum = sum(day.max_tickets for day in days)
+    max_tickets_sum = sum(day.available_tickets for day in days)
     if max_tickets_sum <= 0:
         raise FailedTest(
             message='There is no availability for next 30 days',
@@ -70,66 +70,56 @@ def test_next_30_days(api_url, api_key, product_id, version=1):
 
 
 @test_wrapper
-def test_missing_api_key(api_url, api_key, product_id, version=1):
-    '''[Variants] Request without API-Key'''
-    return availability.test_missing_api_key(api_url, api_key, product_id, 'variants', version=1)
+def test_missing_api_key(api_url, api_key, product_id, version=2):
+    """[Availability] Request without API-Key"""
+    return availability.test_missing_api_key(api_url, api_key, product_id, 'availability', version=version)
 
 
 @test_wrapper
-def test_incorrect_api_key(api_url, api_key, product_id, version=1):
-    '''[Variants] Request with incorrect API-Key'''
-    return availability.test_incorrect_api_key(api_url, api_key, product_id, 'variants', version=1)
+def test_incorrect_api_key(api_url, api_key, product_id, version=2):
+    """[Availability] Request with incorrect API-Key"""
+    return availability.test_incorrect_api_key(api_url, api_key, product_id, 'availability', version=version)
 
 
 @test_wrapper
-def test_missing_argument_error(api_url, api_key, product_id, version=1):
-    '''[Variants] Testing missing argument errors'''
-    return availability.test_missing_argument_error(api_url, api_key, product_id, 'variants', version=1)
+def test_missing_argument_error(api_url, api_key, product_id, version=2):
+    """[Availability] Testing missing argument errors"""
+    return availability.test_missing_argument_error(api_url, api_key, product_id, 'availability', version=version)
 
 
 @test_wrapper
-def test_error_for_non_existing_product(api_url, api_key, product_id, version=1):
-    '''[Variants] Testing availability for non existing product'''
-    return availability.test_error_for_non_existing_product(api_url, api_key, product_id, 'variants', version=1)
+def test_error_for_non_existing_product(api_url, api_key, product_id, version=2):
+    """[Availability] Testing availability for non existing product"""
+    return availability.test_error_for_non_existing_product(
+        api_url, api_key, product_id, 'availability', version=version
+    )
 
 
 @test_wrapper
-def incorrect_date_format(api_url, api_key, product_id, version=1):
-    '''[Variants] Checking incorrect date format'''
-    return availability.incorrect_date_format(api_url, api_key, product_id, 'variants', version=1)
+def incorrect_date_format(api_url, api_key, product_id, version=2):
+    """[Availability] Checking incorrect date format"""
+    return availability.incorrect_date_format(api_url, api_key, product_id, 'availability', version=version)
 
 
 @test_wrapper
-def end_before_start_error(api_url, api_key, product_id, version=1):
-    '''[Variants] Checking incorrect range error'''
-    return availability.end_before_start_error(api_url, api_key, product_id, 'variants', version=1)
+def end_before_start_error(api_url, api_key, product_id, version=2):
+    """[Availability] Checking incorrect range error"""
+    return availability.end_before_start_error(api_url, api_key, product_id, 'availability', version=version)
 
 
 @test_wrapper
-def past_start_date(api_url, api_key, product_id, version=1):
-    '''[Variants] Checking past date'''
-    return availability.past_start_date(api_url, api_key, product_id, 'variants', version=1)
+def past_start_date(api_url, api_key, product_id, version=2):
+    """[Availability] Checking past date"""
+    return availability.past_start_date(api_url, api_key, product_id, 'availability', version=version)
 
 
 @test_wrapper
-def huge_date_range(api_url, api_key, product_id, version=1):
-    '''[Variants] Checking huge date range'''
-    return availability.huge_date_range(api_url, api_key, product_id, 'variants', version=1)
+def huge_date_range(api_url, api_key, product_id, version=2):
+    """[Availability] Checking huge date range"""
+    return availability.huge_date_range(api_url, api_key, product_id, 'availability', version=version)
 
 
 @test_wrapper
-def empty_availability(api_url, api_key, product_id, version=1):
-    '''[Variants] Checking empty availability'''
-    return availability.empty_availability(api_url, api_key, product_id, 'variants', version=1)
-
-
-@test_wrapper
-def not_allowed_method(api_url, api_key, product_id, version=1):
-    '''[Variants] Testing methods that are not allowed'''
-    return availability.not_allowed_method(api_url, api_key, product_id, 'variants', version=1)
-
-
-@test_wrapper
-def invalid_product(api_url, api_key, product_id, version=1):
-    '''[Variants] Testing errors on timeslot product'''
-    return availability.test_error_for_timeslot_product(api_url, api_key, product_id, 'variants', version=1)
+def not_allowed_method(api_url, api_key, product_id, version=2):
+    """[Availability] Testing methods that are not allowed"""
+    return availability.not_allowed_method(api_url, api_key, product_id, 'availability', version=version)
