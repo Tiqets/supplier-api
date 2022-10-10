@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.0.0
+
+- add support for API v2.0.0
+- drop support for API v1.x
+
 ## 1.6.5
 
 - Using time-based reference_id for booking

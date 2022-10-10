@@ -221,7 +221,7 @@ def incorrect_date_format(api_url, api_key, product_id, endpoint, version=2):
     api_error = get_api_error(raw_response, response)
     expected_error = ApiError(
         error_code=2000,
-        error='Incorrect date format',
+        error='Malformed datetime',
         message=f'Incorrect date format {bad_date_format}, please use the YYYY-MM-DD format',
     )
     check_api_error(raw_response, api_error, expected_error)
@@ -234,7 +234,7 @@ def incorrect_date_format(api_url, api_key, product_id, endpoint, version=2):
     api_error = get_api_error(raw_response, response)
     expected_error = ApiError(
         error_code=2000,
-        error='Incorrect date format',
+        error='Malformed datetime',
         message=f'Incorrect date format {bad_date_format}, please use the YYYY-MM-DD format',
     )
     check_api_error(raw_response, api_error, expected_error)

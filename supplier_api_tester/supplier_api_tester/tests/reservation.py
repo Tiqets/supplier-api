@@ -175,7 +175,7 @@ def test_incorrect_date_format(api_url, api_key, product_id, timeslots: bool, ve
     api_error = get_api_error(raw_response, response)
     expected_error = ApiError(
         error_code=2000,
-        error='Incorrect date format',
+        error='Malformed datetime',
         message=f'Incorrect date format {bad_date_format}, please use the YYYY-MM-DDTHH:MM format',
     )
     check_api_error(raw_response, api_error, expected_error)
@@ -236,12 +236,6 @@ def test_reservation(api_url, api_key, product_id, timeslots: bool, version=2):
     url = f'{api_url}/v{version}/products/{product_id}/reservation'
     slot = get_reservation_slot(api_url, api_key, product_id, timeslots)
     json_payload = get_payload_for_reservation(api_url, api_key, product_id, slot)
-    if timeslots:
-        json_payload['datetime'] = (
-            f'{slot.date.isoformat()}T{slot.timeslot}'
-            if slot.timeslot != 'no-timeslots'
-            else f'{slot.date.isoformat()}T00:00'
-        )
     raw_response, response = client(url, api_key, method=requests.post, json_payload=json_payload)
     reservation = get_reservation(raw_response, response)
     if not reservation.reservation_id:

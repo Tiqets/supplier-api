@@ -130,8 +130,8 @@ def products_printer(products: List[Product]) -> None:
             p.use_timeslots,
             p.is_refundable,
             p.cutoff_time,
-            ','.join(p.required_order_data),
-            ','.join(p.required_visitor_data),
+            ','.join(p.required_order_data) if p.required_order_data else '',
+            ','.join(p.required_visitor_data) if p.required_visitor_data else '',
         ] for p in products]
     )
     table = AsciiTable(rows)

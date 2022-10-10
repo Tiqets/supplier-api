@@ -99,10 +99,13 @@ def reservation(product_id: str):
             f'This date is too far ahead in the future. You can book max {constants.MAX_DATE_RANGE} months ahead.'
         )
 
-    # ignore the timeslot component of the `datetime` attribute in the payload if the product doesn't support timeslots
-    timeslot_availability_key = timeslot if utils.product_supports_timeslot(product_id) else 'no-timeslots'
+    # if the product doesn't support timeslots then set the time component to 00:00 to extract availability for that
+    # date/time
+    timeslot_availability_key: str = (
+        datetime_parameter_value if utils.product_supports_timeslot(product_id) else f'{day}T00:00'
+    )
 
-    product_availability = utils.get_availability(product_id, day)
+    product_availability: Dict = utils.get_availability(product_id, day)
     variant_quantity_map = {
         variant['id']: variant['available_tickets']
         for variant in product_availability.get(timeslot_availability_key, {}).get('variants', [])
@@ -236,7 +239,7 @@ def cancel_booking(booking_id):
 
     # if we want to test double cancellation, we need to store the cancelled booking id somewhere
     product["_cancelled_bookings"].append(booking_id)
-    return jsonify({}), 204
+    return {}, 204
 
 
 def run():

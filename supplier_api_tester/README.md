@@ -18,15 +18,15 @@ Listing the products catalog:
 
 ```sh
 supplier_products -u 'http://localhost:8000' -k 'secret'
-+---------+---------+-----------+------------+-------------+
-| ID      | Name    | Timeslots | Refundable | Cutoff time |
-+---------+---------+-----------+------------+-------------+
-| A300-FX | A300-FX | True      | True       | 24          |
-| A400-FX | A400-FX | True      | False      | 0           |
-| A500-FX | A500-FX | False     | True       | 0           |
-| A550-FX | A550-FX | False     | True       | 10          |
-| A600-FX | A600-FX | False     | False      | 0           |
-+---------+---------+-----------+------------+-------------+
++---------+---------+-----------+------------+-------------+-------------------------------------------+-----------------------------------+
+| ID      | Name    | Timeslots | Refundable | Cutoff time | Required Additional Order Data            | Required Additional Visitors Data |
++---------+---------+-----------+------------+-------------+-------------------------------------------+-----------------------------------+
+| A300-FX | A300-FX | True      | True       | 24          |                                           |                                   |
+| A400-FX | A400-FX | True      | False      | 0           | PICKUP_LOCATION,PASSPORT_ID               | FULL_NAME,PHONE                   |
+| A500-FX | A500-FX | False     | True       | 0           | PICKUP_LOCATION,PASSPORT_ID,FLIGHT_NUMBER |                                   |
+| A550-FX | A550-FX | False     | True       | 10          |                                           | EMAIL,DATE_OF_BIRTH               |
+| A600-FX | A600-FX | False     | False      | 0           | NATIONALITY                               |                                   |
++---------+---------+-----------+------------+-------------+-------------------------------------------+-----------------------------------+
 ```
 
 Testing tool usage:
