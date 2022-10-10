@@ -41,7 +41,7 @@ def availability(product_id: str):
     result = {}
     day = start
     while day <= end:
-        result[str(day)] = utils.get_availability(product_id, day)
+        result.update(utils.get_availability(product_id, day))
         day = day + timedelta(days=1)
     return jsonify(result)
 
@@ -84,7 +84,7 @@ def reservation(product_id: str):
     except ValueError:
         raise exceptions.BadRequest(
             2000,
-            'Incorrect date format',
+            'Malformed datetime',
             f'Expected datetime attribute with format YYYY-MM-DDTHH:MM'
         )
 
@@ -119,8 +119,7 @@ def reservation(product_id: str):
             raise exceptions.BadRequest(
                 3000,
                 'Availability error',
-                f'Quantity ({ticket["quantity"]}) is not available anymore'
-                f' for a given variant (id: {ticket["variant_id"]})'
+                f'The requested number of tickets is not longer available for the given variant and/or timeslot'
             )
 
         if product_requires_additional_visitors_data:

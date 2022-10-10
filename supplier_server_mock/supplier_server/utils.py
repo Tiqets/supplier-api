@@ -18,7 +18,7 @@ def get_date(data, name, required=True) -> Optional[date]:
     try:
         return date.fromisoformat(data_str)
     except ValueError:
-        raise BadRequest(2000, 'Incorrect date format', f'Incorrect date format {data_str}, please use the YYYY-MM-DD format')
+        raise BadRequest(2000, 'Malformed datetime', f'Incorrect date format {data_str}, please use the YYYY-MM-DD format')
 
 
 def check_product_id(product_id: str):
@@ -63,21 +63,43 @@ def get_availability(product_id: str, day: date) -> Dict:
 
     :param product_id: the id of the product.
     :param day: get random availability for this day.
-    :return availability data for a product and day.
+    :return availability data for a product and day with the following schema:
+        {
+            "YYYY-MM-DDTHH:MM": {
+                "available_tickets": 100,
+                "variants": [
+                    {
+                        "id": "",
+                        "name": "",
+                        "available_tickets": Int,
+                        "price": {
+                            "currency": "",
+                            "face_value": ""
+                        }
+                    },
+                    {
+                        "id": "",
+                        "name": "",
+                        "available_tickets": Int,
+                        "price": {
+                            "currency": "",
+                            "face_value": ""
+                        }
+                    }
+                ]
+            }
+        }
     """
 
-    timeslots = ['no-timeslots']
+    timeslots = [f'{day.isoformat()}T00:00']
     if product_supports_timeslot(product_id):
-        timeslots = ['17:30', '19:30']
+        timeslots = [f'{day.isoformat()}T17:30', f'{day.isoformat()}T19:30']
 
     result = {}
 
     if day.isoweekday() == 7:
         for timeslot in timeslots:
-            result[timeslot] = {
-                'available_tickets': 0,
-                'variants': [],
-            }
+            result[timeslot] = {}
         return result
 
     number_of_digits = 1 if day.isoweekday() % 3 == 0 else 2
