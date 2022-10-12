@@ -160,16 +160,13 @@ def test_cancellation(api_url, api_key, product_id, timeslots: bool, version=2):
     """Perform booking that will be cancelled"""
     url = f'{api_url}/v{version}/products/{product_id}/reservation'
     slot = get_reservation_slot(api_url, api_key, product_id, timeslots)
-    variant_quantity_map = {
-         variant.id: 2 for variant in slot.variants if variant.available_tickets > 2
-    }
 
+    # make a reservation
     json_payload = get_payload_for_reservation(api_url, api_key, product_id, slot, variant_quantity=2, min_quantity=3)
-    if timeslots:
-        json_payload['datetime'] = slot.timeslot
     raw_response, response = client(url, api_key, method=requests.post, json_payload=json_payload)
     reservation = get_reservation(raw_response, response)
 
+    # make a booking
     url = f'{api_url}/v{version}/booking'
     raw_response, response = client(url, api_key, method=requests.post, json_payload={
         'reservation_id': reservation.reservation_id,
@@ -178,13 +175,13 @@ def test_cancellation(api_url, api_key, product_id, timeslots: bool, version=2):
     booking = get_booking(raw_response, response)
     booking_id = booking.booking_id
 
-    # check if product supports cancellations
+    # get product's information to check if product supports cancellations
     _, products = get_catalog(api_url, api_key, version)
     product = [product for product in products if product.id == product_id][0]
 
     # cancel existing booking
     url = f'{api_url}/v{version}/booking/{booking_id}'
-    raw_response, response = client(url, api_key, method=requests.delete, json_payload={"booking_id": booking_id})
+    raw_response, response = client(url, api_key, method=requests.delete)
 
     # throw error if product does not support cancellation
     if not product.is_refundable:
@@ -247,7 +244,7 @@ def test_cancellation(api_url, api_key, product_id, timeslots: bool, version=2):
     # cancel booking with no ID/non-existent ID
     non_existing_booking_id = "I-DO-NOT-EXIST"
     url = f'{api_url}/v{version}/booking/{non_existing_booking_id}'
-    raw_response, response = client(url, api_key, method=requests.delete, json_payload={"booking_id": non_existing_booking_id})
+    raw_response, response = client(url, api_key, method=requests.delete)
     api_error = get_api_error(raw_response, response)
     expected_error = ApiError(
         error_code=1004,

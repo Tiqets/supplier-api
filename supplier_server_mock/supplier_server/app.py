@@ -191,7 +191,7 @@ def booking():
     booking_id = utils.encode_booking_id(booking_date.isoformat(), product_id)
 
     if booking_id in product['_cancelled_bookings']:
-        del product['_cancelled_bookings'][product['_cancelled_bookings'].index(booking_id)]
+        del product['_cancelled_bookings'][booking_id]
 
     return jsonify(
         {
@@ -238,8 +238,8 @@ def cancel_booking(booking_id):
         )
 
     # if we want to test double cancellation, we need to store the cancelled booking id somewhere
-    product["_cancelled_bookings"].append(booking_id)
-    return {}, 204
+    product["_cancelled_bookings"][booking_id] = True
+    return '', 204
 
 
 def run():

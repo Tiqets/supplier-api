@@ -146,7 +146,7 @@ def get_reservation(raw_response: Response, response) -> Reservation:
 
 
 def get_booking(raw_response: Response, response) -> Booking:
-    '''Getting and testing response from the /booking endpoint'''
+    """Getting and testing response from the /booking endpoint"""
     if type(response) is not dict:
         raise FailedTest(
             message='The response should be a JSON Object',
@@ -197,7 +197,7 @@ def get_booking(raw_response: Response, response) -> Booking:
 
 
 def get_api_error(raw_response: Response, response) -> ApiError:
-    '''Unpacking 400 error JSON structure'''
+    """Unpacking 400 error JSON structure"""
     if type(response) is not dict:
         raise FailedTest(
             message='400 error response should be a JSON Object',
