@@ -5,3 +5,4 @@ build
 ENV
 .venv
 .idea
+.DS_Store
