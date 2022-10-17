@@ -23,12 +23,12 @@ def client(
         response = method(url, params=params, headers=headers, json=json_payload)
     except requests.exceptions.ConnectionError:
         raise FailedTest(
-            message=f'Connection error occured while testing endpoint {url}. Check if your server is available.',
+            message=f'Connection error occurred while testing endpoint {url}. Check if your server is available.',
             response=None,
         )
     except requests.exceptions.HTTPError:
         raise FailedTest(
-            message=f'HTTP error occured while testing endpoint {url}',
+            message=f'HTTP error occurred while testing endpoint {url}',
             response=None,
         )
 

@@ -22,7 +22,7 @@ def reference_id() -> str:
 
 
 @test_wrapper
-def test_missing_reservation_id(api_url, api_key, product_id, timeslots: bool, version=2):
+def test_missing_reservation_id(api_url, api_key, product_id, version=2):
     """Booking without the reservation ID"""
     url = f'{api_url}/v{version}/booking'
     raw_response, response = client(url, api_key, method=requests.post, json_payload={})
@@ -37,7 +37,7 @@ def test_missing_reservation_id(api_url, api_key, product_id, timeslots: bool, v
 
 
 @test_wrapper
-def test_missing_api_key(api_url, api_key, product_id, timeslots: bool, version=2):
+def test_missing_api_key(api_url, api_key, product_id, version=2):
     """Booking without the API key"""
     url = f'{api_url}/v{version}/booking'
     raw_response, _ = client(url, api_key, method=requests.post, json_payload={}, headers={})
@@ -60,10 +60,12 @@ def test_missing_api_key(api_url, api_key, product_id, timeslots: bool, version=
 
 
 @test_wrapper
-def test_incorrect_api_key(api_url, api_key, product_id, timeslots: bool, version=2):
+def test_incorrect_api_key(api_url, api_key, product_id, version=2):
     """Booking with incorrect API-Key"""
     url = f'{api_url}/v{version}/booking'
-    raw_response, _ = client(url, api_key, method=requests.post, json_payload={}, headers={'API-Key': 'NON-EXISTING-API-KEY'})
+    raw_response, _ = client(
+        url, api_key, method=requests.post, json_payload={}, headers={'API-Key': 'NON-EXISTING-API-KEY'}
+    )
 
     if raw_response.status_code != 403:
         raise FailedTest(
@@ -84,7 +86,7 @@ def test_incorrect_api_key(api_url, api_key, product_id, timeslots: bool, versio
 
 
 @test_wrapper
-def test_not_allowed_method(api_url, api_key, product_id, timeslots: bool, version=2):
+def test_not_allowed_method(api_url, api_key, product_id, version=2):
     """Testing methods that are not allowed"""
     url = f'{api_url}/v{version}/booking'
     for method in (requests.get, requests.put, requests.patch, requests.delete):
@@ -99,7 +101,7 @@ def test_not_allowed_method(api_url, api_key, product_id, timeslots: bool, versi
 
 
 @test_wrapper
-def test_booking_incorrect_reservation_id(api_url, api_key, product_id, timeslots: bool, version=2):
+def test_booking_incorrect_reservation_id(api_url, api_key, product_id, version=2):
     """Booking with incorrect reservation ID."""
     url = f'{api_url}/v{version}/booking'
     raw_response, response = client(url, api_key, method=requests.post, json_payload={
@@ -117,17 +119,15 @@ def test_booking_incorrect_reservation_id(api_url, api_key, product_id, timeslot
 
 
 @test_wrapper
-def test_booking(api_url, api_key, product_id, timeslots: bool, version=2):
+def test_booking(api_url, api_key, product_id, version=2):
     """Booking tickets for at least 1 variant"""
     url = f'{api_url}/v{version}/products/{product_id}/reservation'
-    slot = get_reservation_slot(api_url, api_key, product_id, timeslots)
+    slot = get_reservation_slot(api_url, api_key, product_id)
     variant_quantity_map = {
          variant.id: 2 for variant in slot.variants if variant.available_tickets > 2
     }
 
     json_payload = get_payload_for_reservation(api_url, api_key, product_id, slot, variant_quantity=2, min_quantity=3)
-    if timeslots:
-        json_payload['datetime'] = slot.timeslot
     raw_response, response = client(url, api_key, method=requests.post, json_payload=json_payload)
     reservation = get_reservation(raw_response, response)
 
@@ -148,7 +148,7 @@ def test_booking(api_url, api_key, product_id, timeslots: bool, version=2):
             if len(tickets_for_variant) != tickets_quantity:
                 raise FailedTest(
                     message=
-                    f'Expected {tickets_quantity} codes for variant {variant_id} but got only {len(tickets_for_variant)}',
+                    f'Expected {tickets_quantity} codes for variant {variant_id} but got {len(tickets_for_variant)}',
                     response=raw_response,
                 )
 
@@ -156,20 +156,17 @@ def test_booking(api_url, api_key, product_id, timeslots: bool, version=2):
 
 
 @test_wrapper
-def test_cancellation(api_url, api_key, product_id, timeslots: bool, version=2):
+def test_cancellation(api_url, api_key, product_id, version=2):
     """Perform booking that will be cancelled"""
     url = f'{api_url}/v{version}/products/{product_id}/reservation'
-    slot = get_reservation_slot(api_url, api_key, product_id, timeslots)
-    variant_quantity_map = {
-         variant.id: 2 for variant in slot.variants if variant.available_tickets > 2
-    }
+    slot = get_reservation_slot(api_url, api_key, product_id)
 
+    # make a reservation
     json_payload = get_payload_for_reservation(api_url, api_key, product_id, slot, variant_quantity=2, min_quantity=3)
-    if timeslots:
-        json_payload['datetime'] = slot.timeslot
     raw_response, response = client(url, api_key, method=requests.post, json_payload=json_payload)
     reservation = get_reservation(raw_response, response)
 
+    # make a booking
     url = f'{api_url}/v{version}/booking'
     raw_response, response = client(url, api_key, method=requests.post, json_payload={
         'reservation_id': reservation.reservation_id,
@@ -178,13 +175,13 @@ def test_cancellation(api_url, api_key, product_id, timeslots: bool, version=2):
     booking = get_booking(raw_response, response)
     booking_id = booking.booking_id
 
-    # check if product supports cancellations
+    # get product's information to check if product supports cancellations
     _, products = get_catalog(api_url, api_key, version)
     product = [product for product in products if product.id == product_id][0]
 
     # cancel existing booking
     url = f'{api_url}/v{version}/booking/{booking_id}'
-    raw_response, response = client(url, api_key, method=requests.delete, json_payload={"booking_id": booking_id})
+    raw_response, response = client(url, api_key, method=requests.delete)
 
     # throw error if product does not support cancellation
     if not product.is_refundable:
@@ -247,7 +244,7 @@ def test_cancellation(api_url, api_key, product_id, timeslots: bool, version=2):
     # cancel booking with no ID/non-existent ID
     non_existing_booking_id = "I-DO-NOT-EXIST"
     url = f'{api_url}/v{version}/booking/{non_existing_booking_id}'
-    raw_response, response = client(url, api_key, method=requests.delete, json_payload={"booking_id": non_existing_booking_id})
+    raw_response, response = client(url, api_key, method=requests.delete)
     api_error = get_api_error(raw_response, response)
     expected_error = ApiError(
         error_code=1004,
@@ -256,4 +253,3 @@ def test_cancellation(api_url, api_key, product_id, timeslots: bool, version=2):
     )
     check_api_error(raw_response, api_error, expected_error)
     return TestResult()
-

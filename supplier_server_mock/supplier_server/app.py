@@ -41,7 +41,7 @@ def availability(product_id: str):
     result = {}
     day = start
     while day <= end:
-        result[str(day)] = utils.get_availability(product_id, day)
+        result.update(utils.get_availability(product_id, day))
         day = day + timedelta(days=1)
     return jsonify(result)
 
@@ -84,7 +84,7 @@ def reservation(product_id: str):
     except ValueError:
         raise exceptions.BadRequest(
             2000,
-            'Incorrect date format',
+            'Malformed datetime',
             f'Expected datetime attribute with format YYYY-MM-DDTHH:MM'
         )
 
@@ -99,10 +99,13 @@ def reservation(product_id: str):
             f'This date is too far ahead in the future. You can book max {constants.MAX_DATE_RANGE} months ahead.'
         )
 
-    # ignore the timeslot component of the `datetime` attribute in the payload if the product doesn't support timeslots
-    timeslot_availability_key = timeslot if utils.product_supports_timeslot(product_id) else 'no-timeslots'
+    # if the product doesn't support timeslots then set the time component to 00:00 to extract availability for that
+    # date/time
+    timeslot_availability_key: str = (
+        datetime_parameter_value if utils.product_supports_timeslot(product_id) else f'{day}T00:00'
+    )
 
-    product_availability = utils.get_availability(product_id, day)
+    product_availability: Dict = utils.get_availability(product_id, day)
     variant_quantity_map = {
         variant['id']: variant['available_tickets']
         for variant in product_availability.get(timeslot_availability_key, {}).get('variants', [])
@@ -119,8 +122,7 @@ def reservation(product_id: str):
             raise exceptions.BadRequest(
                 3000,
                 'Availability error',
-                f'Quantity ({ticket["quantity"]}) is not available anymore'
-                f' for a given variant (id: {ticket["variant_id"]})'
+                f'The requested number of tickets is not longer available for the given variant and/or timeslot'
             )
 
         if product_requires_additional_visitors_data:
@@ -189,7 +191,7 @@ def booking():
     booking_id = utils.encode_booking_id(booking_date.isoformat(), product_id)
 
     if booking_id in product['_cancelled_bookings']:
-        del product['_cancelled_bookings'][product['_cancelled_bookings'].index(booking_id)]
+        del product['_cancelled_bookings'][booking_id]
 
     return jsonify(
         {
@@ -236,8 +238,8 @@ def cancel_booking(booking_id):
         )
 
     # if we want to test double cancellation, we need to store the cancelled booking id somewhere
-    product["_cancelled_bookings"].append(booking_id)
-    return jsonify({}), 204
+    product["_cancelled_bookings"][booking_id] = True
+    return '', 204
 
 
 def run():

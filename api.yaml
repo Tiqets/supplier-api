@@ -10,9 +10,9 @@ info:
     
     It is loosely based on reservation.
     The endpoints described here are to be exposed on the Supply Partners own systems for Tiqets' systems to consume.
-    In other words: Tiqets initiates HTTP calls to the Supply Partners' systems and the Supply Partner's system must respond.
+    In other words: Tiqets initiates `HTTP` calls to the Supply Partners' systems and the Supply Partner's system must respond.
     
-    You format GET or POST requests in JSON and you will receive either a JSON-formatted response or an HTTP error.
+    You format `GET` or `POST` requests in JSON and you will receive either a JSON-formatted response or an `HTTP` error.
 
     # Data sharing
     Tiqets does not share personal information of its customers (PII) with third parties, unless explicitly agreed otherwise.
@@ -63,7 +63,7 @@ info:
 
     * Remain the same regardless of dates and timeslots.
     (If you use fluctuating IDs in your own systems you must ensure that Tiqets receives a constant, non-varying value.)
-    * Be strings that comply with the following regular expression: /[A-Za-z0-9_\-]{1,16}/
+    * Be strings that comply with the following regular expression: `/[A-Za-z0-9_\-]{1,16}/`
     Examples:
       * "1"
       * "ABC-123"
@@ -89,11 +89,11 @@ info:
 
     These status code are the same for every endpoint.
 
-    | Status code   |                          Message                          |
-    |---------------|-----------------------------------------------------------|
-    |         `403` | Forbidden - Missing or incorrect API key                  |
-    |         `405` | Method Not Allowed - Incorrect method was used (GET/POST) |
-    |         `500` | Service Error - Please report that                        |
+    | Status code   |                          Message                            |
+    |---------------|-------------------------------------------------------------|
+    |         `403` | Forbidden - Missing or incorrect API key                    |
+    |         `405` | Method Not Allowed - Incorrect method was used (`GET/POST`) |
+    |         `500` | Service Error - Please report that                          |
 
     # Context specific errors
 
@@ -161,6 +161,7 @@ info:
     [![mock server screenshot](https://raw.githubusercontent.com/Tiqets/supplier-api/master/docs/mockserver.png)](https://github.com/Tiqets/supplier-api/tree/master/supplier_server_mock)
 
   contact:
+    name: "Tiqets API Support"
     email: apisupport@tiqets.com
   version: 2.0.0
 tags:
@@ -171,17 +172,17 @@ tags:
 
       Tiqets will typically query the availability for 1 particular date or for a full month and populate its availability cache with the response.
 
-      Expected behavior:
+      **Expected behavior**:
         - Only availability within the requested date range is returned
         - When there is no availability for the requested and existing product an empty object (`{}`) shall be returned
 
-      Example #1 to illustrate the above:  
-        - An availability request is made for an existing Product and a date range of 7 months (20-01-2023 - 20-07-2023) is requested.
+      **Example #1 to illustrate the above**:
+        - An availability request is made for an existing product and a date range of 7 months (20-01-2023 - 20-07-2023) is requested.
         - The queried product only has 2 months of availability defined in the system.  
         - **Expected response:** Availability for the 2 months that can be provided, never an error.
 
-      Example #2 to illustrate the above:  
-        - An availability request is made for an existing Product and a date range that isn't defined yet in the Supplier Partner's system.
+      **Example #2 to illustrate the above**:
+        - An availability request is made for an existing product and a date range that isn't defined yet in the Supplier Partner's system.
         - **Expected response**: An empty object (```{}```).
   - name: Product Catalog
     description: |
@@ -216,11 +217,15 @@ paths:
       summary: Availability
       description: |
         Returns the ticket availability of the variants within the requested date range.
-        The same data structure is used regardless of whether timeslots apply. For non-timeslotted tickets (whole day
-        or open-dated) a "fake timeslot" titled `no-timeslots` should be returned.
+        The same data structure is used regardless of whether the product supports timeslots or not.
+
+        **Important**: if a product doesn't support tmeslots then the date/time keys in the availability response must set the timeslot
+        component to `T00:00`; eg. `2022-12-24T00:00`. On the other hand, if a product supports timeslots then every
+        date/time key in the response must include a valid time component, eg. `2022-12-24T15:30`. For more details see
+        the examples in the specification of the endpoint's response.
 
         Dates in the past must be supported without returning an error response. Instead, the endpoint should return an
-        availability without data for the dates in the past.
+        availability response without data for the dates in the past.
       operationId: getAvailability
       parameters:
         - name: product_id
@@ -231,7 +236,7 @@ paths:
             type: string
         - name: start
           in: query
-          description: Start of the date range in ISO format YYYY-MM-DD
+          description: Start of the date range in ISO format `YYYY-MM-DD`
           required: true
           schema:
             type: string
@@ -239,7 +244,7 @@ paths:
             example: "2019-06-21"
         - name: end
           in: query
-          description: End of the date range in ISO format YYYY-MM-DD
+          description: End of the date range in ISO format `YYYY-MM-DD`
           required: true
           schema:
             type: string
@@ -254,137 +259,180 @@ paths:
                 $ref: "#/components/schemas/AvailabilityResponse"
               examples:
                 timeslotted:
-                  summary: Product with timeslots
+                  summary: Available variants for different timeslots per day
                   value:
-                    "2022-12-19":
-                      "11:00":
-                        available_tickets: 0
-                        variants:
-                          - id: "1"
-                            name: Adult
-                            available_tickets: 0
-                            price:
-                              face_value: "3.20"
-                              currency: EUR
-                          - id: "2"
-                            name: Child
-                            available_tickets: 0
-                            price:
-                              face_value: "1.10"
-                              currency: EUR
-                      "16:30":
-                        available_tickets: 100
-                        variants:
-                          - id: "1"
-                            name: Adult
-                            available_tickets: 100
-                            price:
-                              face_value: "10"
-                              currency: EUR
-                          - id: "2"
-                            name: Child
-                            available_tickets: 10
-                            price:
-                              face_value: "5.75"
-                              currency: EUR
-                      "17:30":
-                        available_tickets: 63
-                        variants:
-                          - id: "1"
-                            name: Adult
-                            available_tickets: 53
-                            price:
-                              face_value: "10"
-                              currency: EUR
-                          - id: "2"
-                            name: Child
-                            available_tickets: 10
-                            price:
-                              face_value: "5.75"
-                              currency: EUR
+                    "2022-12-19T11:00":
+                      available_tickets: 0
+                      variants:
+                        - id: "1"
+                          name: Adult
+                          available_tickets: 0
+                          price:
+                            face_value: "3.20"
+                            currency: EUR
+                        - id: "2"
+                          name: Child
+                          available_tickets: 0
+                          price:
+                            face_value: "1.10"
+                            currency: EUR
+                    "2022-12-19T16:30":
+                      available_tickets: 100
+                      variants:
+                        - id: "1"
+                          name: Adult
+                          available_tickets: 100
+                          price:
+                            face_value: "10"
+                            currency: EUR
+                        - id: "2"
+                          name: Child
+                          available_tickets: 10
+                          price:
+                            face_value: "5.75"
+                            currency: EUR
+                    2022-12-19T"17:30":
+                      available_tickets: 63
+                      variants:
+                        - id: "1"
+                          name: Adult
+                          available_tickets: 53
+                          price:
+                            face_value: "10"
+                            currency: EUR
+                        - id: "2"
+                          name: Child
+                          available_tickets: 10
+                          price:
+                            face_value: "5.75"
+                            currency: EUR
+                    "2022-12-20T11:00":
+                      available_tickets: 100
+                      variants:
+                        - id: "1"
+                          name: Adult
+                          available_tickets: 100
+                          price:
+                            face_value: "10"
+                            currency: EUR
+                        - id: "2"
+                          name: Child
+                          available_tickets: 10
+                          price:
+                            face_value: "5.75"
+                            currency: EUR
+                    "2022-12-20T16:30":
+                      available_tickets: 100
+                      variants:
+                        - id: "1"
+                          name: Adult
+                          available_tickets: 100
+                          price:
+                            face_value: "10"
+                            currency: EUR
+                        - id: "2"
+                          name: Child
+                          available_tickets: 10
+                          price:
+                            face_value: "5.75"
+                            currency: EUR
+                    2022-12-20T"17:30":
+                      available_tickets: 63
+                      variants:
+                        - id: "1"
+                          name: Adult
+                          available_tickets: 53
+                          price:
+                            face_value: "10"
+                            currency: EUR
+                        - id: "2"
+                          name: Child
+                          available_tickets: 10
+                          price:
+                            face_value: "5.75"
+                            currency: EUR
                 single_timeslot:
-                  summary: Product with a recurring single timeslot
+                  summary: Available variants for a product with a recurring single timeslot
                   value:
-                    "2022-12-28":
-                      "11:00":
-                        available_tickets: 0
-                        variants:
-                          - id: "1"
-                            name: Adult
-                            available_tickets: 0
-                            price:
-                              face_value: "10"
-                              currency: EUR
-                          - id: "2"
-                            name: Child
-                            available_tickets: 0
-                            price:
-                              face_value: "5.75"
-                              currency: EUR
-                    "2022-12-29":
-                      "11:00":
-                        available_tickets: 14
-                        variants:
-                          - id: "1"
-                            name: Adult
-                            available_tickets: 14
-                            price:
-                              face_value: "10"
-                              currency: EUR
-                          - id: "2"
-                            name: Child
-                            available_tickets: 10
-                            price:
-                              face_value: "5.75"
-                              currency: EUR
+                    "2022-12-28T11:00":
+                      available_tickets: 0
+                      variants:
+                        - id: "1"
+                          name: Adult
+                          available_tickets: 0
+                          price:
+                            face_value: "10"
+                            currency: EUR
+                        - id: "2"
+                          name: Child
+                          available_tickets: 0
+                          price:
+                            face_value: "5.75"
+                            currency: EUR
+                    "2022-12-29T11:00":
+                      available_tickets: 14
+                      variants:
+                        - id: "1"
+                          name: Adult
+                          available_tickets: 14
+                          price:
+                            face_value: "10"
+                            currency: EUR
+                        - id: "2"
+                          name: Child
+                          available_tickets: 10
+                          price:
+                            face_value: "5.75"
+                            currency: EUR
                 non_timeslotted:
-                  summary: Product without timeslots
+                  summary: Available vriants for a product without timeslots
                   value:
-                    "2022-12-19":
-                      "no-timeslots":
-                        available_tickets: 92
-                        variants:
-                          - id: "1"
-                            name: Adult
-                            available_tickets: 82
-                            price:
-                              face_value: "4.20"
-                              currency: EUR
-                          - id: "2"
-                            name: Child
-                            available_tickets: 10
-                            price:
-                              face_value: "2.10"
-                              currency: EUR
+                    "2022-12-19T00:00":
+                      available_tickets: 92
+                      variants:
+                        - id: "1"
+                          name: Adult
+                          available_tickets: 82
+                          price:
+                            face_value: "4.20"
+                            currency: EUR
+                        - id: "2"
+                          name: Child
+                          available_tickets: 10
+                          price:
+                            face_value: "2.10"
+                            currency: EUR
                 past_date:
-                  summary: Request availability for date in the past
+                  summary: Availability response for a single date in the past
                   value: {}
                 date_range_with_past_date:
-                  summary: Request availability on 2022-12-02 from 2022-12-01 until 2022-12-03
+                  summary: Availability response on 2022-12-02 for a date range from 2022-12-01 until 2022-12-03
                   value:
-                    "2022-12-02":
-                      "11:00":
-                        available_tickets: 0
-                        variants:
-                          - id: "1"
-                            name: Adult
-                            available_tickets: 0
-                            price:
-                              face_value: "3.20"
-                              currency: EUR
-                    "2022-12-03": {}
+                    "2022-12-02T11:00":
+                      available_tickets: 0
+                      variants:
+                        - id: "1"
+                          name: Adult
+                          available_tickets: 0
+                          price:
+                            face_value: "3.20"
+                            currency: EUR
+                    "2022-12-03T11:00": {}
+                no_availability:
+                  summary: No available variants
+                  value: {}
         "400":
           description: |
             Bad request
 
             ## Internal error codes
 
-            | Internal error code |           Error           |                                         Message                                          |
-            |---------------------|---------------------------|------------------------------------------------------------------------------------------|
-            |                1000 | Missing argument          | Required argument ATTRIBUTE_NAME was not found                                           |
-            |                1001 | Missing product           | Product with ID ID_NUMBER doesn't exist                                                  |
-            |                2000 | Incorrect date format     | Incorrect date format xxx, please use the YYYY-MM-DD format                              |
-            |                2001 | Incorrect date range      | The end date cannot be earlier than start date                                           |
+            | Internal error code |           Error           |                                         Message                                        |
+            |---------------------|---------------------------|----------------------------------------------------------------------------------------|
+            |                1000 | Missing argument          | Required argument `ATTRIBUTE_NAME` was not found                                       |
+            |                1001 | Missing product           | Product with ID `ID_NUMBER` doesn't exist                                              |
+            |                2000 | Malformed datetime        | Incorrect date format, please use the `YYYY-MM-DD` format                              |
+            |                2001 | Incorrect date range      | The end date cannot be earlier than start date                                         |
           content:
             application/json:
               schema:
@@ -524,14 +572,14 @@ paths:
             |                1000 | Missing argument                | Required argument `ATTRIBUTE_NAME` was not found                                                     |
             |                1001 | Missing product                 | Product with ID `ID_NUMBER` doesn't exist                                                            |
             |                1003 | Missing required fields         | Eg. Missing data for field `FULL_NAME`                                                               |
-            |                2000 | Incorrect date format           | Incorrect date format xxx, please use the `YYYY-MM-DDTHH:MM` format                                  |
-            |                2002 | Wrong timeslot                  | Given timeslot doesn't belong to given date (`YYYY-MM-DD`)                                           |
+            |                2000 | Malformed datetime              | Incorrect date format, please use the `YYYY-MM-DDTHH:MM`                                             |
+            |                2002 | Invalid datetime                | The given date/time doesn't exist in the system                                                      |
             |                2003 | Wrong variant ID                | Given variant_id doesn't belong to given timeslot_id (`TIMESLOT_ID`)                                 |
             |                2004 | Incorrect type                  | Expected `ATTRIBUTE_NAME` to be a string, got `TYPE` instead                                         |
             |                2005 | Invalid Value                   | Eg. The phone number must not contain dots.                                                          |
             |                2009 | Incorrect date                  | Eg. Cannot use a date in the past or, the given date is too far ahead in the future (max 6 months).  |
             |                2010 | Invalid value of required field | Eg. Incorrect value of field `EMAIL`.                                                                |
-            |                3000 | Availability error              | Quantity (3) is not available anymore for a given variant (id: 4337) and timeslot (id: 5567)         |
+            |                3000 | Availability error              | The requested number of tickets is not longer available for a given variant and/or timeslot          |
           content:
             application/json:
               schema:
@@ -614,12 +662,12 @@ paths:
 
             ## Internal error codes
 
-            | Internal error code |          Error           |                         Message                          |
-            |---------------------|--------------------------|----------------------------------------------------------|
-            |                1000 | Missing argument         | Required argument ATTRIBUTE_NAME was not found           |
-            |                2004 | Incorrect type           | Expected ATTRIBUTE_NAME to be a string, got TYPE instead |
-            |                3001 | Reservation expired      | Your reservation has expired MINUTES minutes ago         |
-            |                3002 | Incorrect reservation ID | Given reservation ID is incorrect                        |
+            | Internal error code |          Error           |                         Message                              |
+            |---------------------|--------------------------|--------------------------------------------------------------|
+            |                1000 | Missing argument         | Required argument `ATTRIBUTE_NAME` was not found             |
+            |                2004 | Incorrect type           | Expected `ATTRIBUTE_NAME` to be a string, got `TYPE` instead |
+            |                3001 | Reservation expired      | Your reservation has expired `MINUTES` minutes ago           |
+            |                3002 | Incorrect reservation ID | Given reservation ID is incorrect                            |
           content:
             application/json:
               schema:
@@ -652,9 +700,9 @@ paths:
 
             | Internal error code |          Error             |                         Message                                            |
             |---------------------|----------------------------|----------------------------------------------------------------------------|
-            |                1004  | Missing booking           | Booking with ID ID_NUMBER doesn't exist                                    |
-            |                2009  | Incorrect date            | The booking can only be cancelled HOURS hours in advance                   |
-            |                3003  | Already Cancelled         | The booking with ID BOOKING_ID has already been cancelled                  |
+            |                1004  | Missing booking           | Booking with ID `ID_NUMBER` doesn't exist                                  |
+            |                2009  | Incorrect date            | The booking can only be cancelled `HOURS` hours in advance                 |
+            |                3003  | Already Cancelled         | The booking with ID `BOOKING_ID` has already been cancelled                |
             |                3004  | Cancellation not possible | The booking can't be cancelled, the product doesn't allow cancellations    |
           content:
             application/json:
@@ -679,7 +727,7 @@ components:
           is_refundable: true
           cutoff_time: 0
           max_tickets_per_order: 20
-        - id: "564456324"
+        - id: "PRD-564456324"
           name: "Private Tour"
           description: "Special individual tour"
           use_timeslots: true
@@ -688,7 +736,7 @@ components:
           required_visitor_data:
             - FULL_NAME
             - PHONE
-        - id: "564456325"
+        - id: "UFJELUEtMTIzNDU="
           name: "Children Tour"
           description: "Special individual tour for children"
           use_timeslots: true
@@ -723,16 +771,21 @@ components:
         id:
           type: string
           maxLength: 64
-          description: Permanent and unique ID of a single product. Must use printable ASCII characters. If applicable, consider concatenating or base64 encoding a set of values that are meaningful for your system.
+          description: Permanent and unique ID of a single product. Must use printable ASCII characters. If applicable, consider concatenating or `base64` encoding a set of values that are meaningful for your system.
+          examples:
+            - "UFJELUEtMTIzNDU="
+            - "123456789"
+            - "PRD-123-ABC"
         name:
           type: string
         description:
           type: string
         use_timeslots:
           type: boolean
+          description: Indicates whether the product supports timeslots or not.
         is_refundable:
           type: boolean
-          description: Product supports cancellations
+          description: Indicates whether the product supports cancellations or not.
         cutoff_time:
           type: integer
           description: The minimum number of minutes before the booking date/time for the cancellation to be successful. 0 means no limit.
@@ -787,22 +840,18 @@ components:
           - DATE_OF_BIRTH
     AvailabilityResponse:
       type: object
-      description: Date in ISO format `YYYY-MM-DD`
       additionalProperties:
-        type: object
-        description: Time string in format `HH:MM` or `"no-timeslots"` in case of products without timeslots
-        additionalProperties:
-          $ref: "#/components/schemas/Availability"
+        $ref: "#/components/schemas/Availability"
     Availability:
       type: object
       properties:
         available_tickets:
           type: integer
           example: 15
-          description: Number of available tickets for a given timeslot. This is the maximum number of tickets available for the timeslot.
+          description: Number of available tickets for a given date/timeslot. This is the maximum number of tickets available for the timeslot.
         variants:
           type: array
-          description: List of variants available in this date and timeslot combination.
+          description: List of variants available on a date and timeslot combination.
           items:
             $ref: "#/components/schemas/Variant"
     Variant:

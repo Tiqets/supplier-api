@@ -18,15 +18,15 @@ Listing the products catalog:
 
 ```sh
 supplier_products -u 'http://localhost:8000' -k 'secret'
-+---------+---------+-----------+------------+-------------+
-| ID      | Name    | Timeslots | Refundable | Cutoff time |
-+---------+---------+-----------+------------+-------------+
-| A300-FX | A300-FX | True      | True       | 24          |
-| A400-FX | A400-FX | True      | False      | 0           |
-| A500-FX | A500-FX | False     | True       | 0           |
-| A550-FX | A550-FX | False     | True       | 10          |
-| A600-FX | A600-FX | False     | False      | 0           |
-+---------+---------+-----------+------------+-------------+
++---------+---------+-----------+------------+-------------+-------------------------------------------+-----------------------------------+
+| ID      | Name    | Timeslots | Refundable | Cutoff time | Required Additional Order Data            | Required Additional Visitors Data |
++---------+---------+-----------+------------+-------------+-------------------------------------------+-----------------------------------+
+| A300-FX | A300-FX | True      | True       | 24          |                                           |                                   |
+| A400-FX | A400-FX | True      | False      | 0           | PICKUP_LOCATION,PASSPORT_ID               | FULL_NAME,PHONE                   |
+| A500-FX | A500-FX | False     | True       | 0           | PICKUP_LOCATION,PASSPORT_ID,FLIGHT_NUMBER |                                   |
+| A550-FX | A550-FX | False     | True       | 10          |                                           | EMAIL,DATE_OF_BIRTH               |
+| A600-FX | A600-FX | False     | False      | 0           | NATIONALITY                               |                                   |
++---------+---------+-----------+------------+-------------+-------------------------------------------+-----------------------------------+
 ```
 
 Testing tool usage:
@@ -74,24 +74,20 @@ supplier_tester -u 'http://localhost:8000' -k 'secret' -p 'A500-FX'
 AVAILABILITY TESTS
 ------------------
 
-+----+------+--------------------------------------------------------------+----------------------------+
-| #  | Time | Test name                                                    | Description                |
-+----+------+--------------------------------------------------------------+----------------------------+
-| 1  | 5ms  | [Variants] Checking response format                          |                            |
-| 2  | 10ms | [Variants] Checking for any availability in the next 30 days |                            |
-| 3  | 3ms  | [Variants] Request without API-Key                           |                            |
-| 4  | 3ms  | [Variants] Request with incorrect API-Key                    |                            |
-| 5  | 10ms | [Variants] Testing missing argument errors                   |                            |
-| 6  | 3ms  | [Variants] Testing availability for non existing product     |                            |
-| 7  | 6ms  | [Variants] Checking incorrect date format                    |                            |
-| 8  | 3ms  | [Variants] Checking incorrect range error                    |                            |
-| 9  | 4ms  | [Variants] Checking past date                                |                            |
-| 10 | 3ms  | [Variants] Checking huge date range                          |                            |
-| 11 | 3ms  | [Variants] Checking empty availability                       | Skipping that test because |
-|    |      |                                                              | response is not empty.     |
-| 12 | 14ms | [Variants] Testing methods that are not allowed              |                            |
-| 13 | 3ms  | [Timeslots] Testing errors on invalid (non-timeslot) product |                            |
-+----+------+--------------------------------------------------------------+----------------------------+
++----+-------+--------------------------------------------------------------+
+| #  | Time  | Test name                                                    |
++----+-------+--------------------------------------------------------------+
+| 1  | 24ms  | [Availability] Checking availability for the next 30 days    |
+| 2  | 3ms   | [Availability] Request without API-Key                       |
+| 3  | 3ms   | [Availability] Request with incorrect API-Key                |
+| 4  | 13ms  | [Availability] Testing missing argument errors               |
+| 5  | 5ms   | [Availability] Testing availability for non existing product |
+| 6  | 10ms  | [Availability] Checking incorrect date format                |
+| 7  | 5ms   | [Availability] Checking incorrect range error                |
+| 8  | 5ms   | [Availability] Checking past date                            |
+| 9  | 117ms | [Availability] Checking huge date range                      |
+| 10 | 34ms  | [Availability] Testing methods that are not allowed          |
++----+-------+--------------------------------------------------------------+
 
 -----------------
 RESERVATION TESTS
@@ -134,7 +130,5 @@ PRODUCT CATALOG
 | # | Time | Test name                                                 |
 +---+------+-----------------------------------------------------------+
 | 1 | 4ms  | Get product catalog                                       |
-| 2 | 3ms  | Get product catalog with use_timeslots=True query filter  |
-| 3 | 3ms  | Get product catalog with use_timeslots=False query filter |
 +---+------+-----------------------------------------------------------+
 ```

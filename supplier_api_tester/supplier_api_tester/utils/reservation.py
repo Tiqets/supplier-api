@@ -11,7 +11,7 @@ from supplier_api_tester.utils.availability import get_availability
 from supplier_api_tester.utils.catalog import get_catalog
 
 
-def get_reservation_slot(api_url, api_key, product_id, timeslots: bool, version=2) -> Optional[DailyVariants]:
+def get_reservation_slot(api_url, api_key, product_id, version=2) -> Optional[DailyVariants]:
     """Getting day of timeslot with at least one variant available."""
     start = datetime.utcnow().date()
     end = start + timedelta(days=30)
@@ -48,11 +48,10 @@ def get_payload_for_reservation(
     # get product information to determine the required additional (order, visitors) data
     _, products = get_catalog(api_url, api_key, version=2)
     product = [product for product in products if product.id == product_id][0]
-
     payload = {
         'datetime': (
             f'{slot.date.isoformat()}T{slot.timeslot}'
-            if slot.timeslot != 'no-timeslots'
+            if product.use_timeslots
             else f'{slot.date.isoformat()}T00:00'
         ),
         'customer': {
@@ -91,6 +90,9 @@ def get_payload_for_reservation(
 
 
 def get_required_order_data_payload(product: Product) -> Dict:
+    if not product.required_order_data:
+        return {}
+
     required_order_data: Dict = {}
     for required_field_name in product.required_order_data:
         # get a (random) value for the field

@@ -16,17 +16,19 @@
 
 #### Availability
 
-- Timesloted and non-timesloted endpoints has been merged into a single endpoint `/v2/availability`
-- Same response format for timesloted and non-timesloted products
-- Each variant might return information about the current price.
+- Remove the endpoints `/products/{product-id}/timeslots` and `/products/{product-id}/variants` and replace them with a new endpoint `/v2/availability`.
+- Change the schema of the endpoint's response.
+- Same response format for products that support timeslots and products that do not.
 - `timeslot_id` query parameter has been dropped.
 - Provide a better explanation of the meaning of the attribute `available_tickets`.
 - Update the endpoints' prefix from `v1/` to `v2/`.
 - Deprecate the use of error code `2009`.
-- Add examples to show how to treat dates in the past while making requests to the availability endpoint.
+- Update description of error codes `2000`.
+- Add new examples to show how to treat dates in the past while making requests to the availability endpoint.
 - Remove attribute `id` for every timeslot from the availability endpoint's response schema.
 - Update description of `/availability` endpoint.
-- Add a new attribute `price` to every `Variant` object in the `/v2/availability` endpoint's response. The `Price`
+- Each variant might return information about the current price via the optional attribute `price`.
+- Add a new (optional) attribute `price` to every `Variant` object in the `/v2/availability` endpoint's response. The `Price`
   object has the following fields:
   - `face_value`: `string`
   - `currency`: `string`
@@ -45,7 +47,7 @@
 - Remove `timeslot_id` and `date` attributes.
 - Add a new attribute `datetime` to the endpoint's payload to replace the attributes `timeslot_id` and `date`.
 - Update the examples to include payloads with the new attribute `datetime`.
-- Update description of error code `2009`.
+- Update description of error codes `2000`, `2002`, `2009` and `3000`.
 - Remove error code `2006`.
 
 #### Booking
