@@ -25,7 +25,6 @@ RESERVATION_TEST = (
     reservation.test_incorrect_date_format,
     reservation.test_past_date,
     reservation.test_not_allowed_method,
-    # TODO check for response w/error 2006?
 )
 
 BOOKING_TEST = (

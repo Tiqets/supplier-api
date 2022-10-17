@@ -11,7 +11,7 @@ from supplier_api_tester.utils.availability import get_availability
 from supplier_api_tester.utils.catalog import get_catalog
 
 
-def get_reservation_slot(api_url, api_key, product_id, timeslots: bool, version=2) -> Optional[DailyVariants]:
+def get_reservation_slot(api_url, api_key, product_id, version=2) -> Optional[DailyVariants]:
     """Getting day of timeslot with at least one variant available."""
     start = datetime.utcnow().date()
     end = start + timedelta(days=30)

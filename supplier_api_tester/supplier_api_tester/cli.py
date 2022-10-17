@@ -18,7 +18,7 @@ def print_title(title):
 @click.option('-u', '--url', required=True, prompt='Server URL', type=str)
 @click.option('-k', '--api-key', required=True, prompt='API Key', type=str)
 @click.option('-p', '--product-id', type=str, help='Product ID to call tests on. Required with -a and -t flags')
-@click.option('-t', '--timeslots', is_flag=True, default=False, help='Use timeslots')
+@click.option('-t', '--timeslots', is_flag=True, default=False, help='Use timeslots. Not supported in v2.x')
 @click.option('-a', '--availability', is_flag=True, default=False, help='Run availability tests')
 @click.option('-r', '--reservation', is_flag=True, default=False, help='Run reservation tests')
 @click.option('-b', '--booking', is_flag=True, default=False, help='Run booking tests')
@@ -43,7 +43,6 @@ def supplier_tester(url, api_key, product_id, timeslots, availability, reservati
             api_key=api_key,
             product_id=product_id,
             test_target='availability',
-            timeslots=timeslots,
         )
         results = runner.run()
         results_printer(results, no_colors)
@@ -55,7 +54,6 @@ def supplier_tester(url, api_key, product_id, timeslots, availability, reservati
             api_key=api_key,
             product_id=product_id,
             test_target='reservation',
-            timeslots=timeslots,
         )
         results = runner.run()
         results_printer(results, no_colors)
@@ -67,7 +65,6 @@ def supplier_tester(url, api_key, product_id, timeslots, availability, reservati
             api_key=api_key,
             product_id=product_id,
             test_target='booking',
-            timeslots=timeslots,
         )
         results = runner.run()
         results_printer(results, no_colors)
@@ -79,7 +76,6 @@ def supplier_tester(url, api_key, product_id, timeslots, availability, reservati
             api_key=api_key,
             product_id=product_id,
             test_target='catalog',
-            timeslots=timeslots,
         )
         results = runner.run()
         results_printer(results, no_colors)
