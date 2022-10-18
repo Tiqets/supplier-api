@@ -14,6 +14,20 @@ pip install supplier-api-tester
 
 ## Usage
 
+The CLI Testing Tool supports both API v1.x and v2.x. By default, the CLI runs all the tests for API v2.x. 
+
+If you wish to test your API implementation based on the v1 specification then you can pass the argument `--version-1` 
+(`-v1`) in the CLI to enable v1 testing.
+
+For example, the following command will test your API implementation according to the v1 specification:
+
+```sh
+supplier_products -u 'http://localhost:8000' -k 'secret' --version-1
+```
+
+**Important: remember to run the appropriate version of the API server if you are testing both versions at the same 
+time**
+
 Listing the products catalog:
 
 ```sh
@@ -29,12 +43,27 @@ supplier_products -u 'http://localhost:8000' -k 'secret'
 +---------+---------+-----------+------------+-------------+-------------------------------------------+-----------------------------------+
 ```
 
+Listing the products catalog for API v1.x:
+
+```shell
+supplier_products -u 'http://localhost:8000' -k 'secret' --version-1
++---------+---------+-----------+------------+-------------+
+| ID      | Name    | Timeslots | Refundable | Cutoff time |
++---------+---------+-----------+------------+-------------+
+| A300-FX | A300-FX | True      | True       | 24          |
+| A400-FX | A400-FX | True      | False      | 0           |
+| A500-FX | A500-FX | False     | True       | 0           |
+| A550-FX | A550-FX | False     | True       | 10          |
+| A600-FX | A600-FX | False     | False      | 0           |
++---------+---------+-----------+------------+-------------+
+```
+
 Testing tool usage:
 ```
 supplier_tester --help
 Usage: supplier_tester [OPTIONS]
 
-  Test you Supplier API implementation
+  Test your Supplier API implementation
 
 Options:
   -u, --url TEXT         [required]
@@ -46,6 +75,7 @@ Options:
   -b, --booking          Run booking tests
   -c, --catalog          Run product catalog tests
   -nc, --no-colors       Not using colors on output
+  -v1, --version-1       Run the CLI tests for API v1.x
   --help                 Show this message and exit
 ```
 

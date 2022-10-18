@@ -3,8 +3,8 @@
 ## 2.0.0
 
 - add support for API v2.0.0
-- drop support for API v1.x
-- drop support for the CLI argument `--timeslots` (`-t`) in v2.0 
+- drop support for the CLI argument `--timeslots` (`-t`) in v2.0
+- add new argument `--version-1` to the CLI tool to test an implementation against API v1.x or v2.x (default)
 
 ## 1.6.5
 
