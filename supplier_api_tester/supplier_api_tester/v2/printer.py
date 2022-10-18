@@ -1,6 +1,6 @@
 from textwrap import wrap
 from typing import List
-from .models import Product
+from supplier_api_tester.v2.models import Product
 
 from terminaltables import AsciiTable
 

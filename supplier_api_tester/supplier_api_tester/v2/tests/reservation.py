@@ -6,10 +6,10 @@ from typing import List
 
 import requests
 
-from ..client import client
-from ..decorators import test_wrapper
-from ..exceptions import FailedTest
-from ..models import TestResult, ApiError
+from supplier_api_tester.v2.client import client
+from supplier_api_tester.v2.decorators import test_wrapper
+from supplier_api_tester.v2.exceptions import FailedTest
+from supplier_api_tester.v2.models import TestResult, ApiError
 from ..utils.adapters import get_api_error
 from ..utils.date import get_tomorrow
 from ..utils.adapters import get_reservation

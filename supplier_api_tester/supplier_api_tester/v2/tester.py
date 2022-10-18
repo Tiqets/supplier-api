@@ -1,7 +1,7 @@
 from typing import List
 
-from .models import TestResult
-from .tests import (
+from supplier_api_tester.v2.models import TestResult
+from supplier_api_tester.v2.tests import (
     AVAILABILITY_TEST,
     BOOKING_TEST,
     PRODUCT_CATALOG,

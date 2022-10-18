@@ -2,9 +2,9 @@ import json
 import time
 from functools import wraps
 
-from .exceptions import FailedTest
-from .models import TestResult, Response
-from .utils.conversions import ns_to_ms
+from supplier_api_tester.v2.exceptions import FailedTest
+from supplier_api_tester.v2.models import TestResult, Response
+from supplier_api_tester.v2.utils.conversions import ns_to_ms
 
 
 def test_wrapper(f):

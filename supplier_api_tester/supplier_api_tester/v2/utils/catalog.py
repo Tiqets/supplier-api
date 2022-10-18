@@ -2,8 +2,8 @@ from typing import List, Tuple
 import requests
 from requests.models import Response
 
-from ..client import client
-from ..models import Product
+from supplier_api_tester.v2.client import client
+from supplier_api_tester.v2.models import Product
 from ..utils.adapters import get_products
 
 

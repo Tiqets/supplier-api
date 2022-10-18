@@ -4,7 +4,7 @@ from requests.models import Response
 
 from typing import Any, Callable, Tuple
 
-from .exceptions import FailedTest
+from supplier_api_tester.v2.exceptions import FailedTest
 
 
 def client(

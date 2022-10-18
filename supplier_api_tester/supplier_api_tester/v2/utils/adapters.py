@@ -8,8 +8,8 @@ from typing import List
 import dacite
 from requests.models import Response
 
-from ..exceptions import FailedTest
-from ..models import ApiError, Booking, DailyVariants, Product, Reservation
+from supplier_api_tester.v2.exceptions import FailedTest
+from supplier_api_tester.v2.models import ApiError, Booking, DailyVariants, Product, Reservation
 
 
 def check_base64(item):

@@ -4,11 +4,11 @@ from typing import List
 from typing import Optional
 from typing import Union
 
-from supplier_api_tester.exceptions import FailedTest
-from supplier_api_tester.models import DailyVariants, Timeslot
-from supplier_api_tester.models import Product
-from supplier_api_tester.utils.availability import get_availability
-from supplier_api_tester.utils.catalog import get_catalog
+from supplier_api_tester.v2.exceptions import FailedTest
+from supplier_api_tester.v2.models import DailyVariants, Timeslot
+from supplier_api_tester.v2.models import Product
+from supplier_api_tester.v2.utils.availability import get_availability
+from supplier_api_tester.v2.utils.catalog import get_catalog
 
 
 def get_reservation_slot(api_url, api_key, product_id, version=2) -> Optional[DailyVariants]:

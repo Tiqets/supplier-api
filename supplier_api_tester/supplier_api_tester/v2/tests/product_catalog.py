@@ -4,9 +4,9 @@
 from typing import List
 from requests.models import Response
 
-from ..decorators import test_wrapper
-from ..exceptions import FailedTest
-from ..models import Product, TestResult
+from supplier_api_tester.v2.decorators import test_wrapper
+from supplier_api_tester.v2.exceptions import FailedTest
+from supplier_api_tester.v2.models import Product, TestResult
 from ..utils.catalog import get_catalog
 
 

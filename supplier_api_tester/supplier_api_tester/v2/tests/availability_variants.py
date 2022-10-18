@@ -3,15 +3,15 @@
 
 from datetime import datetime, timedelta
 
-from ..decorators import test_wrapper
-from ..exceptions import FailedTest
-from ..models import TestResult
+from supplier_api_tester.v2.decorators import test_wrapper
+from supplier_api_tester.v2.exceptions import FailedTest
+from supplier_api_tester.v2.models import TestResult
 from ..utils import availability
 
 
 @test_wrapper
 def test_next_30_days(api_url, api_key, product_id, version=2):
-    """[Availability] Checking availability for the next 30 days"""
+    """Checking availability for the next 30 days"""
     start_date = datetime.utcnow().date()
     end_date = start_date + timedelta(days=30)
     days, raw_response = availability.get_availability(
@@ -71,25 +71,25 @@ def test_next_30_days(api_url, api_key, product_id, version=2):
 
 @test_wrapper
 def test_missing_api_key(api_url, api_key, product_id, version=2):
-    """[Availability] Request without API-Key"""
+    """Request without API-Key"""
     return availability.test_missing_api_key(api_url, api_key, product_id, 'availability', version=version)
 
 
 @test_wrapper
 def test_incorrect_api_key(api_url, api_key, product_id, version=2):
-    """[Availability] Request with incorrect API-Key"""
+    """Request with incorrect API-Key"""
     return availability.test_incorrect_api_key(api_url, api_key, product_id, 'availability', version=version)
 
 
 @test_wrapper
 def test_missing_argument_error(api_url, api_key, product_id, version=2):
-    """[Availability] Testing missing argument errors"""
+    """Testing missing argument errors"""
     return availability.test_missing_argument_error(api_url, api_key, product_id, 'availability', version=version)
 
 
 @test_wrapper
 def test_error_for_non_existing_product(api_url, api_key, product_id, version=2):
-    """[Availability] Testing availability for non existing product"""
+    """Testing availability for non existing product"""
     return availability.test_error_for_non_existing_product(
         api_url, api_key, product_id, 'availability', version=version
     )
@@ -97,29 +97,29 @@ def test_error_for_non_existing_product(api_url, api_key, product_id, version=2)
 
 @test_wrapper
 def incorrect_date_format(api_url, api_key, product_id, version=2):
-    """[Availability] Checking incorrect date format"""
+    """Checking incorrect date format"""
     return availability.incorrect_date_format(api_url, api_key, product_id, 'availability', version=version)
 
 
 @test_wrapper
 def end_before_start_error(api_url, api_key, product_id, version=2):
-    """[Availability] Checking incorrect range error"""
+    """Checking incorrect range error"""
     return availability.end_before_start_error(api_url, api_key, product_id, 'availability', version=version)
 
 
 @test_wrapper
 def past_start_date(api_url, api_key, product_id, version=2):
-    """[Availability] Checking past date"""
+    """Checking past date"""
     return availability.past_start_date(api_url, api_key, product_id, 'availability', version=version)
 
 
 @test_wrapper
 def huge_date_range(api_url, api_key, product_id, version=2):
-    """[Availability] Checking huge date range"""
+    """Checking huge date range"""
     return availability.huge_date_range(api_url, api_key, product_id, 'availability', version=version)
 
 
 @test_wrapper
 def not_allowed_method(api_url, api_key, product_id, version=2):
-    """[Availability] Testing methods that are not allowed"""
+    """Testing methods that are not allowed"""
     return availability.not_allowed_method(api_url, api_key, product_id, 'availability', version=version)

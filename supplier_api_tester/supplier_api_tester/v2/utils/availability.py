@@ -5,15 +5,15 @@ from typing import List, Tuple
 import requests
 from requests.models import Response
 
-from supplier_api_tester.client import client
-from supplier_api_tester.exceptions import FailedTest
-from supplier_api_tester.models import ApiError, DailyVariants, TestResult
-from supplier_api_tester.utils.adapters import (
+from supplier_api_tester.v2.client import client
+from supplier_api_tester.v2.exceptions import FailedTest
+from supplier_api_tester.v2.models import ApiError, DailyVariants, TestResult
+from supplier_api_tester.v2.utils.adapters import (
     get_api_error,
     parse_availability_variants,
 )
-from supplier_api_tester.utils.errors import check_api_error
-from supplier_api_tester.utils.date import get_tomorrow
+from supplier_api_tester.v2.utils.errors import check_api_error
+from supplier_api_tester.v2.utils.date import get_tomorrow
 
 
 def get_availability(
