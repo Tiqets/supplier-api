@@ -1,11 +1,11 @@
 from requests.models import Response
 
-from supplier_api_tester.exceptions import FailedTest
-from supplier_api_tester.models import TestResult
+from supplier_api_tester.v1.exceptions import FailedTest
+from supplier_api_tester.v1.models import TestResult
 
 
 def check_api_error(raw_response: Response, api_error, expected_error) -> TestResult:
-    """Checking if the API error matches the expected error"""
+    '''Chcking if the API error matches the expected error'''
     if api_error.error_code != expected_error.error_code:
         raise FailedTest(
             message=f'Incorrect error_code ({api_error.error_code}). Expected value: {expected_error.error_code}',

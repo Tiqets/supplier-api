@@ -1,17 +1,10 @@
 import click
 
-from .exceptions import FailedTest
-from .tester import SupplierApiTester
-from .printer import results_printer, products_printer
-from .utils.catalog import get_catalog
+from supplier_api_tester.v2.cli import supplier_tester as supplier_tester_v2
+from supplier_api_tester.v2.cli import supplier_products as supplier_products_v2
 
-
-def print_title(title):
-    print()
-    print('-' * len(title))
-    print(title)
-    print('-' * len(title))
-    print()
+from supplier_api_tester.v1.cli import supplier_tester as supplier_tester_v1
+from supplier_api_tester.v1.cli import supplier_products as supplier_products_v1
 
 
 @click.command()
@@ -24,8 +17,11 @@ def print_title(title):
 @click.option('-b', '--booking', is_flag=True, default=False, help='Run booking tests')
 @click.option('-c', '--catalog', is_flag=True, default=False, help='Run product catalog tests')
 @click.option('-nc', '--no-colors', is_flag=True, default=False, help='Not using colors on output')
-def supplier_tester(url, api_key, product_id, timeslots, availability, reservation, booking, catalog, no_colors):
-    """Test you Supplier API implementation"""
+@click.option('-v', '--version', default=2, help='Choose the supplier API version', prompt='API version', type=int)
+def supplier_tester(
+        url, api_key, product_id, timeslots, availability, reservation, booking, catalog, no_colors, version: int
+):
+    """Test your Supplier API implementation"""
 
     if not any((availability, reservation, booking, catalog)):
         availability = True
@@ -36,59 +32,20 @@ def supplier_tester(url, api_key, product_id, timeslots, availability, reservati
     if any((availability, timeslots, reservation, booking)) and not product_id:
         product_id = click.prompt('Product ID')
 
-    if availability:
-        print_title('AVAILABILITY TESTS')
-        runner = SupplierApiTester(
-            host=url,
-            api_key=api_key,
-            product_id=product_id,
-            test_target='availability',
-        )
-        results = runner.run()
-        results_printer(results, no_colors)
-
-    if reservation:
-        print_title('RESERVATION TESTS')
-        runner = SupplierApiTester(
-            host=url,
-            api_key=api_key,
-            product_id=product_id,
-            test_target='reservation',
-        )
-        results = runner.run()
-        results_printer(results, no_colors)
-
-    if booking:
-        print_title('BOOKING TESTS')
-        runner = SupplierApiTester(
-            host=url,
-            api_key=api_key,
-            product_id=product_id,
-            test_target='booking',
-        )
-        results = runner.run()
-        results_printer(results, no_colors)
-
-    if catalog:
-        print_title('PRODUCT CATALOG')
-        runner = SupplierApiTester(
-            host=url,
-            api_key=api_key,
-            product_id=product_id,
-            test_target='catalog',
-        )
-        results = runner.run()
-        results_printer(results, no_colors)
+    if version == 1:
+        supplier_tester_v1(url, api_key, product_id, timeslots, availability, reservation, booking, catalog, no_colors)
+    else:
+        supplier_tester_v2(url, api_key, product_id, availability, reservation, booking, catalog, no_colors)
 
 
 @click.command()
 @click.option('-u', '--url', required=True, prompt='Server URL', type=str)
 @click.option('-k', '--api-key', required=True, prompt='API Key', type=str)
-def supplier_products(url, api_key):
+@click.option('-v', '--version', default=2, help='Choose the supplier API version', prompt='API version', type=int)
+def supplier_products(url: str, api_key: str, version: int):
     """Shows the product catalog"""
-    try:
-        _, products = get_catalog(url, api_key, version=2)
-    except FailedTest as e:
-        print(f'Unable to get the products: {e.message}')
-        exit(1)
-    products_printer(products)
+
+    if version == 1:
+        supplier_products_v1(url, api_key)
+    else:
+        supplier_products_v2(url, api_key)

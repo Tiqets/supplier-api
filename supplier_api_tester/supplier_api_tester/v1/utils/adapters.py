@@ -2,14 +2,13 @@ import base64
 import binascii
 
 from datetime import date, datetime
-from typing import Dict
 from typing import List
 
 import dacite
 from requests.models import Response
 
 from ..exceptions import FailedTest
-from ..models import ApiError, Booking, DailyVariants, Product, Reservation
+from ..models import ApiError, Booking, DailyVariants, Product, Reservation, Timeslot
 
 
 def check_base64(item):
@@ -32,13 +31,13 @@ def format_error_message(e: Exception) -> str:
 
 
 def booking_pdf_validator(booking: Booking, raw_response: Response):
-    if booking.barcode_scope == 'order':
+    if booking.barcode_position == 'order':
         if not check_base64(booking.barcode):
             raise FailedTest(
-                message="Error while decoding (base64) PDF voucher for the order",
+                message = "Error while decoding (base64) PDF voucher for the order",
                 response=raw_response
         )
-    elif booking.barcode_scope == 'ticket':
+    elif booking.barcode_position == 'ticket':
         for variant, barcodes in booking.tickets.items():
             for barcode in barcodes:
                 if not check_base64(barcode):
@@ -48,51 +47,70 @@ def booking_pdf_validator(booking: Booking, raw_response: Response):
                     )
 
 
-def parse_availability_variants(raw_response: Response, response: Dict) -> List[DailyVariants]:
-    """Getting and testing response from the /availability endpoint"""
-    if type(response) is not dict:
+def parse_availability_variants(raw_response: Response, response) -> List[DailyVariants]:
+    '''Getting and testing response from the /variants endpoint'''
+    if type(response) is not list:
         raise FailedTest(
-            message='The response should be a JSON Object',
+            message='The response should be a JSON Array',
             response=raw_response,
         )
-
-    available_variants: List[DailyVariants] = []
     try:
-        for day, day_availability in response.items():
-            # extract timeslot component from the day value: YYYY-MM-DDTHH:MM
-            date_time_value = datetime.fromisoformat(day)
-            available_variants.append(
-                dacite.from_dict(
-                    data_class=DailyVariants,
-                    data={
-                        'date': str(date_time_value.date()),
-                        'timeslot': f'{date_time_value.time().hour}:{date_time_value.time().minute}',
-                        'available_tickets': day_availability.get('available_tickets', 0),
-                        'variants': [
-                            {**v}
-                            for v in day_availability.get('variants', [])
-                        ]
-                    },
-                    config=dacite.Config(
-                        type_hooks={date: date.fromisoformat},
-                        strict=True,
-                    )
+        days = [
+            dacite.from_dict(
+                data_class=DailyVariants,
+                data=day,
+                config=dacite.Config(
+                    type_hooks={date: date.fromisoformat},
+                    strict=True,
                 )
             )
+            for day in response
+        ]
     except (
         dacite.exceptions.WrongTypeError,
         dacite.exceptions.MissingValueError,
         dacite.exceptions.UnexpectedDataError,
     ) as e:
         raise FailedTest(
-            message=f'Incorrect JSON format in response from the /availability endpoint: {format_error_message(e)}',
+            message=f'Incorrect JSON format in response from the /variants endpoint: {format_error_message(e)}',
             response=raw_response,
         )
-    return available_variants
+    return days
 
 
-def get_products(raw_response: Response, response: Dict) -> List[Product]:
-    """Getting and testing response from the /products endpoint"""
+def parse_availability_timeslots(raw_response: Response, response) -> List[Timeslot]:
+    '''Getting and testing response from the /timeslots endpoint'''
+    if type(response) is not list:
+        raise FailedTest(
+            message='The response should be a JSON Array',
+            response=raw_response,
+        )
+    try:
+        timeslots = [
+            dacite.from_dict(
+                data_class=Timeslot,
+                data=timeslot,
+                config=dacite.Config(
+                    type_hooks={date: date.fromisoformat},
+                    strict=True,
+                )
+            )
+            for timeslot in response
+        ]
+    except (
+        dacite.exceptions.WrongTypeError,
+        dacite.exceptions.MissingValueError,
+        dacite.exceptions.UnexpectedDataError,
+    ) as e:
+        raise FailedTest(
+            message=f'Incorrect JSON format in response from the /timeslots endpoint: {format_error_message(e)}',
+            response=raw_response,
+        )
+    return timeslots
+
+
+def get_products(raw_response: Response, response) -> List[Product]:
+    '''Getting and testing response from the /products endpoint'''
     if type(response) is not list:
         raise FailedTest(
             message='The response should be a JSON Array',
@@ -119,7 +137,7 @@ def get_products(raw_response: Response, response: Dict) -> List[Product]:
 
 
 def get_reservation(raw_response: Response, response) -> Reservation:
-    """Getting and testing response from the /reservation endpoint"""
+    '''Getting and testing response from the /reservation endpoint'''
     if type(response) is not dict:
         raise FailedTest(
             message='The response should be a JSON Object',
@@ -146,7 +164,7 @@ def get_reservation(raw_response: Response, response) -> Reservation:
 
 
 def get_booking(raw_response: Response, response) -> Booking:
-    """Getting and testing response from the /booking endpoint"""
+    '''Getting and testing response from the /booking endpoint'''
     if type(response) is not dict:
         raise FailedTest(
             message='The response should be a JSON Object',
@@ -178,17 +196,17 @@ def get_booking(raw_response: Response, response) -> Booking:
     if booking.barcode_format == 'PDF':
         booking_pdf_validator(booking, raw_response)
 
-    if booking.barcode_scope not in ('order', 'ticket'):
+    if booking.barcode_position not in ('order', 'ticket'):
         raise FailedTest(
-            message=f'Incorrect value in the barcode_scope field: {booking.barcode_scope}',
+            message=f'Incorrect value in the barcode_position field: {booking.barcode_position}',
             response=raw_response,
         )
-    if booking.barcode_scope == 'order' and not booking.barcode:
+    if booking.barcode_position == 'order' and not booking.barcode:
         raise FailedTest(
             message='Barcode for the whole order is empty',
             response=raw_response,
         )
-    if booking.barcode_scope == 'ticket' and not booking.tickets:
+    if booking.barcode_position == 'ticket' and not booking.tickets:
         raise FailedTest(
             message='Tickets Array is empty',
             response=raw_response,
@@ -200,7 +218,7 @@ def get_api_error(raw_response: Response, response) -> ApiError:
     """Unpacking 400 error JSON structure"""
     if raw_response.ok:
         raise FailedTest(
-            message=f'Expected HTTP 400 but got HTTP {response.get("status_code")} instead.',
+            message=f'Expected HTTP 400 error but got {raw_response.status_code}',
             response=raw_response,
         )
     if type(response) is not dict:
