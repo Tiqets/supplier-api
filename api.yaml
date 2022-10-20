@@ -163,7 +163,7 @@ info:
   contact:
     name: "Tiqets API Support"
     email: apisupport@tiqets.com
-  version: 2.0.0
+    version: 2.0.0
 tags:
   - name: Availability
     description: |
