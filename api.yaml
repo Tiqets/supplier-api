@@ -6,7 +6,7 @@ info:
     if they aren't connected already.
 
     This specification is for the API v2.0. If you are using the deprecated API v1.x then you should read the
-    [documentation for API v1](https://tiqets.github.io/supplier-api/v1/).
+    [documentation for API v1](https://tiqets.github.io/supplier-api/v1.html).
     
     It is loosely based on reservation.
     The endpoints described here are to be exposed on the Supply Partners own systems for Tiqets' systems to consume.
