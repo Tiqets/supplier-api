@@ -16,7 +16,7 @@ def client(
     json_payload=None,
 ) -> Tuple[Response, Any]:
     params = params if params is not None else {}
-    headers = headers if headers is not None else {'API-Key': api_key}
+    headers = headers if headers is not None else {'API-Key': api_key, 'TIQETS-TEST-ORDER': 'true'}
     headers['Cache-Control'] = 'no-store,no-cache,must-revalidate,max-age=0,post-check=0,pre-check=0'
     headers['Pragma'] = 'no-cache'
     try:
