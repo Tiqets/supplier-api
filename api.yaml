@@ -268,19 +268,7 @@ paths:
                   value:
                     "2022-12-19T11:00":
                       available_tickets: 0
-                      variants:
-                        - id: "1"
-                          name: Adult
-                          available_tickets: 0
-                          price:
-                            face_value: "3.20"
-                            currency: EUR
-                        - id: "2"
-                          name: Child
-                          available_tickets: 0
-                          price:
-                            face_value: "1.10"
-                            currency: EUR
+                      variants: []
                     "2022-12-19T16:30":
                       available_tickets: 100
                       variants:
@@ -361,19 +349,7 @@ paths:
                   value:
                     "2022-12-28T11:00":
                       available_tickets: 0
-                      variants:
-                        - id: "1"
-                          name: Adult
-                          available_tickets: 0
-                          price:
-                            face_value: "10"
-                            currency: EUR
-                        - id: "2"
-                          name: Child
-                          available_tickets: 0
-                          price:
-                            face_value: "5.75"
-                            currency: EUR
+                      variants: []
                     "2022-12-29T11:00":
                       available_tickets: 14
                       variants:
@@ -415,14 +391,22 @@ paths:
                   value:
                     "2022-12-02T11:00":
                       available_tickets: 0
+                      variants: []
+                    "2022-12-03T11:00":
+                      available_tickets: 63
                       variants:
                         - id: "1"
                           name: Adult
-                          available_tickets: 0
+                          available_tickets: 53
                           price:
-                            face_value: "3.20"
+                            face_value: "10"
                             currency: EUR
-                    "2022-12-03T11:00": {}
+                        - id: "2"
+                          name: Child
+                          available_tickets: 10
+                          price:
+                            face_value: "5.75"
+                            currency: EUR
                 no_availability:
                   summary: No available variants
                   value: {}
