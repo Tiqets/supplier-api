@@ -564,7 +564,6 @@ paths:
             |                2004 | Incorrect type                  | Expected `ATTRIBUTE_NAME` to be a string, got `TYPE` instead.                                        |
             |                2005 | Invalid Value                   | Eg. The phone number must not contain dots.                                                          |
             |                2009 | Incorrect date                  | Eg. Cannot use a date in the past or, the given date is too far ahead in the future (max 6 months).  |
-            |                2010 | Invalid value of required field | Eg. Incorrect value of field `EMAIL`.                                                                |
             |                3000 | Availability error              | The requested number of tickets is not longer available for a given variant and/or date/timeslot.    |
           content:
             application/json:

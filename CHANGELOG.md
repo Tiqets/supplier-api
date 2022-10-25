@@ -49,6 +49,7 @@
 - Update the examples to include payloads with the new attribute `datetime`.
 - Update description of error codes `2000`, `2002`, `2009` and `3000`.
 - Remove error code `2006`.
+- Remove error code `2010` in favor of error code `2005`.
 
 #### Booking
 
