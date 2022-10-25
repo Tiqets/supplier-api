@@ -17,7 +17,7 @@ from supplier_api_tester.v1.cli import supplier_products as supplier_products_v1
 @click.option('-b', '--booking', is_flag=True, default=False, help='Run booking tests')
 @click.option('-c', '--catalog', is_flag=True, default=False, help='Run product catalog tests')
 @click.option('-nc', '--no-colors', is_flag=True, default=False, help='Not using colors on output')
-@click.option('-v', '--version', default=2, help='Choose the supplier API version', prompt='API version', type=int)
+@click.option('-v', '--version', default=2, help='Choosing the API version', prompt='API version', type=int)
 def supplier_tester(
         url, api_key, product_id, timeslots, availability, reservation, booking, catalog, no_colors, version: int
 ):
@@ -41,7 +41,7 @@ def supplier_tester(
 @click.command()
 @click.option('-u', '--url', required=True, prompt='Server URL', type=str)
 @click.option('-k', '--api-key', required=True, prompt='API Key', type=str)
-@click.option('-v', '--version', default=2, help='Choose the supplier API version', prompt='API version', type=int)
+@click.option('-v', '--version', default=2, help='Choosing the API version', prompt='API version', type=int)
 def supplier_products(url: str, api_key: str, version: int):
     """Shows the product catalog"""
 

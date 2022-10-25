@@ -16,22 +16,21 @@ pip install supplier-api-tester
 
 The CLI Testing Tool supports both API v1.x and v2.x. By default, the CLI runs all the tests for API v2.x. 
 
-If you wish to test your API implementation based on the v1 specification then you can pass the argument `--version-1` 
-(`-v1`) in the CLI to enable v1 testing.
+If you wish to test your API implementation based on the v1 specification then you can pass the argument `--version` 
+(or `-v`) in the CLI to enable v1 testing.
+
+For more details on how to test your v1-complaint implementation please refer to the [API docs for V1](https://tiqets.github.io/supplier-api/v1.html). 
 
 For example, the following command will test your API implementation according to the v1 specification:
 
 ```sh
-supplier_products -u 'http://localhost:8000' -k 'secret' --version-1
+supplier_products -u 'http://localhost:8000' -k 'secret' -v 1
 ```
-
-**Important: remember to run the appropriate version of the API server if you are testing both versions at the same 
-time**
 
 Listing the products catalog:
 
 ```sh
-supplier_products -u 'http://localhost:8000' -k 'secret'
+supplier_products -u 'http://localhost:8000' -k 'secret' -v 2
 +---------+---------+-----------+------------+-------------+-------------------------------------------+-----------------------------------+
 | ID      | Name    | Timeslots | Refundable | Cutoff time | Required Additional Order Data            | Required Additional Visitors Data |
 +---------+---------+-----------+------------+-------------+-------------------------------------------+-----------------------------------+
@@ -46,7 +45,7 @@ supplier_products -u 'http://localhost:8000' -k 'secret'
 Listing the products catalog for API v1.x:
 
 ```shell
-supplier_products -u 'http://localhost:8000' -k 'secret' --version-1
+supplier_products -u 'http://localhost:8000' -k 'secret' -v 1
 +---------+---------+-----------+------------+-------------+
 | ID      | Name    | Timeslots | Refundable | Cutoff time |
 +---------+---------+-----------+------------+-------------+
@@ -75,30 +74,26 @@ Options:
   -b, --booking          Run booking tests
   -c, --catalog          Run product catalog tests
   -nc, --no-colors       Not using colors on output
-  -v1, --version-1       Run the CLI tests for API v1.x
+  -v, --version          Choosing the API version
   --help                 Show this message and exit
 ```
 
 Running all tests:
 
 ```sh
-supplier_tester -u 'http://localhost:8000' -k 'secret' -p 'A500-FX'  # For products without timeslots
-supplier_tester -u 'http://localhost:8000' -k 'secret' -p 'A400-FX' -t  # For products with timeslots
+supplier_tester -u 'http://localhost:8000' -k 'secret' -p 'A500-FX' -v 2
 ```
-
-**Remember to choose valid product id. It has to refer timeslotted product when you use `-t` flag.**
 
 Running only availability tests:
 
 ```sh
-supplier_tester -u 'http://localhost:8000' -k 'secret' -p 'A500-FX' -a  # For products without timeslots
-supplier_tester -u 'http://localhost:8000' -k 'secret' -p 'A400-FX' -a -t  # For products with timeslots
+supplier_tester -u 'http://localhost:8000' -k 'secret' -p 'A500-FX' -a -v 2
 ```
 
 Test example:
 
 ```sh
-supplier_tester -u 'http://localhost:8000' -k 'secret' -p 'A500-FX'
+supplier_tester -u 'http://localhost:8000' -k 'secret' -p 'A500-FX' -v 2
 
 ------------------
 AVAILABILITY TESTS
