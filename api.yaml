@@ -167,23 +167,7 @@ info:
 tags:
   - name: Availability
     description: |
-      The availability endpoint lists the variants (commonly referred to by the industry as "ticket types" or "Discounts") that are currently available at which quantities and optionally at what price.
-      The returned values must be up-to-date and always in the local time of the product/venue.
-
-      Tiqets will typically query the availability for 1 particular date or for a full month and populate its availability cache with the response.
-
-      **Expected behavior**:
-        - Only availability within the requested date range is returned
-        - When there is no availability for the requested and existing product an empty object (`{}`) shall be returned
-
-      **Example #1 to illustrate the above**:
-        - An availability request is made for an existing product and a date range of 7 months (20-01-2023 - 20-07-2023) is requested.
-        - The queried product only has 2 months of availability defined in the system.  
-        - **Expected response:** Availability for the 2 months that can be provided, never an error.
-
-      **Example #2 to illustrate the above**:
-        - An availability request is made for an existing product and a date range that isn't defined yet in the Supplier Partner's system.
-        - **Expected response**: An empty object (```{}```).
+      The availability endpoint allows Tiqets to retrieve a product's available variants for a given date range.
   - name: Product Catalog
     description: |
       The product catalog endpoints allow Tiqets to retrieve the attractions, events or tours offered by our Supply Partners.
@@ -216,7 +200,28 @@ paths:
         - Availability
       summary: Availability
       description: |
-        Returns the ticket availability of the variants within the requested date range.
+        The availability endpoint lists the variants (commonly referred to by the industry as "Ticket Types" or
+        "Discounts") that are currently available. The endpoint also indicates the number of available variants (or
+        tickets) and, optionally, ther price and currency.
+
+        The returned values must be up-to-date and always in the local time of the product/venue.
+
+        Tiqets will typically query the availability for 1 particular date or for a full month and populate its
+        availability cache with the response.
+
+        **Expected behavior**:
+          - Only availability within the requested date range is returned
+          - When there is no availability for the requested and existing product an empty object (`{}`) shall be returned
+
+        **Example #1 to illustrate the above**:
+          - An availability request is made for an existing product and a date range of 7 months (20-01-2023 - 20-07-2023) is requested.
+          - The queried product only has 2 months of availability defined in the system.
+          - **Expected response:** Availability for the 2 months that can be provided, never an error.
+
+        **Example #2 to illustrate the above**:
+          - An availability request is made for an existing product and a date range that isn't defined yet in the Supplier Partner's system.
+          - **Expected response**: An empty object (```{}```).
+
         The same data structure is used regardless of whether the product supports timeslots or not.
 
         **Important**: if a product doesn't support tmeslots then the date/time keys in the availability response must set the timeslot
@@ -437,9 +442,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/BadRequest"
-        "501":
-          description: Returned when this endpoint is Not Implemented
-          content: {}
       security:
         - authorization_header: []
   /v2/products/{product_id}/reservation:
@@ -569,17 +571,17 @@ paths:
 
             | Internal error code |             Error               |                                            Message                                                   |
             |---------------------|---------------------------------|------------------------------------------------------------------------------------------------------|
-            |                1000 | Missing argument                | Required argument `ATTRIBUTE_NAME` was not found                                                     |
-            |                1001 | Missing product                 | Product with ID `ID_NUMBER` doesn't exist                                                            |
-            |                1003 | Missing required fields         | Eg. Missing data for field `FULL_NAME`                                                               |
-            |                2000 | Malformed datetime              | Incorrect date format, please use the `YYYY-MM-DDTHH:MM`                                             |
-            |                2002 | Invalid datetime                | The given date/time doesn't exist in the system                                                      |
-            |                2003 | Wrong variant ID                | Given variant_id doesn't belong to given timeslot_id (`TIMESLOT_ID`)                                 |
-            |                2004 | Incorrect type                  | Expected `ATTRIBUTE_NAME` to be a string, got `TYPE` instead                                         |
+            |                1000 | Missing argument                | Required argument `ATTRIBUTE_NAME` was not found.                                                    |
+            |                1001 | Missing product                 | Product with ID `ID_NUMBER` doesn't exist.                                                           |
+            |                1003 | Missing required fields         | Eg. Missing data for field `FULL_NAME`.                                                              |
+            |                2000 | Malformed datetime              | Incorrect date format, please use the `YYYY-MM-DDTHH:MM`.                                            |
+            |                2002 | Invalid datetime                | The given date/time doesn't exist in the system.                                                     |
+            |                2003 | Wrong variant ID                | Given variant id doesn't belong to the given date/timeslot.                                          |
+            |                2004 | Incorrect type                  | Expected `ATTRIBUTE_NAME` to be a string, got `TYPE` instead.                                        |
             |                2005 | Invalid Value                   | Eg. The phone number must not contain dots.                                                          |
             |                2009 | Incorrect date                  | Eg. Cannot use a date in the past or, the given date is too far ahead in the future (max 6 months).  |
             |                2010 | Invalid value of required field | Eg. Incorrect value of field `EMAIL`.                                                                |
-            |                3000 | Availability error              | The requested number of tickets is not longer available for a given variant and/or timeslot          |
+            |                3000 | Availability error              | The requested number of tickets is not longer available for a given variant and/or date/timeslot.    |
           content:
             application/json:
               schema:
@@ -622,7 +624,6 @@ paths:
                     booking_id: "657788"
                     barcode_format: "QRCODE"
                     barcode_scope: ticket
-                    barcode: ""
                     tickets:
                       "variant_1_id":
                         - barcode1
@@ -649,7 +650,6 @@ paths:
                     booking_id: "657787"
                     barcode_format: "PDF"
                     barcode_scope: ticket
-                    barcode: ""
                     tickets:
                       "variant_1_id":
                         - "ZXhhbXBsZS12aXNpdG9yLWJhcmNvZGUtMQ=="
@@ -848,7 +848,7 @@ components:
         available_tickets:
           type: integer
           example: 15
-          description: Number of available tickets for a given date/timeslot. This is the maximum number of tickets available for the timeslot.
+          description: A number of available tickets for a given date/timeslot.
         variants:
           type: array
           description: List of variants available on a date and timeslot combination.
@@ -867,7 +867,7 @@ components:
         available_tickets:
           type: integer
           example: 10
-          description: Number of available tickets for the variant in the given timeslot.
+          description: A number of available tickets for the variant in the given date/timeslot.
         price:
           type: object
           properties:
