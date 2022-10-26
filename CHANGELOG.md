@@ -1,5 +1,67 @@
 # Changelog
 
+## 2.0.0
+
+#### Product Catalog
+
+- Endpoint with product catalog becomes required
+- `use_timeslots` query parameter has been dropped
+- New product fields:
+  - `max_tickets_per_order` - each product can set a limit for a number of tickets in the order
+  - `required_visitor_data` - each product can describe a list of additional data that are required from each visitor (full name, email, phone, address, passport id, date of birth)
+  - `required_order_data` - data that is required to be delivered on the order level (not per visitor, eg. pickup location, nationality, zip code)
+- Update the `/products` endpoint's response example to include examples of products with `required_visitor_data` and `required_order_data`.
+- List the possible values for `required_order_data` and `required_visitor_data`.
+- Update the endpoints' prefix from `v1/` to `v2/`.
+
+#### Availability
+
+- Remove the endpoints `/products/{product-id}/timeslots` and `/products/{product-id}/variants` and replace them with a new endpoint `/v2/availability`.
+- Change the schema of the endpoint's response.
+- Same response format for products that support timeslots and products that do not.
+- `timeslot_id` query parameter has been dropped.
+- Provide a better explanation of the meaning of the attribute `available_tickets`.
+- Update the endpoints' prefix from `v1/` to `v2/`.
+- Deprecate the use of error code `2009`.
+- Update description of error codes `2000`.
+- Add new examples to show how to treat dates in the past while making requests to the availability endpoint.
+- Remove attribute `id` for every timeslot from the availability endpoint's response schema.
+- Update description of `/availability` endpoint.
+- Each variant might return information about the current price via the optional attribute `price`.
+- Add a new (optional) attribute `price` to every `Variant` object in the `/v2/availability` endpoint's response. The `Price`
+  object has the following fields:
+  - `face_value`: `string`
+  - `currency`: `string`
+  
+  See the endpoint's documentation for examples.
+
+#### Reservation
+
+- New error code `1003` that can be return if required visitor data wasn't delivered
+- New fields:
+  - `required_visitor_data`
+  - `required_order_data`
+- List the possible values for `required_order_data` and `required_visitor_data`.
+- Update the `/reservation` endpoint's response examples to include examples with `required_order_data`.
+- Update the endpoints' prefix from `v1/` to `v2/`.
+- Remove `timeslot_id` and `date` attributes.
+- Add a new attribute `datetime` to the endpoint's payload to replace the attributes `timeslot_id` and `date`.
+- Update the examples to include payloads with the new attribute `datetime`.
+- Update description of error codes `2000`, `2002`, `2009` and `3000`.
+- Remove error code `2006`.
+- Remove error code `2010` in favor of error code `2005`.
+
+#### Booking
+
+- New optional header `TIQETS-TEST-ORDER`
+- Rename attribute `barcode_position` in the endpoint's response to `barcode_scope`. Update the description of the attribute to make it easier to understand.
+- Update the `/booking` endpoint's response examples to include examples of PDF barcodes and barcodes at `order` and `ticket` scope.
+- Update the endpoints' prefix from `v1/` to `v2/`.
+
+#### Concepts
+
+- Add a section on Date and Times to explain the use of date/times across the API.
+
 ## 1.6.0
 
 - Add new field `order_reference` to booking step.

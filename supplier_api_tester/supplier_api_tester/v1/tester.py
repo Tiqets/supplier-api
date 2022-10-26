@@ -9,11 +9,9 @@ from .tests import (
     PRODUCT_CATALOG,
     RESERVATION_TEST,
 )
-from .utils.reservation import get_reservation_slot
 
 
-class SupplierApiTester(object):
-
+class SupplierApiTesterV1(object):
     def __init__(
         self,
         host: str,
@@ -29,7 +27,7 @@ class SupplierApiTester(object):
         self.timeslots = timeslots
 
     def run(self) -> List[TestResult]:
-        TEST_TARGETS = {
+        test_targets = {
             'availability': _run_tests(AVAILABILITY_TEST, self.host, self.api_key, self.product_id),
             'reservation': _run_tests(RESERVATION_TEST, self.host, self.api_key, self.product_id, self.timeslots),
             'booking': _run_tests(BOOKING_TEST, self.host, self.api_key, self.product_id, self.timeslots),
@@ -37,12 +35,12 @@ class SupplierApiTester(object):
             'timeslots': _run_tests(AVAILABILITY_TIMESLOTS_TEST, self.host, self.api_key, self.product_id),
             'variants': _run_tests(AVAILABILITY_VARIANTS_TEST, self.host, self.api_key, self.product_id),
         }
-        results = list(TEST_TARGETS[self.test_target])
+        results = list(test_targets[self.test_target])
         if self.test_target == 'availability':
             if self.timeslots:
-                return results + list(TEST_TARGETS['timeslots'])
+                return results + list(test_targets['timeslots'])
             else:
-                return results + list(TEST_TARGETS['variants'])
+                return results + list(test_targets['variants'])
         return results
 
 

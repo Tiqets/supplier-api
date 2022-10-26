@@ -1,10 +1,9 @@
 from datetime import datetime, timedelta
 from typing import Union
 
-from supplier_api_tester.client import client
-from supplier_api_tester.exceptions import FailedTest
-from supplier_api_tester.models import DailyVariants, Timeslot
-from supplier_api_tester.utils.availability import (
+from supplier_api_tester.v1.exceptions import FailedTest
+from supplier_api_tester.v1.models import DailyVariants, Timeslot
+from supplier_api_tester.v1.utils.availability import (
     get_availability_timeslots,
     get_availability_variants,
 )

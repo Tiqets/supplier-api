@@ -1,12 +1,11 @@
 import base64
-from base64 import b64encode, b64decode
 import binascii
 
 from datetime import date, datetime
 from typing import List
 
 import dacite
-from requests.models import Request, Response
+from requests.models import Response
 
 from ..exceptions import FailedTest
 from ..models import ApiError, Booking, DailyVariants, Product, Reservation, Timeslot
@@ -216,7 +215,12 @@ def get_booking(raw_response: Response, response) -> Booking:
 
 
 def get_api_error(raw_response: Response, response) -> ApiError:
-    '''Unpacking 400 error JSON structure'''
+    """Unpacking 400 error JSON structure"""
+    if raw_response.ok:
+        raise FailedTest(
+            message=f'Expected HTTP 400 error but got {raw_response.status_code}',
+            response=raw_response,
+        )
     if type(response) is not dict:
         raise FailedTest(
             message='400 error response should be a JSON Object',

@@ -2,14 +2,14 @@
 # then they should be done under a single test case.
 
 from datetime import datetime, timedelta, timezone
-from typing import Union
+from typing import List
 
 import requests
 
 from ..client import client
 from ..decorators import test_wrapper
 from ..exceptions import FailedTest
-from ..models import TestResult, Timeslot, ApiError
+from ..models import TestResult, ApiError
 from ..utils.adapters import get_api_error
 from ..utils.date import get_tomorrow
 from ..utils.adapters import get_reservation
@@ -68,7 +68,7 @@ def test_incorrect_api_key(api_url, api_key, product_id, timeslots: bool, versio
 
 @test_wrapper
 def test_missing_argument_error(api_url, api_key, product_id, timeslots: bool, version=1):
-    '''Testing missing argument errors'''
+    """Testing missing argument errors"""
     tomorrow = get_tomorrow()
     warnings: List[str] = []
     slot = get_reservation_slot(api_url, api_key, product_id, timeslots)

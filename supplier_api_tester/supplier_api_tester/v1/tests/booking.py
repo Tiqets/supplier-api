@@ -22,7 +22,7 @@ def reference_id() -> str:
 
 @test_wrapper
 def test_missing_reservation_id(api_url, api_key, product_id, timeslots: bool, version=1):
-    '''Booking without the reservation ID'''
+    """Booking without the reservation ID"""
     url = f'{api_url}/v{version}/booking'
     raw_response, response = client(url, api_key, method=requests.post, json_payload={})
     api_error = get_api_error(raw_response, response)
