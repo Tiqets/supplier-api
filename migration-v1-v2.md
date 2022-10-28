@@ -1,7 +1,8 @@
 # Tiqets Supplier API Migration Guide from v1 to v2
 
 Starting on November 1st, 2022, Tiqets has released a new version of 
-the [Tiqets Supplier API](https://tiqets.github.io/supplier-api/). The new version of the API....
+the [Tiqets Supplier API](https://tiqets.github.io/supplier-api/). The new version simplifies some aspects of the API 
+but also extends it with new features. 
 
 For questions related to this migration guide or about the API you can contact us at: 
 [apisupport@tiqets.com](mailto:apisupport@tiqets.com)
@@ -23,31 +24,34 @@ specification. For a complete list of the endpoints please refer to the official
 
 | Endpoint’s Name      | HTTP Method | Endpoint’s URL in v1 | Endpoint’s URL in v2 |
 | ----------- | ----------- | ----------- | ----------- |
-| **Product Catalog**      | `GET`       | `https://your-api-domain/v1/products` | `https://your-api-domain/v2/products` |
-| **Availability**   | `GET`        | `https://your-api-domain/v1/products/{product_id}/variants` | `https://your-api-domain/v2/products/{product_id}/availability` |
-| **Availability**  | `GET`        | `https://your-api-domain/v1/products/{product_id}/timeslots` | `https://your-api-domain/v2/products/{product_id}/availability` |
-| **Reservation**   | `POST`        | `https://your-api-domain/v1/products/{product_id}/reservation` | `https://your-api-domain/v2/products/{product_id}/reservation` |
-| **Booking**   | `POST`        | `https://your-api-domain/v1/booking` | `https://your-api-domain/v2/booking` |
-| **Cancellation**   | `DELETE`        | `https://your-api-domain/v1/booking` | `https://your-api-domain/v2/booking` |
+| **Product Catalog**      | `GET`       | `/v1/products` | `/v2/products` |
+| **Availability (variants)**   | `GET`        | `/v1/products/{product_id}/variants` | `/v2/products/{product_id}/availability` |
+| **Availability (timeslots)**  | `GET`        | `/v1/products/{product_id}/timeslots` | `/v2/products/{product_id}/availability` |
+| **Reservation**   | `POST`        | `/v1/products/{product_id}/reservation` | `/v2/products/{product_id}/reservation` |
+| **Booking**   | `POST`        | `/v1/booking` | `/v2/booking` |
+| **Cancellation**   | `DELETE`        | `/v1/booking` | `/v2/booking` |
 
 ### Product Catalog
 
+An API v2 server **MUST** implement the endpoint `/v2/products`. This endpoint allows Tiqets to retrieve the list of 
+products offered by the supplier.
+
 For details and examples please refer to the official 
 [Product Endpoint Documentation](https://tiqets.github.io/supplier-api/#tag/Product-Catalog/operation/getProducts).
+
+#### Changes Affecting the Endpoint's Requests
+
+| Query Parameter       | Type of Change | v1          | v2          |
+| ----------- | -----------    | ----------- | ----------- |
+| `use_timeslots` | removed    | optional    | deleted     |
 
 #### Changes Affecting the Endpoint's Response
 
 | Field       | Type of Change | v1          | v2          | Description |
 | ----------- | -----------    | ----------- | ----------- | ----------- |
 | `max_tickets_per_order` | added    | N/A | optional | Specify the maximum amount of tickets that can be added to a single order. The absence of this field will mean that the product doesn't have such limits |
-| `required_visitor_data` | added    | N/A | optional | a list of additional data that is required from each visitor (_full name_, _email_, _phone_, _address_, _passport id_, _date of birth_) |
-| `required_order_data`   | added    | N/A | optional | a list of the additional fields required to be delivered on the order level (eg. _pickup location_, _nationality_, _zip code_) |
-
-#### Changes Affecting the Endpoint's Requests
-
-| Field       | Type of Change | v1          | v2          |
-| ----------- | -----------    | ----------- | ----------- |
-| `use_timeslots` | removed    | optional    | deleted     |
+| `required_visitor_data` | added    | N/A | optional | A list of additional data that is required from each visitor (_full name_, _email_, _phone_, _address_, _passport id_, _date of birth_) |
+| `required_order_data`   | added    | N/A | optional | A list of the additional fields required to be delivered on the order level (eg. _pickup location_, _nationality_, _zip code_) |
 
 ### Availability
 
@@ -55,7 +59,7 @@ For details and examples please refer to the official
 [Availability Endpoint Documentation](https://tiqets.github.io/supplier-api/#tag/Availability/operation/getAvailability).
 
 The new API introduces a new endpoint that allows Tiqets to fetch the availability of a product. In v1, the client would 
-make an `HTTP` request to 2 different endpoints depending on whether the product supports timeslots or not.
+make an `GET` request to 2 different endpoints depending on whether the product supports timeslots or not.
 
 In v1, if a product supports timeslots then the client would request availability in the following manner:
 
@@ -141,7 +145,7 @@ For example, the following is a valid availability response for a product that d
 }
 ```
 
-**New `price` Field to Describe Variants**:
+**New `price` Field to Describe Variants**
 
 The schema of the response's `variants` field includes a new, _optional_ field called `price`. The supplier can use this 
 field to specify the price of an available variant. The schema of the `price` field is as follows:
@@ -188,20 +192,25 @@ For details and examples please refer to the official
 
 The lists of possible values for these fields are:
 
-- `required_order_data`: **PICKUP_LOCATION**, **DROPOFF_LOCATION**, **NATIONALITY**, **FLIGHT_NUMBER**, **PASSPORT_ID**
-- `required_visitor_data`: **FULL_NAME**, **EMAIL**, **PHONE**, **ADDRESS**, **PASSPORT_ID**, **DATE_OF_BIRTH**
+- `required_order_data`:
+  - **PICKUP_LOCATION**
+  - **DROPOFF_LOCATION**
+  - **NATIONALITY**
+  - **FLIGHT_NUMBER**
+  - **PASSPORT_ID**
+  
+- `required_visitor_data`: 
+  - **FULL_NAME**
+  - **EMAIL**
+  - **PHONE**
+  - **ADDRESS**
+  - **PASSPORT_ID**
+  - **DATE_OF_BIRTH**
 
 ### Booking
 
 For details and examples please refer to the official 
 [Booking Endpoint Documentation](https://tiqets.github.io/supplier-api/#tag/Booking/operation/booking).
-
-#### Changes Affecting the Endpoint's Response
-
-| Field       | Type of Change | v1          | v2          |
-| ----------- | -----------    | ----------- | ----------- |
-| `barcode_position` | renamed    | `barcode_position`    | `barcode_scope`     |
-
 
 #### Changes Affecting the Endpoint's Requests
 
@@ -210,7 +219,14 @@ can make a booking request and flag the booking as a **test booking**.
 
 **Important**: the API server **MUST** respond with a valid `HTTP` response and, **MUST** mark the booking as 
 **test booking** in their internal systems.
- 
+
+#### Changes Affecting the Endpoint's Response
+
+| Field       | Type of Change | v1          | v2          |
+| ----------- | -----------    | ----------- | ----------- |
+| `barcode_position` | renamed    | `barcode_position`    | `barcode_scope`     |
+
+
 ## Errors
 
 In API v2 some error codes have been deprecated. Make sure to update your API server accordingly.
