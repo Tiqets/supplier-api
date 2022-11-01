@@ -1,28 +1,27 @@
 # Tiqets Supplier API Migration Guide from v1 to v2
 
-Starting on November 1st, 2022, Tiqets has released a new version of 
-the [Tiqets Supplier API](https://tiqets.github.io/supplier-api/). The new version simplifies some aspects of the API 
-but also extends it with new features. 
+As of November 1st, 2022, Tiqets has released a new version of
+the [Tiqets Supplier API](https://tiqets.github.io/supplier-api/) which is both a simplification and an extension of the specification.
 
-For questions related to this migration guide or about the API you can contact us at: 
-[apisupport@tiqets.com](mailto:apisupport@tiqets.com)
+The changes in a nutshell:
+* We've merged the concepts of full-day and timeslots
+* We've added (limited) support for checkout questions
+* We've added support for pricing
+
+Questions? Contact us at: [apisupport@tiqets.com](mailto:apisupport@tiqets.com)
 
 ## Endpoints
 
-Migrating the API from version 1 to version 2 requires updating the endpoints' URLs to drop the v1 string and
-replace it with v2.
+All endpoints of version 2 are prepended with `/v2` instead of `/v1`
 
-For example, to retrieve the list of products Tiqets would make an `HTTP` request as follows:
-
+For example, to retrieve your product  catalog Tiqets would perform an `HTTP` request as follows:
 ```shell
 GET https://your-api-domain/v2/products
 ```
 
-The following table summarises the changes that are required to migrate all the endpoints to support v2 of the
-specification. For a complete list of the endpoints please refer to the official
-[Tiqets Supplier API Specification](https://tiqets.github.io/supplier-api/).
+The following table lists the required changes to migrate all endpoints to version 2 of the specification. For a complete list of the endpoints please refer to the official [Tiqets Supplier API Specification](https://tiqets.github.io/supplier-api/).
 
-| Endpoint’s Name      | HTTP Method | Endpoint’s URL in v1 | Endpoint’s URL in v2 |
+| Endpoint's Name      | HTTP Method | Endpoint's URL in v1 | Endpoint's URL in v2 |
 | ----------- | ----------- | ----------- | ----------- |
 | **Product Catalog**      | `GET`       | `/v1/products` | `/v2/products` |
 | **Availability (variants)**   | `GET`        | `/v1/products/{product_id}/variants` | `/v2/products/{product_id}/availability` |
@@ -33,11 +32,9 @@ specification. For a complete list of the endpoints please refer to the official
 
 ### Product Catalog
 
-An API v2 server **MUST** implement the endpoint `/v2/products`. This endpoint allows Tiqets to retrieve the list of 
-products offered by the supplier.
+The product catalog endpoint **MUST** be implemented by a v2-complaint API implementation. 
 
-For details and examples please refer to the official 
-[Product Endpoint Documentation](https://tiqets.github.io/supplier-api/#tag/Product-Catalog/operation/getProducts).
+For details and examples please refer to the official [Product Endpoint Documentation](https://tiqets.github.io/supplier-api/#tag/Product-Catalog/operation/getProducts).
 
 #### Changes Affecting the Endpoint's Requests
 
@@ -55,36 +52,30 @@ For details and examples please refer to the official
 
 ### Availability
 
-For details and examples please refer to the official 
-[Availability Endpoint Documentation](https://tiqets.github.io/supplier-api/#tag/Availability/operation/getAvailability).
+For details and examples please refer to the official [Availability Endpoint Documentation](https://tiqets.github.io/supplier-api/#tag/Availability/operation/getAvailability).
 
-The new API introduces a new endpoint that allows Tiqets to fetch the availability of a product. In v1, the client would 
-make an `GET` request to 2 different endpoints depending on whether the product supports timeslots or not.
+V2 offers a *single* endpoint for disclosure of availability of products with or without timeslots.
+Note that it's still not allowed for products to mix timeslots and full-day.
 
-In v1, if a product supports timeslots then the client would request availability in the following manner:
-
+**In v1**
+Availability fetching for products *with* timeslots:
 ```shell
 GET https://your-api-domain/v1/products/{product-id}/timeslots
 ```
-
-If, on the other hand the product doesn't support timeslots then the client would make the following request:
-
+Availability fetching for products *without* timeslots (full-day):
 ```shell
 GET https://your-api-domain/v1/products/{product-id}/variants
 ```
-
-In v2 of the API the endpoints above have been deprecated and replaced with a new endpoint. To retrieve availability of 
-a product the client would make a request as follows:
-
+**In v2**
+Availability fetching for products *with or without* timeslots:
 ```shell
 GET https://your-api-domain/v2/products/{product-id}/availability
 ```
 
 #### Changes Affecting the Endpoint's Response
-
 **New Response Schema**
 
-The schema of the availability endpoint's response has changed. The availability's response is a `JSON` 
+The schema of the availability endpoint's response has changed. The availability's response is a `JSON`
 object. Each key defines an available day/timeslot, and it's specified using the format `YYYY-MM-DDTHH:MM`.
 
 An example of a valid response is:
@@ -113,11 +104,10 @@ An example of a valid response is:
 }
 ```
 
-This indicates that the product has 2 available variants on "2022-12-19" at "16:30". For additional details please refer 
-to the official documentation of the endpoint.
+This indicates that the product has 2 available variants on "2022-12-19" at "16:30". For additional details please refer to the official documentation of the endpoint.
 
-If a product does not support timeslots then each 1st-level key in the `JSON` object must specify the time as 
-`T00:00`. 
+If a product does not support timeslots then each 1st-level key in the `JSON` object **MUST** specify the time as
+`T00:00`.
 
 For example, the following is a valid availability response for a product that does not support timeslots:
 
@@ -147,8 +137,11 @@ For example, the following is a valid availability response for a product that d
 
 **New `price` Field to Describe Variants**
 
-The schema of the response's `variants` field includes a new, _optional_ field called `price`. The supplier can use this 
-field to specify the price of an available variant. The schema of the `price` field is as follows:
+The schema of the response's `variants` field includes a new, _optional_ field called `price`. The supplier may use this field to specify the price of an available variant.
+
+> **Important Note** The presence of pricing doesn't imply that Tiqets shall ingest that price information. Only if the requirements for price ingestion are met then price ingestion *may* be enabled for certain products. Criteria currently are the type of agreement between the supplier and Tiqets and whether all variants carry the same commission percentage.
+
+The schema of the `price` field is as follows:
 
 ```json
 {
@@ -177,8 +170,7 @@ For example, a valid value for the `variants` field could be:
 
 ### Reservation
 
-For details and examples please refer to the official 
-[Reservation Endpoint Documentation](https://tiqets.github.io/supplier-api/#tag/Availability/operation/getAvailability).
+For details and examples please refer to the official [Reservation Endpoint Documentation](https://tiqets.github.io/supplier-api/#tag/Availability/operation/getAvailability).
 
 #### Changes Affecting the Endpoint's Requests
 
@@ -188,37 +180,18 @@ For details and examples please refer to the official
 | `timeslot_id`  | removed        |  `timeslot_id` |  N/A         |
 | `date`         | removed        |  `date`        |  N/A         |
 | `required_order_data`         | added        |  N/A        |  `required_order_data`        |
-| `required_visitor_data`         | added        |  N/A        |  `required_visitor_data`        |
+| `required_visitor_data`         | added        |  N/A        |  `required_visitor_data`     |
 
-The lists of possible values for these fields are:
-
-- `required_order_data`:
-  - **PICKUP_LOCATION**
-  - **DROPOFF_LOCATION**
-  - **NATIONALITY**
-  - **FLIGHT_NUMBER**
-  - **PASSPORT_ID**
-  
-- `required_visitor_data`: 
-  - **FULL_NAME**
-  - **EMAIL**
-  - **PHONE**
-  - **ADDRESS**
-  - **PASSPORT_ID**
-  - **DATE_OF_BIRTH**
 
 ### Booking
 
-For details and examples please refer to the official 
-[Booking Endpoint Documentation](https://tiqets.github.io/supplier-api/#tag/Booking/operation/booking).
+For details and examples please refer to the official [Booking Endpoint Documentation](https://tiqets.github.io/supplier-api/#tag/Booking/operation/booking).
 
 #### Changes Affecting the Endpoint's Requests
 
-The new version of the API supports an optional `HTTP` header named `TIQETS-TEST-ORDER`. Using this header the client 
-can make a booking request and flag the booking as a **test booking**. 
+V2 supports an optional `HTTP` header named `TIQETS-TEST-ORDER`. This header is used by the integration test tool to make a booking request and give you the opportunity to mark the booking as a **test booking**.
 
-**Important**: the API server **MUST** respond with a valid `HTTP` response and, **MUST** mark the booking as 
-**test booking** in their internal systems.
+**Important**: Your implementation **MUST** respond with a valid `HTTP` response and **MUST** mark the booking as a **test booking** in their internal systems.
 
 #### Changes Affecting the Endpoint's Response
 
@@ -229,7 +202,7 @@ can make a booking request and flag the booking as a **test booking**.
 
 ## Errors
 
-In API v2 some error codes have been deprecated. Make sure to update your API server accordingly.
+In API v2 some error codes have been deprecated. Make sure to update your implementation accordingly.
 
 | Endpoint         | Error Code   | v1          | v2          |
 | -----------      | -----------  | ----------- | ----------- |
@@ -238,5 +211,4 @@ In API v2 some error codes have been deprecated. Make sure to update your API se
 | **Reservation**  | `2010`       | present     | removed     |
 | **Reservation**  | `1003`       | N/A         | new         |
 
-Please refer to the [Official API Documentation](https://tiqets.github.io/supplier-api/) for a full list of the error 
-codes supported in v2.
+Please refer to the [Official API Documentation](https://tiqets.github.io/supplier-api/) for a full list of the error codes supported in v2.
