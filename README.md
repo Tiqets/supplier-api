@@ -12,3 +12,7 @@ Refer to [https://www.tiqets.com/venues](https://www.tiqets.com/venues) for more
 Our [online documentation](https://tiqets.github.io/supplier-api/) (OpenAPI / Swagger) details what interfaces you need to add to your servers and [how to test](https://tiqets.github.io/supplier-api/#section/Development-tools) your implementation.
 
 [![Documentation screenshot](docs/spec.png)](https://tiqets.github.io/supplier-api/)
+
+## API Migration Guide
+
+Please refer to the [API Migration Guide](https://tiqets.github.io/supplier-api/migration.md) if you need to migrate your API from v1 to v2.
