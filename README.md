@@ -15,4 +15,4 @@ Our [online documentation](https://tiqets.github.io/supplier-api/) (OpenAPI / Sw
 
 ## API Migration Guide
 
-Please refer to the [API Migration Guide](https://tiqets.github.io/supplier-api/migration.md) if you need to migrate your API from v1 to v2.
+Please refer to the [API Migration Guide](MIGRATION.md) if you need to migrate your API from v1 to v2.
