@@ -12,15 +12,15 @@ info:
     In other words: Tiqets initiates `HTTP` calls to the Supply Partners' systems and the Supply Partner's system must
     respond.
 
+    **Important**: This specification is for the API v2.0. If you are using the deprecated API v1.x then you should read the
+    [documentation for API v1](https://tiqets.github.io/supplier-api/v1.html). If you are migrating between versions
+    please refer to the [API Migration Guide](https://tiqets.github.io/supplier-api/migration.html) for details.
+
     # Data sharing
     Tiqets does not share personal information of its customers (PII) with third parties, unless explicitly agreed otherwise.
     This API Specification does however provide the structure to share (PII) but our systems will default to sending placeholder values.
 
     Any PII received is to be treated according to the rules laid out in the European Union's "General Data Protection Regulation (GDPR)"
-
-    **Important**: This specification is for the API v2.0. If you are using the deprecated API v1.x then you should read the
-    [documentation for API v1](https://tiqets.github.io/supplier-api/v1.html). If you are migrating between versions
-    please refer to the [API Migration Guide](https://tiqets.github.io/supplier-api/migration.html) for details.
 
     # Generic requirements
 
