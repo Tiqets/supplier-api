@@ -6,467 +6,63 @@
         <meta name="description" content="Tiqets Supplier API Migration Guide" />
         <meta name="author" content="Tiqets International BV"/>
         <title>Tiqets Supplier API Migration Guide</title>
-        <!-- Core theme CSS (includes Bootstrap)-->
-        <link href="./docs/css/styles.css" rel="stylesheet" />
+        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.2/css/foundation.min.css">
+        <link rel="stylesheet" type="text/css" href="./docs/css/styles-showdown.css">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
         <style>
-        .code-snippet {
-            font-family: Courier, monospace;
-            white-space: pre;
-            background-color: rgb(17, 23, 26);
-            color: white;
-            padding: 5px;
-            overflow-x: auto;
-            line-height: normal;
-            border-radius: 0px;
-            border: 1px solid rgba(38, 50, 56, 0.1);
-        }
-        .code-style {
-            background-color: transparent;
-            color: white;
-            padding: 0px;
-        }
+            h1, h2, h3, h4, h5, h6 {
+                font-family: Montserrat, sans-serif;
+            }
+
+            pre {
+                background-color: rgb(27, 33, 26);
+                border: 0;
+                padding: 0;
+                color: white;
+                border-radius: 2px;
+            }
+
+            .language-json {
+                font-family: Courier, monospace;
+                white-space: pre;
+                background-color: rgb(27, 33, 26);
+                color: white;
+                padding: 5px;
+                overflow-x: auto;
+                line-height: normal;
+                border-radius: 0px;
+            }
         </style>
     </head>
     <body>
-        <div class="d-flex" id="wrapper">
-            <!-- Sidebar-->
-            <div class="border-end bg-white" id="sidebar-wrapper">
-                <div class="sidebar-heading border-bottom bg-light">Tiqets Supplier API</div>
-                <div class="list-group list-group-flush">
-                    <a class="list-group-item list-group-item-action list-group-item-light p-3" href="#endpoints">Endpoints</a>
-                    <a class="list-group-item list-group-item-action list-group-item-light p-3" href="#products">Product Endpoint</a>
-                    <a class="list-group-item list-group-item-action list-group-item-light p-3" href="#availability">Availability Endpoint</a>
-                    <a class="list-group-item list-group-item-action list-group-item-light p-3" href="#reservation">Reservation Endpoint</a>
-                    <a class="list-group-item list-group-item-action list-group-item-light p-3" href="#booking">Booking Endpoint</a>
-                    <a class="list-group-item list-group-item-action list-group-item-light p-3" href="#errors">Errors</a>
-                </div>
-            </div>
-
-            <!-- Page content wrapper-->
-            <div id="page-content-wrapper">
-                <!-- Top navigation-->
-                <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
-                    <div class="container-fluid">
-                        <button class="btn btn-primary" id="sidebarToggle">Toggle Menu</button>
-                        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
-                        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                            <ul class="navbar-nav ms-auto mt-2 mt-lg-0">
-                                <li class="nav-item active"><a class="nav-link" href="https://tiqets.github.io/supplier-api/" target="_blank">API Documentation</a></li>
-                                <li>
-                                    <a class="nav-link" href="https://www.tiqets.com" target="_blank">
-                                        <img src="./docs/tiqets-logo.png" class="img-fluid" width="80px" alt="Tiqets Homepage">
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </nav>
-                <!-- Page content-->
-                <div class="container-fluid">
-                    <h1 class="mt-4">Tiqets Supplier API Migration Guide from v1 to v2</h1>
-                    <p>As of November 1st, 2022, Tiqets has released a new version of the <a href="https://tiqets.github.io/supplier-api/" target="_blank">Tiqets Supplier API</a> which is both a simplification and an extension of the specification.</p>
-                    <p>The changes in a nutshell:</p>
-                    <ul>
-                        <li>We've merged the concepts of full-day and timeslots</li>
-                        <li>We've added (limited) support for checkout questions</li>
-                        <li>We've added support for pricing</li>                        
-                    </ul>
-                    <p>Questions? Contact us at: <a href="mailto:apisupport@tiqets.com" target="_blank">apisupport@tiqets.com</a></p>
-
-                    <h2 class="mt-4" id="endpoints">Endpoints</h2>
-
-                    <p>All endpoints of version 2 are prepended with <code>/v2</code> instead of <code>/v1</code></p>
-
-                    <p>For example, to retrieve your product catalog Tiqets would perform an HTTP request as follows:</p>
-
-                    <p><kbd>GET https://your-api-domain/v2/products</kbd></p>
-
-                    <p>The following table lists the required changes to migrate all endpoints to version 2 of the specification. For a complete list of the endpoints please refer to the official <a href="https://tiqets.github.io/supplier-api/" target="_blank">Tiqets Supplier API Specification</a>.</p>
-
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th scope="col">Endpoint's Name</th>
-                                <th scope="col">HTTP Method</th>
-                                <th scope="col">Endpoint's URL in v1</th>
-                                <th scope="col">Endpoint's URL in v2</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Product Catalog</td>
-                                <td><code>GET</code></td>
-                                <td><code>/v1/products</code></td>
-                                <td><code>/v2/products</code></td>
-                            </tr>
-                            <tr>
-                                <td>Availability (variants)</td>
-                                <td><code>GET</code></td>
-                                <td><code>/v1/products/{product_id}/variants</code></td>
-                                <td><code>/v2/products/{product_id}/availability</code></td>
-                            </tr>
-                            <tr>
-                                <td>Availability (timeslots)</td>
-                                <td><code>GET</code></td>
-                                <td><code>/v1/products/{product_id}/timeslots</code></td>
-                                <td><code>/v2/products/{product_id}/availability</code></td>
-                            </tr>
-                            <tr>
-                                <td>Reservation</td>
-                                <td><code>POST</code></td>
-                                <td><code>/v1/products/{product_id}/reservation</code></td>
-                                <td><code>/v2/products/{product_id}/reservation</code></td>
-                            </tr>
-                            <tr>
-                                <td>Booking</td>
-                                <td><code>POST</code></td>
-                                <td><code>/v1/booking</code></td>
-                                <td><code>/v2/booking</code></td>
-                            </tr>
-                            <tr>
-                                <td>Cancellation</td>
-                                <td><code>DELETE</code></td>
-                                <td><code>/v1/booking</code></td>
-                                <td><code>/v2/booking</code></td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <h3 class="mt-4" id="products">Product Catalog Endpoint</h3>
-
-                    <p>The product catalog endpoint MUST be implemented by a v2-complaint API implementation.</p>
-
-                    <p>For details and examples please refer to the official <a href="https://tiqets.github.io/supplier-api/#tag/Product-Catalog/operation/getProducts" target="_blank">Product Endpoint Documentation</a>.</p>
-
-                    <h4 class="mt-4">Changes Affecting the Endpoint's Requests</h4>
-
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th scope="col">Query Parameter</th>
-                                <th scope="col">Type of Change</th>
-                                <th scope="col">v1</th>
-                                <th scope="col">v2</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>                                
-                                <td><code>use_timeslots</code></td>
-                                <td><span class="badge text-bg-danger">removed</span></td>
-                                <td><span class="badge text-bg-success">optional</span></td>
-                                <td><span class="badge text-bg-danger">deleted</span></td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-
-                    <h4 class="mt-4">Changes Affecting the Endpoint's Response</h4>
-
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th scope="col">Field</th>
-                                <th scope="col">Type of Change</th>
-                                <th scope="col">v1</th>
-                                <th scope="col">v2</th>
-                                <th scope="col">Description</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>                                
-                                <td><code>max_tickets_per_order</code></td>
-                                <td><span class="badge text-bg-danger">added</span></td>
-                                <td><span class="badge text-bg-info">N/A </span></td>
-                                <td><span class="badge text-bg-success">optional</span></td>
-                                <td>
-                                    <p>Specify the maximum amount of tickets that can be added to a single order. The absence of this field will mean that the product doesn't have such limits</p>
-                                </td>
-                            </tr>
-                            <tr>                                
-                                <td><code>required_visitor_data</code></td>
-                                <td><span class="badge text-bg-danger">added</span></td>
-                                <td><span class="badge text-bg-info">N/A </span></td>
-                                <td><span class="badge text-bg-success">optional</span></td>
-                                <td>
-                                    <p>A list of additional data that is required from each visitor (<code>full name</code>, <code>email</code>, <code>phone</code>, <code>address</code>, <code>passport id</code>, <code>date of birth</code>)</p>
-                                </td>
-                            </tr>
-                            <tr>                                
-                                <td><code>required_order_data</code></td>
-                                <td><span class="badge text-bg-danger">added</span></td>
-                                <td><span class="badge text-bg-info">N/A </span></td>
-                                <td><span class="badge text-bg-success">optional</span></td>
-                                <td>
-                                    <p>A list of the additional fields required to be delivered on the order level (eg. <code>pickup location</code>, <code>nationality</code>, <code>zip code</code>)</p>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <h3 class="mt-4" id="availability">Availability Endpoint</h3>
-
-                    <p>For details and examples please refer to the official <a href="https://tiqets.github.io/supplier-api/#tag/Availability/operation/getAvailability" target="_blank">Availability Endpoint Documentation</a>.</p>
-
-                    <p>V2 offers a single endpoint for disclosure of availability of products with or without timeslots. Note that it's still not allowed for products to mix timeslots and full-day.</p>
-
-                    <p>In v1 Availability fetching for products with timeslots:</p>
-
-                    <p><kbd>GET https://your-api-domain/v1/products/{product-id}/timeslots</kbd></p>
-                    
-                    <p>Availability fetching for products without timeslots (full-day):</p>
-
-                    <p><kbd>GET https://your-api-domain/v1/products/{product-id}/variants</kbd></p>
-
-                    <p>In v2 Availability fetching for products with or without timeslots:</p>
-
-                    <p><kbd>GET https://your-api-domain/v2/products/{product-id}/availability</kbd></p>
-
-                    <h4 class="mt-4">Changes Affecting the Endpoint's Response</h4>
-
-                    <h5 class="mt-4">New Response Schema</h5>
-
-                    <p>The schema of the availability endpoint's response has changed. The availability's response is a <code>JSON</code> object. Each key defines an available day/timeslot, and it's specified using the format <code>YYYY-MM-DDTHH:MM</code>.</p>
-
-                    <p>An example of a valid response is:</p>
-
-                    <div class="card">
-                        <div class="card-body text-bg-light p-3">
-                            <pre class="code-snippet">
-{
-  "2022-12-19T16:30": {
-    "available_tickets": 100,
-    "variants": [
-      {
-        "id": "1",
-        "name": "Adult",
-        "available_tickets": 100,
-        "price": {
-          "face_value": "10",
-          "currency": "EUR"
-        }
-      },
-      {
-        "id": "2",
-        "name": "Child",
-        "available_tickets": 10
-      }
-    ]
-  }
-}
-                            </pre>
-                        </div>
-                    </div>
-
-                    <p>This indicates that the product has 2 available variants on "2022-12-19" at "16:30". For additional details please refer to the official documentation of the endpoint.</p>
-
-                    <p>If a product does not support timeslots then each 1st-level key in the <code>JSON</code> object MUST specify the time as <code>T00:00</code>.</p>
-
-                    <p>For example, the following is a valid availability response for a product that does not support timeslots:</p>
-
-                    <div class="card">
-                        <div class="card-body text-bg-light p-3">
-                            <pre class="code-snippet">
-{
-  "2022-12-19T00:00": {
-    "available_tickets": 100,
-    "variants": [
-      {
-        "id": "1",
-        "name": "Adult",
-        "available_tickets": 100,
-        "price": {
-          "face_value": "10",
-          "currency": "EUR"
-        }
-      },
-      {
-        "id": "2",
-        "name": "Child",
-        "available_tickets": 10
-      }
-    ]
-  }
-}
-                            </pre>
-                        </div>
-                    </div>
-
-                    <h5 class="mt-4">New price Field to Describe Variants</h5>
-
-                    <p>The schema of the response's <code>variants</code> field includes a new, optional field called <code>price</code>. The supplier may use this field to specify the price of an available variant.</p>
-
-                    <div class="alert alert-warning" role="alert">
-                        <b>Important Note</b> The presence of pricing doesn't imply that Tiqets shall ingest that price information. Only if the requirements for price ingestion are met then price ingestion may be enabled for certain products. Criteria currently are the type of agreement between the supplier and Tiqets and whether all variants carry the same commission percentage.
-                    </div>
-
-                    <p>The schema of the <code>price</code> field is as follows:</p>
-
-                    <div class="card">
-                        <div class="card-body text-bg-light p-3">
-                            <pre class="code-snippet">
-{
-  "face_value": string,
-  "currency": string
-}
-                            </pre>
-                        </div>
-                    </div>
-
-                    <p>For example, a valid value for the <code>variants</code> field could be:</p>
-
-                    <div class="card">
-                        <div class="card-body text-bg-light p-3 text-secondary">
-                            <pre class="code-snippet">
-{
-  "variants": [
-      {
-        "id": "1",
-        "name": "Adult",
-        "available_tickets": 100,
-        "price": {
-          "face_value": "10.99",
-          "currency": "EUR"
-        }
-      }
-   ]
-}
-                            </pre>
-                        </div>
-                    </div>
-
-                    <h3 class="mt-4" id="reservation">Reservation Endpoint</h3>
-                    
-                    <p>For details and examples please refer to the official <a href="https://tiqets.github.io/supplier-api/#tag/Availability/operation/getAvailability" target="_blank">Reservation Endpoint Documentation</a>.</p>
-
-                    <h4 class="mt-4">Changes Affecting the Endpoint's Requests</h4>
-
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th scope="col">Field</th>
-                                <th scope="col">Type of Change</th>
-                                <th scope="col">v1</th>
-                                <th scope="col">v2</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>                                
-                                <td><code>datetime</code></td>
-                                <td><span class="badge text-bg-danger">added</span></td>
-                                <td><span class="badge text-bg-info">N/A</span></td>
-                                <td><span class="badge text-bg-danger">required</span></td>
-                            </tr>
-
-                            <tr>                                
-                                <td><code>timeslot_id</code></td>
-                                <td><span class="badge text-bg-danger">removed</span></td>
-                                <td><code>timeslot_id</code></td>
-                                <td><span class="badge text-bg-danger">N/A</span></td>
-                            </tr>
-                            <tr>                                
-                                <td><code>date</code></td>
-                                <td><span class="badge text-bg-danger">removed</span></td>
-                                <td><code>date</code></td>
-                                <td><span class="badge text-bg-danger">N/A</span></td>
-                            </tr>
-                            <tr>                                
-                                <td><code>required_order_data</code></td>
-                                <td><span class="badge text-bg-danger">added</span></td>
-                                <td><span class="badge text-bg-info">N/A</span></td>
-                                <td><code>required_order_data</code></td>
-                            </tr>
-                            <tr>                                
-                                <td><code>required_visitor_data</code></td>
-                                <td><span class="badge text-bg-danger">added</span></td>
-                                <td><span class="badge text-bg-info">N/A</span></td>
-                                <td><code>required_visitor_data</code></td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <h3 class="mt-4" id="booking">Booking Endpoint</h3>
-                    
-                    <p>For details and examples please refer to the official <a href="https://tiqets.github.io/supplier-api/#tag/Booking/operation/booking" target="_blank">Booking Endpoint Documentation</a>.</p>
-
-                    <h4 class="mt-4">Changes Affecting the Endpoint's Requests</h4>
-
-                    <p>V2 supports an optional <code>HTTP</code> header named <code>TIQETS-TEST-ORDER</code>. This header is used by the integration test tool to make a booking request and give you the opportunity to mark the booking as a test booking.</p>
-
-                    <div class="alert alert-warning" role="alert">
-                        <b>Important</b>: Your implementation MUST respond with a valid <code>HTTP</code> response and MUST mark the booking as a test booking in their internal systems.
-                    </div>
-
-                    <h4 class="mt-4">Changes Affecting the Endpoint's Response</h4>
-
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th scope="col">Field</th>
-                                <th scope="col">Type of Change</th>
-                                <th scope="col">v1</th>
-                                <th scope="col">v2</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>                                
-                                <td><code>barcode_position</code></td>
-                                <td><span class="badge text-bg-danger">renamed</span></td>
-                                <td><code>barcode_position</code></td>
-                                <td><code>barcode_scope</code></td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <h2 class="mt-4" id="errors">Errors</h2>
-
-                    <p>In API v2 some error codes have been deprecated. Make sure to update your implementation accordingly.</p>
-
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th scope="col">Endpoint</th>
-                                <th scope="col">Error Code</th>
-                                <th scope="col">v1</th>
-                                <th scope="col">v2</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>                                
-                                <td>Availability</td>
-                                <td><code>2009</code></td>
-                                <td><span class="badge text-bg-success">present</span></td>
-                                <td><span class="badge text-bg-danger">removed</span></td>
-                            </tr>
-                            <tr>                                
-                                <td>Reservation</td>
-                                <td><code>2006</code></td>
-                                <td><span class="badge text-bg-success">present</span></td>
-                                <td><span class="badge text-bg-danger">removed</span></td>
-                            </tr>
-                            <tr>                                
-                                <td>Reservation</td>
-                                <td><code>2010</code></td>
-                                <td><span class="badge text-bg-success">present</span></td>
-                                <td><span class="badge text-bg-danger">removed</span></td>
-                            </tr>
-                            <tr>                                
-                                <td>Reservation</td>
-                                <td><code>1003</code></td>
-                                <td><span class="badge text-bg-info">N/A</span></td>
-                                <td><span class="badge text-bg-danger">new</span></td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <p>Please refer to the <a href="https://tiqets.github.io/supplier-api/" target="_blank">Official API Documentation</a> for a full list of the error codes supported in v2.</p>
-
-                </div>
-            </div>
+        <div class="container-fluid">
+            <div id="apimigration"></div>
         </div>
-        <!-- Bootstrap core JS-->
+        <script src="https://cdn.jsdelivr.net/npm/showdown@2.1.0/dist/showdown.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.1/dist/jquery.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-        <!-- Core theme JS-->
-        <script src="./docs/js/scripts.js"></script>
+        <script>
+            $( document ).ready(function() {
+                $.get(
+                    "MIGRATION.md",
+                    function( data ) {
+                        var converter = new showdown.Converter({
+                            'omitExtraWLInCodeBlocks': true,
+                            'parseImgDimensions': true,
+                            'simplifiedAutoLink': true,
+                            'tables': true,
+                            'literalMidWordUnderscores': true,
+                            'strikethrough': true,
+                            'smoothLivePreview': true,
+                            'tasklists': true,
+                            'ghCompatibleHeaderId': true,
+                            'moreStyling': true,
+                        });
+                        var html = converter.makeHtml(data);
+                        $("#apimigration").html(html);
+                    }
+                )
+            });
+        </script>
     </body>
 </html>
