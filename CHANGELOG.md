@@ -30,7 +30,7 @@
 - Each variant might return information about the current price via the optional attribute `price`.
 - Add a new (optional) attribute `price` to every `Variant` object in the `/v2/availability` endpoint's response. The `Price`
   object has the following fields:
-  - `face_value`: `string`
+  - `amount`: `string`
   - `currency`: `string`
   
   See the endpoint's documentation for examples.

@@ -56,7 +56,7 @@ class Product:
 @dataclass
 class VariantPrice:
     currency: str
-    face_value: str
+    amount: str
 
 
 @dataclass
