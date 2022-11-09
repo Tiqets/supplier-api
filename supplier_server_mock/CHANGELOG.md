@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.1
+
+- Rename `face_value` to `amount` in availability data generator
+
 ## 2.0.0
 
 - add support for the Supplier API v2.0

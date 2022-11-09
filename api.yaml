@@ -278,13 +278,13 @@ paths:
                           name: Adult
                           available_tickets: 100
                           price:
-                            face_value: "10"
+                            amount: "10"
                             currency: EUR
                         - id: "2"
                           name: Child
                           available_tickets: 10
                           price:
-                            face_value: "5.75"
+                            amount: "5.75"
                             currency: EUR
                     2022-12-19T"17:30":
                       available_tickets: 63
@@ -293,13 +293,13 @@ paths:
                           name: Adult
                           available_tickets: 53
                           price:
-                            face_value: "10"
+                            amount: "10"
                             currency: EUR
                         - id: "2"
                           name: Child
                           available_tickets: 10
                           price:
-                            face_value: "5.75"
+                            amount: "5.75"
                             currency: EUR
                     "2022-12-20T11:00":
                       available_tickets: 100
@@ -308,13 +308,13 @@ paths:
                           name: Adult
                           available_tickets: 100
                           price:
-                            face_value: "10"
+                            amount: "10"
                             currency: EUR
                         - id: "2"
                           name: Child
                           available_tickets: 10
                           price:
-                            face_value: "5.75"
+                            amount: "5.75"
                             currency: EUR
                     "2022-12-20T16:30":
                       available_tickets: 100
@@ -323,13 +323,13 @@ paths:
                           name: Adult
                           available_tickets: 100
                           price:
-                            face_value: "10"
+                            amount: "10"
                             currency: EUR
                         - id: "2"
                           name: Child
                           available_tickets: 10
                           price:
-                            face_value: "5.75"
+                            amount: "5.75"
                             currency: EUR
                     2022-12-20T"17:30":
                       available_tickets: 63
@@ -338,13 +338,13 @@ paths:
                           name: Adult
                           available_tickets: 53
                           price:
-                            face_value: "10"
+                            amount: "10"
                             currency: EUR
                         - id: "2"
                           name: Child
                           available_tickets: 10
                           price:
-                            face_value: "5.75"
+                            amount: "5.75"
                             currency: EUR
                 single_timeslot:
                   summary: Available variants for a product with a recurring single timeslot
@@ -359,13 +359,13 @@ paths:
                           name: Adult
                           available_tickets: 14
                           price:
-                            face_value: "10"
+                            amount: "10"
                             currency: EUR
                         - id: "2"
                           name: Child
                           available_tickets: 10
                           price:
-                            face_value: "5.75"
+                            amount: "5.75"
                             currency: EUR
                 non_timeslotted:
                   summary: Available vriants for a product without timeslots
@@ -377,13 +377,13 @@ paths:
                           name: Adult
                           available_tickets: 82
                           price:
-                            face_value: "4.20"
+                            amount: "4.20"
                             currency: EUR
                         - id: "2"
                           name: Child
                           available_tickets: 10
                           price:
-                            face_value: "2.10"
+                            amount: "2.10"
                             currency: EUR
                 past_date:
                   summary: Availability response for a single date in the past
@@ -401,13 +401,13 @@ paths:
                           name: Adult
                           available_tickets: 53
                           price:
-                            face_value: "10"
+                            amount: "10"
                             currency: EUR
                         - id: "2"
                           name: Child
                           available_tickets: 10
                           price:
-                            face_value: "5.75"
+                            amount: "5.75"
                             currency: EUR
                 no_availability:
                   summary: No available variants
@@ -856,7 +856,7 @@ components:
         price:
           type: object
           properties:
-            face_value:
+            amount:
               type: string
               example: "3.20"
             currency:

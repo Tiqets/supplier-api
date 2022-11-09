@@ -90,7 +90,7 @@ An example of a valid response is:
         "name": "Adult",
         "available_tickets": 100,
         "price": {
-          "face_value": "10",
+          "amount": "10",
           "currency": "EUR"
         }
       },
@@ -121,7 +121,7 @@ For example, the following is a valid availability response for a product that d
         "name": "Adult",
         "available_tickets": 100,
         "price": {
-          "face_value": "10",
+          "amount": "10",
           "currency": "EUR"
         }
       },
@@ -145,7 +145,7 @@ The schema of the `price` field is as follows:
 
 ```json
 {
-  "face_value": string,
+  "amount": string,
   "currency": string
 }
 ```
@@ -160,7 +160,7 @@ For example, a valid value for the `variants` field could be:
         "name": "Adult",
         "available_tickets": 100,
         "price": {
-          "face_value": "10.99",
+          "amount": "10.99",
           "currency": "EUR"
         }
       }

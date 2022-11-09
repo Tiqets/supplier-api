@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.0.1
+
+- In the (optional) `price` object of the `Variant` object in the `/v2/availability` endpoint's response,
+  rename the `face_value` field `amount`
+
 ## 2.0.0
 
 #### Product Catalog

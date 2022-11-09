@@ -74,7 +74,7 @@ def get_availability(product_id: str, day: date) -> Dict:
                         "available_tickets": Int,
                         "price": {
                             "currency": "",
-                            "face_value": ""
+                            "amount": ""
                         }
                     },
                     {
@@ -83,7 +83,7 @@ def get_availability(product_id: str, day: date) -> Dict:
                         "available_tickets": Int,
                         "price": {
                             "currency": "",
-                            "face_value": ""
+                            "amount": ""
                         }
                     }
                 ]
@@ -125,7 +125,7 @@ def get_availability(product_id: str, day: date) -> Dict:
                 'name': variant,
                 'available_tickets': variant_max_ticket,
                 'price': {
-                    'face_value': f"{Decimal('12.45') * i}",
+                    'amount': f"{Decimal('12.45') * i}",
                     'currency': PRODUCTS_CURRENCIES.get(product_id, 'EUR'),
                 },
             })

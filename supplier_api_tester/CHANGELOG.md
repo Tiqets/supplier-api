@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.1
+
+- Rename VariantPrice's field `face_value` to `amount` 
+
 ## 2.0.0
 
 - add support for API v2.0.0
