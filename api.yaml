@@ -204,7 +204,15 @@ paths:
       description: |
         The availability endpoint lists the variants (commonly referred to by the industry as "Ticket Types" or
         "Discounts") that are currently available. The endpoint also indicates the number of available variants (or
-        tickets) and, optionally, ther price and currency.
+        tickets) and, optionally, their price, defined by the `amount` and the `currency`. The `amount` **MUST** be the 
+        price that a customer would pay at the venue’s ticket office and **MUST** include any applicable local taxes.
+        
+        ### Note on pricing information:
+        ```
+        Pricing information MAY be ingested by Tiqets if, and only if, the prerequisites are met which currently are:
+        - The supplier and Tiqets have signed a specific type of agreement
+        - All variants carry the same commission percentage, according to the agreement
+        ```
 
         The returned values must be up-to-date and always in the local time of the product/venue.
 
