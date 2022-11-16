@@ -294,7 +294,7 @@ paths:
                           price:
                             amount: "5.75"
                             currency: EUR
-                    2022-12-19T"17:30":
+                    2022-12-19T17:30:
                       available_tickets: 63
                       variants:
                         - id: "1"
@@ -339,16 +339,16 @@ paths:
                           price:
                             amount: "5.75"
                             currency: EUR
-                    2022-12-20T"17:30":
+                    2022-12-20T17:30:
                       available_tickets: 63
                       variants:
-                        - id: "1"
+                        - id: "0UUHZR0LlE"
                           name: Adult
                           available_tickets: 53
                           price:
                             amount: "10"
                             currency: EUR
-                        - id: "2"
+                        - id: "x5kggQPJNl"
                           name: Child
                           available_tickets: 10
                           price:
@@ -513,15 +513,15 @@ paths:
                     - variant_id: "1"
                       quantity: 2
                       required_visitor_data:
-                        - FULL_NAME: "Jon Snow"
-                          EMAIL: "jon@snow.com"
-                        - FULL_NAME: "Tyrion Lannister"
-                          EMAIL: "tyrion@casterlyrock.com"
+                        - full_name: "Jon Snow"
+                          email: "jon@snow.com"
+                        - full_name: "Tyrion Lannister"
+                          email: "tyrion@casterlyrock.com"
                     - variant_id: "2"
                       quantity: 1
                       required_visitor_data:
-                          - FULL_NAME: "Arya Stark"
-                            EMAIL: "arya@north.com"
+                          - full_name: "Arya Stark"
+                            email: "arya@north.com"
                   customer:
                     first_name: "Jon"
                     last_name: "Snow"
@@ -529,7 +529,7 @@ paths:
                     phone: "+48 555 555 555"
                     country: "nl"
                   required_order_data:
-                    PICKUP_LOCATION: "Porto Azzurro Aparthotel, Malta"
+                    pickup_location: "Porto Azzurro Aparthotel, Malta"
                     NATIONALITY: "USA"
               with_additional_order_data:
                 summary: Reservation with additional order data but without visitor data.
@@ -547,7 +547,7 @@ paths:
                     phone: "+48 555 555 555"
                     country: "nl"
                   required_order_data:
-                    PICKUP_LOCATION: "Porto Azzurro Aparthotel, Malta"
+                    pickup_location: "Porto Azzurro Aparthotel, Malta"
                     NATIONALITY: "USA"
         required: true
       responses:
@@ -567,7 +567,7 @@ paths:
             |---------------------|---------------------------------|------------------------------------------------------------------------------------------------------|
             |                1000 | Missing argument                | Required argument `ATTRIBUTE_NAME` was not found.                                                    |
             |                1001 | Missing product                 | Product with ID `ID_NUMBER` doesn't exist.                                                           |
-            |                1003 | Missing required fields         | Eg. Missing data for field `FULL_NAME`.                                                              |
+            |                1003 | Missing required fields         | Eg. Missing data for field `full_name`.                                                              |
             |                2000 | Malformed datetime              | Incorrect date format, please use the `YYYY-MM-DDTHH:MM`.                                            |
             |                2002 | Invalid datetime                | The given date/time doesn't exist in the system.                                                     |
             |                2003 | Wrong variant ID                | Given variant id doesn't belong to the given date/timeslot.                                          |
@@ -727,8 +727,8 @@ components:
           is_refundable: true
           cutoff_time: 120
           required_visitor_data:
-            - FULL_NAME
-            - PHONE
+            - full_name
+            - phone
         - id: "UFJELUEtMTIzNDU="
           name: "Children Tour"
           description: "Special individual tour for children"
@@ -736,10 +736,10 @@ components:
           is_refundable: true
           cutoff_time: 120
           required_visitor_data:
-            - FULL_NAME
+            - full_name
           required_order_data:
-            - PICKUP_LOCATION
-            - PASSPORT_ID
+            - pickup_location
+            - passport_id
         - id: "564456326"
           name: "Adults Tour"
           description: "Special individual tour for adults"
@@ -747,9 +747,9 @@ components:
           is_refundable: true
           cutoff_time: 60
           required_order_data:
-            - PICKUP_LOCATION
-            - PASSPORT_ID
-            - FLIGHT_NUMBER
+            - pickup_location
+            - passport_id
+            - flight_number
       items:
         $ref: "#/components/schemas/Product"
     Product:
@@ -804,33 +804,33 @@ components:
           field:
             type: string
             enum:
-              - FULL_NAME
-              - EMAIL
-              - PHONE
-              - ADDRESS
-              - PASSPORT_ID
-              - DATE_OF_BIRTH
+              - full_name
+              - email
+              - phone
+              - address
+              - passport_id
+              - date_of_birth
           value:
             type: string
     RequiredOrderData:
         type: string
         description: List of additional fields that need to be provided while creating a reservation. Each field will contain a piece of information about the whole order.
         enum:
-          - PICKUP_LOCATION
+          - pickup_location
           - DROPOFF_LOCATION
           - NATIONALITY
-          - FLIGHT_NUMBER
-          - PASSPORT_ID
+          - flight_number
+          - passport_id
     RequiredVisitorData:
         type: string
         description: List of additional fields that need to be provided while creating a reservation. Each field will contain a piece of information about each visitor.
         enum:
-          - FULL_NAME
-          - EMAIL
-          - PHONE
-          - ADDRESS
-          - PASSPORT_ID
-          - DATE_OF_BIRTH
+          - full_name
+          - email
+          - phone
+          - address
+          - passport_id
+          - date_of_birth
     AvailabilityResponse:
       type: object
       additionalProperties:
@@ -884,12 +884,12 @@ components:
           example: 2
         required_visitor_data:
           type: array
-          description: Additional details per visitor. Will only be provided if Tiqets has enabled these questions in their checkout flow for this product so be sure to list all the requred fields in the product catalog. Each object in the array will contain the number of required fields per visitor. So if the product requires both `FULL_NAME` and `EMAIL` and `quantity` equals 2 then 2 objects with 2 fields each will be provided (see the payload example).
+          description: Additional details per visitor. Will only be provided if Tiqets has enabled these questions in their checkout flow for this product so be sure to list all the requred fields in the product catalog. Each object in the array will contain the number of required fields per visitor. So if the product requires both `full_name` and `email` and `quantity` equals 2 then 2 objects with 2 fields each will be provided (see the payload example).
           items:
             type: object
             additionalProperties:
               type: string
-              description: "Accepted fields are: `FULL_NAME`, `EMAIL`, `PHONE`, `ADDRESS`, `PASSPORT_ID` and `DATE_OF_BIRTH`. See the payload in the examples."
+              description: "Accepted fields are: `full_name`, `email`, `phone`, `address`, `passport_id` and `date_of_birth`. See the payload in the examples."
     Reservation:
       type: object
       required:
@@ -937,7 +937,7 @@ components:
           description: The additional fields that need to be provided while creating a reservation. Each field will contain a piece of information about the whole order.
           additionalProperties:
             type: string
-            description: "Accepted fields are: `PICKUP_LOCATION`, `DROPOFF_LOCATION`, `NATIONALITY`, `FLIGHT_NUMBER` and `PASSPORT_ID`. See the payload in the examples."
+            description: "Accepted fields are: `pickup_location`, `DROPOFF_LOCATION`, `NATIONALITY`, `flight_number` and `passport_id`. See the payload in the examples."
     ReservationResponse:
       type: object
       properties:
