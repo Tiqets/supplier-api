@@ -713,6 +713,7 @@ components:
           name: "Example Tour"
           use_timeslots: true
           is_refundable: true
+          provides_pricing: true
           cutoff_time: 30
         - id: "345678900-345678"
           name: "Example Museum"
@@ -735,6 +736,7 @@ components:
           description: "Special individual tour for children"
           use_timeslots: true
           is_refundable: true
+          provides_pricing: true
           cutoff_time: 120
           required_visitor_data:
             - full_name
@@ -760,6 +762,7 @@ components:
         - name
         - use_timeslots
         - is_refundable
+        - provides_pricing
         - cutoff_time
       properties:
         id:
@@ -780,6 +783,9 @@ components:
         is_refundable:
           type: boolean
           description: Indicates whether the product supports cancellations or not.
+        provides_pricing:
+          type: boolean
+          description: Indicates whether the product supports pricing or not.
         cutoff_time:
           type: integer
           description: The minimum number of minutes before the booking date/time for the cancellation to be successful. 0 means no limit.
