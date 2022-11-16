@@ -507,6 +507,27 @@ paths:
                     email: "jon@snow.com"
                     phone: "+48 555 555 555"
                     country: "nl"
+              with_pricing:
+                summary: Reservation with pricing
+                value:
+                  datetime: "2022-12-26T17:00"
+                  tickets:
+                    - variant_id: "BzYBUNze"
+                      quantity: 2
+                      price:
+                        amount: "10"
+                        currency: "EUR"
+                    - variant_id: "kKdTxEC"
+                      quantity: 1
+                      price:
+                        amount: "8"
+                        currency: "EUR"
+                  customer:
+                    first_name: "Jon"
+                    last_name: "Snow"
+                    email: "jon@snow.com"
+                    phone: "+48 555 555 555"
+                    country: "nl"
               with_additional_data:
                 summary: Reservation containing additional data
                 value:
@@ -894,6 +915,15 @@ components:
         quantity:
           type: integer
           example: 2
+        price:
+          type: object
+          properties:
+            amount:
+              type: string
+              example: "4.20"
+            currency:
+              type: string
+              example: EUR
         required_visitor_data:
           type: array
           description: Additional details per visitor. Will only be provided if Tiqets has enabled these questions in their checkout flow for this product so be sure to list all the requred fields in the product catalog. Each object in the array will contain the number of required fields per visitor. So if the product requires both `full_name` and `email` and `quantity` equals 2 then 2 objects with 2 fields each will be provided (see the payload example).
