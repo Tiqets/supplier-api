@@ -697,6 +697,7 @@ paths:
             |                2009  | Incorrect date            | The booking can only be cancelled `HOURS` hours in advance                 |
             |                3003  | Already Cancelled         | The booking with ID `BOOKING_ID` has already been cancelled                |
             |                3004  | Cancellation not possible | The booking can't be cancelled, the product doesn't allow cancellations    |
+            |                3004  | Tickets already used      | The booking can't be cancelled because tickets have already been used      |
           content:
             application/json:
               schema:
