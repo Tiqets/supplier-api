@@ -234,10 +234,12 @@ paths:
 
         The same data structure is used regardless of whether the product supports timeslots or not.
 
-        **Important**: if a product doesn't support tmeslots then the date/time keys in the availability response must set the timeslot
+        **Important**: 
+        - if a product doesn't support timeslots then the date/time keys in the availability response must set the timeslot
         component to `T00:00`; eg. `2022-12-24T00:00`. On the other hand, if a product supports timeslots then every
         date/time key in the response must include a valid time component, eg. `2022-12-24T15:30`. For more details see
         the examples in the specification of the endpoint's response.
+        - If a product has `provides_pricing=true`, then this endpoint should return the price for each variant.
 
         Dates in the past must be supported without returning an error response. Instead, the endpoint should return an
         availability response without data for the dates in the past.
@@ -720,6 +722,7 @@ components:
           description: "All day entry to Example Museum."
           use_timeslots: false
           is_refundable: true
+          provides_pricing: false
           cutoff_time: 0
           max_tickets_per_order: 20
         - id: "PRD-564456324"
@@ -727,6 +730,7 @@ components:
           description: "Special individual tour"
           use_timeslots: true
           is_refundable: true
+          provides_pricing: false
           cutoff_time: 120
           required_visitor_data:
             - full_name
@@ -748,6 +752,7 @@ components:
           description: "Special individual tour for adults"
           use_timeslots: true
           is_refundable: true
+          provides_pricing: false
           cutoff_time: 60
           required_order_data:
             - pickup_location
