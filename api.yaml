@@ -282,13 +282,13 @@ paths:
                     "2022-12-19T16:30":
                       available_tickets: 100
                       variants:
-                        - id: "1"
+                        - id: "TcGz7ywywiWYURHEWD"
                           name: Adult
                           available_tickets: 100
                           price:
                             amount: "10"
                             currency: EUR
-                        - id: "2"
+                        - id: "hKl5sDxP9ont4GB"
                           name: Child
                           available_tickets: 10
                           price:
@@ -297,13 +297,13 @@ paths:
                     2022-12-19T17:30:
                       available_tickets: 63
                       variants:
-                        - id: "1"
+                        - id: "wimaiHdm"
                           name: Adult
                           available_tickets: 53
                           price:
                             amount: "10"
                             currency: EUR
-                        - id: "2"
+                        - id: "erHVNJ7KlKU4Oi4F"
                           name: Child
                           available_tickets: 10
                           price:
@@ -312,13 +312,13 @@ paths:
                     "2022-12-20T11:00":
                       available_tickets: 100
                       variants:
-                        - id: "1"
+                        - id: "Gtcs6N50GnSLr6J9"
                           name: Adult
                           available_tickets: 100
                           price:
                             amount: "10"
                             currency: EUR
-                        - id: "2"
+                        - id: "HKBI861tu"
                           name: Child
                           available_tickets: 10
                           price:
@@ -327,13 +327,13 @@ paths:
                     "2022-12-20T16:30":
                       available_tickets: 100
                       variants:
-                        - id: "1"
+                        - id: "BeT4xQB"
                           name: Adult
                           available_tickets: 100
                           price:
                             amount: "10"
                             currency: EUR
-                        - id: "2"
+                        - id: "el7Lje"
                           name: Child
                           available_tickets: 10
                           price:
@@ -363,13 +363,13 @@ paths:
                     "2022-12-29T11:00":
                       available_tickets: 14
                       variants:
-                        - id: "1"
+                        - id: "hdT3Hng4vsQRSkg"
                           name: Adult
                           available_tickets: 14
                           price:
                             amount: "10"
                             currency: EUR
-                        - id: "2"
+                        - id: "pJEZw2DtlaKEWi"
                           name: Child
                           available_tickets: 10
                           price:
@@ -381,13 +381,13 @@ paths:
                     "2022-12-19T00:00":
                       available_tickets: 92
                       variants:
-                        - id: "1"
+                        - id: "Y0J7aP1f3"
                           name: Adult
                           available_tickets: 82
                           price:
                             amount: "4.20"
                             currency: EUR
-                        - id: "2"
+                        - id: "3cSQ8i"
                           name: Child
                           available_tickets: 10
                           price:
@@ -405,13 +405,13 @@ paths:
                     "2022-12-03T11:00":
                       available_tickets: 63
                       variants:
-                        - id: "1"
+                        - id: "Zoe7zLmeWgu6pI"
                           name: Adult
                           available_tickets: 53
                           price:
                             amount: "10"
                             currency: EUR
-                        - id: "2"
+                        - id: "I9yRjJ"
                           name: Child
                           available_tickets: 10
                           price:
@@ -465,9 +465,9 @@ paths:
                 value:
                   datetime: "2022-12-26T15:30"
                   tickets:
-                    - variant_id: "1"
+                    - variant_id: "njj6LScEfpp6P"
                       quantity: 2
-                    - variant_id: "2"
+                    - variant_id: "24PV7c7O"
                       quantity: 1
                   customer:
                     first_name: "Jon"
@@ -480,9 +480,9 @@ paths:
                 value:
                   datetime: "2022-12-26T00:00"
                   tickets:
-                    - variant_id: "1"
+                    - variant_id: "TkiKZwB"
                       quantity: 2
-                    - variant_id: "2"
+                    - variant_id: "GnHe4Q3AjeJtMcM59QJV"
                       quantity: 1
                   customer:
                     first_name: "Jon"
@@ -495,9 +495,9 @@ paths:
                 value:
                   datetime: "2022-12-26T17:00"
                   tickets:
-                    - variant_id: "1"
+                    - variant_id: "BzYBUNze"
                       quantity: 2
-                    - variant_id: "2"
+                    - variant_id: "kKdTxEC"
                       quantity: 1
                   customer:
                     first_name: "Jon"
@@ -510,14 +510,14 @@ paths:
                 value:
                   datetime: "2022-12-26T15:30"
                   tickets:
-                    - variant_id: "1"
+                    - variant_id: "rLVezl2rFjo5Hxtb"
                       quantity: 2
                       required_visitor_data:
                         - full_name: "Jon Snow"
                           email: "jon@snow.com"
                         - full_name: "Tyrion Lannister"
                           email: "tyrion@casterlyrock.com"
-                    - variant_id: "2"
+                    - variant_id: "h2xK0CeEYeN7n"
                       quantity: 1
                       required_visitor_data:
                           - full_name: "Arya Stark"
@@ -536,9 +536,9 @@ paths:
                 value:
                   datetime: "2022-12-26T23:30"
                   tickets:
-                    - variant_id: "1"
+                    - variant_id: "5ZSkpJSifs"
                       quantity: 2
-                    - variant_id: "2"
+                    - variant_id: "223NF5"
                       quantity: 1
                   customer:
                     first_name: "Jon"
