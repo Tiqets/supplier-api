@@ -553,7 +553,7 @@ paths:
                     country: "nl"
                   required_order_data:
                     pickup_location: "Porto Azzurro Aparthotel, Malta"
-                    NATIONALITY: "USA"
+                    nationality: "USA"
               with_additional_order_data:
                 summary: Reservation with additional order data but without visitor data.
                 value:
@@ -571,7 +571,7 @@ paths:
                     country: "nl"
                   required_order_data:
                     pickup_location: "Porto Azzurro Aparthotel, Malta"
-                    NATIONALITY: "USA"
+                    nationality: "USA"
         required: true
       responses:
         "200":
@@ -811,7 +811,7 @@ components:
           description: Indicates whether the product supports cancellations or not.
         provides_pricing:
           type: boolean
-          description: Indicates whether the product supports pricing or not.
+          description: Indicates whether the product contains pricing or not.
         cutoff_time:
           type: integer
           description: The minimum number of minutes before the booking date/time for the cancellation to be successful. 0 means no limit.
@@ -850,8 +850,8 @@ components:
         description: List of additional fields that need to be provided while creating a reservation. Each field will contain a piece of information about the whole order.
         enum:
           - pickup_location
-          - DROPOFF_LOCATION
-          - NATIONALITY
+          - dropoff_location
+          - nationality
           - flight_number
           - passport_id
     RequiredVisitorData:
@@ -979,7 +979,7 @@ components:
           description: The additional fields that need to be provided while creating a reservation. Each field will contain a piece of information about the whole order.
           additionalProperties:
             type: string
-            description: "Accepted fields are: `pickup_location`, `DROPOFF_LOCATION`, `NATIONALITY`, `flight_number` and `passport_id`. See the payload in the examples."
+            description: "Accepted fields are: `pickup_location`, `dropoff_location`, `nationality`, `flight_number` and `passport_id`. See the payload in the examples."
     ReservationResponse:
       type: object
       properties:
