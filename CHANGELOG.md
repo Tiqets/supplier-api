@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.1.0
+#### Product Catalog
+- New product fields:
+  - `provides_pricing` - each product can enable or disable pricing by setting this field to `true` or `false`.
+#### Reservation
+- New variant field
+  - `price` - each variant must provide this field when product is expected to have pricing with `provides_pricing=true` from Product Catalog.
+- `required_order_data` and `required_visitor_data` now have lower case fields instead of upper case.
+#### Booking Cancellation
+- Add a status code `3004` `Tickets already used`
+
 ## 2.0.1
 
 - In the (optional) `price` object of the `Variant` object in the `/v2/availability` endpoint's response,
@@ -37,7 +48,7 @@
   object has the following fields:
   - `face_value`: `string`
   - `currency`: `string`
-  
+
   See the endpoint's documentation for examples.
 
 #### Reservation
