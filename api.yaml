@@ -50,7 +50,7 @@ info:
 
     ### Variant
 
-    A "Variant" (in the business often called "ticket types") covers certain price points and inclusions.  
+    A "Variant" (in the business often called "ticket types") covers certain price points and inclusions.
     Each Product must offer at least 1 variant.
     Eg.:
 
@@ -82,7 +82,7 @@ info:
 
     ### Date ranges
 
-    Endpoints that support date ranges must consider those parameters to be "inclusive".  
+    Endpoints that support date ranges must consider those parameters to be "inclusive".
     This means that:
     * A range that starts on 2019-12-29 and that ends on 2019-12-31 covers 3 whole days.
     * A range that starts on 2019-12-29 and that ends on 2019-12-29 covers 1 day.
@@ -99,7 +99,7 @@ info:
 
     # Context specific errors
 
-    Each request besides the status codes can return context specific errors.  
+    Each request besides the status codes can return context specific errors.
     The HTTP status code must be ```400 - Bad request``` and the response body must contain this JSON structure:
 
     ```
@@ -165,7 +165,7 @@ info:
   contact:
     name: "Tiqets API Support"
     email: apisupport@tiqets.com
-    version: 2.0.0
+    version: 2.1.0
 tags:
   - name: Availability
     description: |
@@ -204,9 +204,9 @@ paths:
       description: |
         The availability endpoint lists the variants (commonly referred to by the industry as "Ticket Types" or
         "Discounts") that are currently available. The endpoint also indicates the number of available variants (or
-        tickets) and, optionally, their price, defined by the `amount` and the `currency`. The `amount` **MUST** be the 
+        tickets) and, optionally, their price, defined by the `amount` and the `currency`. The `amount` **MUST** be the
         price that a customer would pay at the venue’s ticket office and **MUST** include any applicable local taxes.
-        
+
         ### Note on pricing information:
         ```
         Pricing information MAY be ingested by Tiqets if, and only if, the prerequisites are met which currently are:
@@ -234,7 +234,7 @@ paths:
 
         The same data structure is used regardless of whether the product supports timeslots or not.
 
-        **Important**: 
+        **Important**:
         - if a product doesn't support timeslots then the date/time keys in the availability response must set the timeslot
         component to `T00:00`; eg. `2022-12-24T00:00`. On the other hand, if a product supports timeslots then every
         date/time key in the response must include a valid time component, eg. `2022-12-24T15:30`. For more details see
