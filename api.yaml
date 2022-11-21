@@ -1,6 +1,7 @@
 openapi: 3.0.3
 info:
   title: Tiqets Supplier API
+  version: 2.1.0
   description: |
     The Tiqets Supplier API Specification allows Tiqets' Supply Partners to connect their booking systems to Tiqets.com
     if they aren't connected already.
@@ -161,11 +162,9 @@ info:
     Python must be installed on your development environment.
 
     [![mock server screenshot](https://raw.githubusercontent.com/Tiqets/supplier-api/master/docs/mockserver.png)](https://github.com/Tiqets/supplier-api/tree/master/supplier_server_mock)
-
   contact:
     name: "Tiqets API Support"
     email: apisupport@tiqets.com
-    version: 2.1.0
 tags:
   - name: Availability
     description: |
