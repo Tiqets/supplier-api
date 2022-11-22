@@ -1,6 +1,7 @@
 openapi: 3.0.3
 info:
   title: Tiqets Supplier API
+  version: 2.1.0
   description: |
     The Tiqets Supplier API Specification allows Tiqets' Supply Partners to connect their booking systems to Tiqets.com
     if they aren't connected already.
@@ -50,7 +51,7 @@ info:
 
     ### Variant
 
-    A "Variant" (in the business often called "ticket types") covers certain price points and inclusions.  
+    A "Variant" (in the business often called "ticket types") covers certain price points and inclusions.
     Each Product must offer at least 1 variant.
     Eg.:
 
@@ -82,7 +83,7 @@ info:
 
     ### Date ranges
 
-    Endpoints that support date ranges must consider those parameters to be "inclusive".  
+    Endpoints that support date ranges must consider those parameters to be "inclusive".
     This means that:
     * A range that starts on 2019-12-29 and that ends on 2019-12-31 covers 3 whole days.
     * A range that starts on 2019-12-29 and that ends on 2019-12-29 covers 1 day.
@@ -99,7 +100,7 @@ info:
 
     # Context specific errors
 
-    Each request besides the status codes can return context specific errors.  
+    Each request besides the status codes can return context specific errors.
     The HTTP status code must be ```400 - Bad request``` and the response body must contain this JSON structure:
 
     ```
@@ -161,11 +162,9 @@ info:
     Python must be installed on your development environment.
 
     [![mock server screenshot](https://raw.githubusercontent.com/Tiqets/supplier-api/master/docs/mockserver.png)](https://github.com/Tiqets/supplier-api/tree/master/supplier_server_mock)
-
   contact:
     name: "Tiqets API Support"
     email: apisupport@tiqets.com
-    version: 2.0.0
 tags:
   - name: Availability
     description: |
@@ -204,9 +203,9 @@ paths:
       description: |
         The availability endpoint lists the variants (commonly referred to by the industry as "Ticket Types" or
         "Discounts") that are currently available. The endpoint also indicates the number of available variants (or
-        tickets) and, optionally, their price, defined by the `amount` and the `currency`. The `amount` **MUST** be the 
+        tickets) and, optionally, their price, defined by the `amount` and the `currency`. The `amount` **MUST** be the
         price that a customer would pay at the venue’s ticket office and **MUST** include any applicable local taxes.
-        
+
         ### Note on pricing information:
         ```
         Pricing information MAY be ingested by Tiqets if, and only if, the prerequisites are met which currently are:
@@ -234,10 +233,12 @@ paths:
 
         The same data structure is used regardless of whether the product supports timeslots or not.
 
-        **Important**: if a product doesn't support tmeslots then the date/time keys in the availability response must set the timeslot
+        **Important**:
+        - if a product doesn't support timeslots then the date/time keys in the availability response must set the timeslot
         component to `T00:00`; eg. `2022-12-24T00:00`. On the other hand, if a product supports timeslots then every
         date/time key in the response must include a valid time component, eg. `2022-12-24T15:30`. For more details see
         the examples in the specification of the endpoint's response.
+        - If a product has `provides_pricing=true`, then this endpoint should return the price for each variant.
 
         Dates in the past must be supported without returning an error response. Instead, the endpoint should return an
         availability response without data for the dates in the past.
@@ -282,28 +283,28 @@ paths:
                     "2022-12-19T16:30":
                       available_tickets: 100
                       variants:
-                        - id: "1"
+                        - id: "TcGz7ywywiWYURHEWD"
                           name: Adult
                           available_tickets: 100
                           price:
                             amount: "10"
                             currency: EUR
-                        - id: "2"
+                        - id: "hKl5sDxP9ont4GB"
                           name: Child
                           available_tickets: 10
                           price:
                             amount: "5.75"
                             currency: EUR
-                    2022-12-19T"17:30":
+                    2022-12-19T17:30:
                       available_tickets: 63
                       variants:
-                        - id: "1"
+                        - id: "wimaiHdm"
                           name: Adult
                           available_tickets: 53
                           price:
                             amount: "10"
                             currency: EUR
-                        - id: "2"
+                        - id: "erHVNJ7KlKU4Oi4F"
                           name: Child
                           available_tickets: 10
                           price:
@@ -312,13 +313,13 @@ paths:
                     "2022-12-20T11:00":
                       available_tickets: 100
                       variants:
-                        - id: "1"
+                        - id: "Gtcs6N50GnSLr6J9"
                           name: Adult
                           available_tickets: 100
                           price:
                             amount: "10"
                             currency: EUR
-                        - id: "2"
+                        - id: "HKBI861tu"
                           name: Child
                           available_tickets: 10
                           price:
@@ -327,28 +328,28 @@ paths:
                     "2022-12-20T16:30":
                       available_tickets: 100
                       variants:
-                        - id: "1"
+                        - id: "BeT4xQB"
                           name: Adult
                           available_tickets: 100
                           price:
                             amount: "10"
                             currency: EUR
-                        - id: "2"
+                        - id: "el7Lje"
                           name: Child
                           available_tickets: 10
                           price:
                             amount: "5.75"
                             currency: EUR
-                    2022-12-20T"17:30":
+                    2022-12-20T17:30:
                       available_tickets: 63
                       variants:
-                        - id: "1"
+                        - id: "0UUHZR0LlE"
                           name: Adult
                           available_tickets: 53
                           price:
                             amount: "10"
                             currency: EUR
-                        - id: "2"
+                        - id: "x5kggQPJNl"
                           name: Child
                           available_tickets: 10
                           price:
@@ -363,13 +364,13 @@ paths:
                     "2022-12-29T11:00":
                       available_tickets: 14
                       variants:
-                        - id: "1"
+                        - id: "hdT3Hng4vsQRSkg"
                           name: Adult
                           available_tickets: 14
                           price:
                             amount: "10"
                             currency: EUR
-                        - id: "2"
+                        - id: "pJEZw2DtlaKEWi"
                           name: Child
                           available_tickets: 10
                           price:
@@ -381,13 +382,13 @@ paths:
                     "2022-12-19T00:00":
                       available_tickets: 92
                       variants:
-                        - id: "1"
+                        - id: "Y0J7aP1f3"
                           name: Adult
                           available_tickets: 82
                           price:
                             amount: "4.20"
                             currency: EUR
-                        - id: "2"
+                        - id: "3cSQ8i"
                           name: Child
                           available_tickets: 10
                           price:
@@ -405,13 +406,13 @@ paths:
                     "2022-12-03T11:00":
                       available_tickets: 63
                       variants:
-                        - id: "1"
+                        - id: "Zoe7zLmeWgu6pI"
                           name: Adult
                           available_tickets: 53
                           price:
                             amount: "10"
                             currency: EUR
-                        - id: "2"
+                        - id: "I9yRjJ"
                           name: Child
                           available_tickets: 10
                           price:
@@ -465,9 +466,9 @@ paths:
                 value:
                   datetime: "2022-12-26T15:30"
                   tickets:
-                    - variant_id: "1"
+                    - variant_id: "njj6LScEfpp6P"
                       quantity: 2
-                    - variant_id: "2"
+                    - variant_id: "24PV7c7O"
                       quantity: 1
                   customer:
                     first_name: "Jon"
@@ -480,9 +481,9 @@ paths:
                 value:
                   datetime: "2022-12-26T00:00"
                   tickets:
-                    - variant_id: "1"
+                    - variant_id: "TkiKZwB"
                       quantity: 2
-                    - variant_id: "2"
+                    - variant_id: "GnHe4Q3AjeJtMcM59QJV"
                       quantity: 1
                   customer:
                     first_name: "Jon"
@@ -495,10 +496,31 @@ paths:
                 value:
                   datetime: "2022-12-26T17:00"
                   tickets:
-                    - variant_id: "1"
+                    - variant_id: "BzYBUNze"
                       quantity: 2
-                    - variant_id: "2"
+                    - variant_id: "kKdTxEC"
                       quantity: 1
+                  customer:
+                    first_name: "Jon"
+                    last_name: "Snow"
+                    email: "jon@snow.com"
+                    phone: "+48 555 555 555"
+                    country: "nl"
+              with_pricing:
+                summary: Reservation with pricing
+                value:
+                  datetime: "2022-12-26T17:00"
+                  tickets:
+                    - variant_id: "BzYBUNze"
+                      quantity: 2
+                      price:
+                        amount: "10"
+                        currency: "EUR"
+                    - variant_id: "kKdTxEC"
+                      quantity: 1
+                      price:
+                        amount: "8"
+                        currency: "EUR"
                   customer:
                     first_name: "Jon"
                     last_name: "Snow"
@@ -510,18 +532,18 @@ paths:
                 value:
                   datetime: "2022-12-26T15:30"
                   tickets:
-                    - variant_id: "1"
+                    - variant_id: "rLVezl2rFjo5Hxtb"
                       quantity: 2
                       required_visitor_data:
-                        - FULL_NAME: "Jon Snow"
-                          EMAIL: "jon@snow.com"
-                        - FULL_NAME: "Tyrion Lannister"
-                          EMAIL: "tyrion@casterlyrock.com"
-                    - variant_id: "2"
+                        - full_name: "Jon Snow"
+                          email: "jon@snow.com"
+                        - full_name: "Tyrion Lannister"
+                          email: "tyrion@casterlyrock.com"
+                    - variant_id: "h2xK0CeEYeN7n"
                       quantity: 1
                       required_visitor_data:
-                          - FULL_NAME: "Arya Stark"
-                            EMAIL: "arya@north.com"
+                          - full_name: "Arya Stark"
+                            email: "arya@north.com"
                   customer:
                     first_name: "Jon"
                     last_name: "Snow"
@@ -529,16 +551,16 @@ paths:
                     phone: "+48 555 555 555"
                     country: "nl"
                   required_order_data:
-                    PICKUP_LOCATION: "Porto Azzurro Aparthotel, Malta"
-                    NATIONALITY: "USA"
+                    pickup_location: "Porto Azzurro Aparthotel, Malta"
+                    nationality: "USA"
               with_additional_order_data:
                 summary: Reservation with additional order data but without visitor data.
                 value:
                   datetime: "2022-12-26T23:30"
                   tickets:
-                    - variant_id: "1"
+                    - variant_id: "5ZSkpJSifs"
                       quantity: 2
-                    - variant_id: "2"
+                    - variant_id: "223NF5"
                       quantity: 1
                   customer:
                     first_name: "Jon"
@@ -547,8 +569,8 @@ paths:
                     phone: "+48 555 555 555"
                     country: "nl"
                   required_order_data:
-                    PICKUP_LOCATION: "Porto Azzurro Aparthotel, Malta"
-                    NATIONALITY: "USA"
+                    pickup_location: "Porto Azzurro Aparthotel, Malta"
+                    nationality: "USA"
         required: true
       responses:
         "200":
@@ -567,7 +589,7 @@ paths:
             |---------------------|---------------------------------|------------------------------------------------------------------------------------------------------|
             |                1000 | Missing argument                | Required argument `ATTRIBUTE_NAME` was not found.                                                    |
             |                1001 | Missing product                 | Product with ID `ID_NUMBER` doesn't exist.                                                           |
-            |                1003 | Missing required fields         | Eg. Missing data for field `FULL_NAME`.                                                              |
+            |                1003 | Missing required fields         | Eg. Missing data for field `full_name`.                                                              |
             |                2000 | Malformed datetime              | Incorrect date format, please use the `YYYY-MM-DDTHH:MM`.                                            |
             |                2002 | Invalid datetime                | The given date/time doesn't exist in the system.                                                     |
             |                2003 | Wrong variant ID                | Given variant id doesn't belong to the given date/timeslot.                                          |
@@ -697,6 +719,7 @@ paths:
             |                2009  | Incorrect date            | The booking can only be cancelled `HOURS` hours in advance                 |
             |                3003  | Already Cancelled         | The booking with ID `BOOKING_ID` has already been cancelled                |
             |                3004  | Cancellation not possible | The booking can't be cancelled, the product doesn't allow cancellations    |
+            |                3004  | Tickets already used      | The booking can't be cancelled because tickets have already been used      |
           content:
             application/json:
               schema:
@@ -712,12 +735,14 @@ components:
           name: "Example Tour"
           use_timeslots: true
           is_refundable: true
+          provides_pricing: true
           cutoff_time: 30
         - id: "345678900-345678"
           name: "Example Museum"
           description: "All day entry to Example Museum."
           use_timeslots: false
           is_refundable: true
+          provides_pricing: false
           cutoff_time: 0
           max_tickets_per_order: 20
         - id: "PRD-564456324"
@@ -725,31 +750,34 @@ components:
           description: "Special individual tour"
           use_timeslots: true
           is_refundable: true
+          provides_pricing: false
           cutoff_time: 120
           required_visitor_data:
-            - FULL_NAME
-            - PHONE
+            - full_name
+            - phone
         - id: "UFJELUEtMTIzNDU="
           name: "Children Tour"
           description: "Special individual tour for children"
           use_timeslots: true
           is_refundable: true
+          provides_pricing: true
           cutoff_time: 120
           required_visitor_data:
-            - FULL_NAME
+            - full_name
           required_order_data:
-            - PICKUP_LOCATION
-            - PASSPORT_ID
+            - pickup_location
+            - passport_id
         - id: "564456326"
           name: "Adults Tour"
           description: "Special individual tour for adults"
           use_timeslots: true
           is_refundable: true
+          provides_pricing: false
           cutoff_time: 60
           required_order_data:
-            - PICKUP_LOCATION
-            - PASSPORT_ID
-            - FLIGHT_NUMBER
+            - pickup_location
+            - passport_id
+            - flight_number
       items:
         $ref: "#/components/schemas/Product"
     Product:
@@ -759,6 +787,7 @@ components:
         - name
         - use_timeslots
         - is_refundable
+        - provides_pricing
         - cutoff_time
       properties:
         id:
@@ -779,6 +808,9 @@ components:
         is_refundable:
           type: boolean
           description: Indicates whether the product supports cancellations or not.
+        provides_pricing:
+          type: boolean
+          description: Indicates whether the product contains pricing or not.
         cutoff_time:
           type: integer
           description: The minimum number of minutes before the booking date/time for the cancellation to be successful. 0 means no limit.
@@ -804,33 +836,33 @@ components:
           field:
             type: string
             enum:
-              - FULL_NAME
-              - EMAIL
-              - PHONE
-              - ADDRESS
-              - PASSPORT_ID
-              - DATE_OF_BIRTH
+              - full_name
+              - email
+              - phone
+              - address
+              - passport_id
+              - date_of_birth
           value:
             type: string
     RequiredOrderData:
         type: string
         description: List of additional fields that need to be provided while creating a reservation. Each field will contain a piece of information about the whole order.
         enum:
-          - PICKUP_LOCATION
-          - DROPOFF_LOCATION
-          - NATIONALITY
-          - FLIGHT_NUMBER
-          - PASSPORT_ID
+          - pickup_location
+          - dropoff_location
+          - nationality
+          - flight_number
+          - passport_id
     RequiredVisitorData:
         type: string
         description: List of additional fields that need to be provided while creating a reservation. Each field will contain a piece of information about each visitor.
         enum:
-          - FULL_NAME
-          - EMAIL
-          - PHONE
-          - ADDRESS
-          - PASSPORT_ID
-          - DATE_OF_BIRTH
+          - full_name
+          - email
+          - phone
+          - address
+          - passport_id
+          - date_of_birth
     AvailabilityResponse:
       type: object
       additionalProperties:
@@ -882,14 +914,23 @@ components:
         quantity:
           type: integer
           example: 2
+        price:
+          type: object
+          properties:
+            amount:
+              type: string
+              example: "4.20"
+            currency:
+              type: string
+              example: EUR
         required_visitor_data:
           type: array
-          description: Additional details per visitor. Will only be provided if Tiqets has enabled these questions in their checkout flow for this product so be sure to list all the requred fields in the product catalog. Each object in the array will contain the number of required fields per visitor. So if the product requires both `FULL_NAME` and `EMAIL` and `quantity` equals 2 then 2 objects with 2 fields each will be provided (see the payload example).
+          description: Additional details per visitor. Will only be provided if Tiqets has enabled these questions in their checkout flow for this product so be sure to list all the requred fields in the product catalog. Each object in the array will contain the number of required fields per visitor. So if the product requires both `full_name` and `email` and `quantity` equals 2 then 2 objects with 2 fields each will be provided (see the payload example).
           items:
             type: object
             additionalProperties:
               type: string
-              description: "Accepted fields are: `FULL_NAME`, `EMAIL`, `PHONE`, `ADDRESS`, `PASSPORT_ID` and `DATE_OF_BIRTH`. See the payload in the examples."
+              description: "Accepted fields are: `full_name`, `email`, `phone`, `address`, `passport_id` and `date_of_birth`. See the payload in the examples."
     Reservation:
       type: object
       required:
@@ -937,7 +978,7 @@ components:
           description: The additional fields that need to be provided while creating a reservation. Each field will contain a piece of information about the whole order.
           additionalProperties:
             type: string
-            description: "Accepted fields are: `PICKUP_LOCATION`, `DROPOFF_LOCATION`, `NATIONALITY`, `FLIGHT_NUMBER` and `PASSPORT_ID`. See the payload in the examples."
+            description: "Accepted fields are: `pickup_location`, `dropoff_location`, `nationality`, `flight_number` and `passport_id`. See the payload in the examples."
     ReservationResponse:
       type: object
       properties:
