@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.1
+#### Booking Cancellation
+- Deprecate status code `3004` `Tickets already used` and replace it with `3005` `Tickets already used`. 
+
 ## 2.1.0
 #### Product Catalog
 - New product fields:

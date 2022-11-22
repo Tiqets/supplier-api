@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Tiqets Supplier API
-  version: 2.1.0
+  version: 2.1.1
   description: |
     The Tiqets Supplier API Specification allows Tiqets' Supply Partners to connect their booking systems to Tiqets.com
     if they aren't connected already.
@@ -95,7 +95,7 @@ info:
     | Status code   |                          Message                            |
     |---------------|-------------------------------------------------------------|
     |         `403` | Forbidden - Missing or incorrect API key                    |
-    |         `405` | Method Not Allowed - Incorrect method was used (`GET/POST`) |
+    |         `405` | Method Not Allowed - Incorrect HTTP method was used         |
     |         `500` | Service Error - Please report that                          |
 
     # Context specific errors
@@ -719,7 +719,7 @@ paths:
             |                2009  | Incorrect date            | The booking can only be cancelled `HOURS` hours in advance                 |
             |                3003  | Already Cancelled         | The booking with ID `BOOKING_ID` has already been cancelled                |
             |                3004  | Cancellation not possible | The booking can't be cancelled, the product doesn't allow cancellations    |
-            |                3004  | Tickets already used      | The booking can't be cancelled because tickets have already been used      |
+            |                3005  | Tickets already used      | The booking can't be cancelled because tickets have already been used      |
           content:
             application/json:
               schema:
