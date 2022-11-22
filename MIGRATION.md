@@ -86,7 +86,7 @@ An example of a valid response is:
     "available_tickets": 100,
     "variants": [
       {
-        "id": "1",
+        "id": "TcGz7ywywiWYURHEWD",
         "name": "Adult",
         "available_tickets": 100,
         "price": {
@@ -95,7 +95,7 @@ An example of a valid response is:
         }
       },
       {
-        "id": "2",
+        "id": "hKl5sDxP9ont4GB",
         "name": "Child",
         "available_tickets": 10
       }
@@ -117,7 +117,7 @@ For example, the following is a valid availability response for a product that d
     "available_tickets": 100,
     "variants": [
       {
-        "id": "1",
+        "id": "Y0J7aP1f3",
         "name": "Adult",
         "available_tickets": 100,
         "price": {
@@ -126,7 +126,7 @@ For example, the following is a valid availability response for a product that d
         }
       },
       {
-        "id": "2",
+        "id": "3cSQ8i",
         "name": "Child",
         "available_tickets": 10
       }
@@ -206,9 +206,10 @@ In API v2 some error codes have been deprecated. Make sure to update your implem
 
 | Endpoint         | Error Code   | v1          | v2          |
 | -----------      | -----------  | ----------- | ----------- |
-| **Availability** | `2009`       | present     | removed     |
-| **Reservation**  | `2006`       | present     | removed     |
-| **Reservation**  | `2010`       | present     | removed     |
-| **Reservation**  | `1003`       | N/A         | new         |
+| `/v2/products/{product_id}/availability` | `2009`       | present     | removed     |
+| `/v2/products/{product_id}/reservation`  | `2006`       | present     | removed     |
+| `/v2/products/{product_id}/reservation`  | `2010`       | present     | removed     |
+| `/v2/products/{product_id}/reservation`  | `1003`       | N/A         | new         |
+| `/v2/booking/{booking_id}`      | `3005`       | N/A         | new         |
 
 Please refer to the [Official API Documentation](https://tiqets.github.io/supplier-api/) for a full list of the error codes supported in v2.
