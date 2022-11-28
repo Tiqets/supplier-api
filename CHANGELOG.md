@@ -3,7 +3,7 @@
 ## 2.2.0
 #### Reservation
 - Update the endpoint's response to accept an optional `pricing` attribute that MUST be provided when the client makes a 
-reservation for a product whose attribute `provide_pricing=true`. 
+reservation for a product whose attribute `provides_pricing=true`. 
 
 ## 2.1.1
 #### Booking Cancellation
