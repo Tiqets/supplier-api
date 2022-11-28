@@ -182,6 +182,15 @@ For details and examples please refer to the official [Reservation Endpoint Docu
 | `required_order_data`         | added        |  N/A        |  `required_order_data`        |
 | `required_visitor_data`         | added        |  N/A        |  `required_visitor_data`     |
 
+#### Changes Affecting the Endpoint's Response
+
+| Field          | Type of Change | v1             | v2           |
+| -----------    | -----------    | -----------    | -----------  |
+| `pricing`      | added          |  N/A           |  optional    |
+
+If a product provides pricing information, ie. the product's attribute `provides_pricing=true`, then the response to a 
+reservation request for that product MUST include the attribute `pricing` with prices for all the variants in the 
+reservation. 
 
 ### Booking
 
