@@ -8,10 +8,13 @@ from requests.models import Response
 from supplier_api_tester.v2.client import client
 from supplier_api_tester.v2.exceptions import FailedTest
 from supplier_api_tester.v2.models import ApiError, DailyVariants, TestResult
+from supplier_api_tester.v2.models import Product
 from supplier_api_tester.v2.utils.adapters import (
     get_api_error,
     parse_availability_variants,
 )
+from supplier_api_tester.v2.utils.catalog import get_catalog
+from supplier_api_tester.v2.utils.catalog import product_provides_pricing
 from supplier_api_tester.v2.utils.errors import check_api_error
 from supplier_api_tester.v2.utils.date import get_tomorrow
 
@@ -65,27 +68,6 @@ def huge_date_range(api_url, api_key, product_id, endpoint, version=2):
         'end': end.isoformat(),
     })
     return TestResult()
-
-
-# TODO this no longer needed in v2 because the API error 2009 was removed. Check that the response is not 2009 error
-def empty_availability(api_url, api_key, product_id, endpoint, version=2):
-    """Checking availability that is supposed to be empty"""
-    today = datetime.utcnow().date()
-    start = today + timedelta(days=300)
-    end = start + timedelta(days=1)
-
-    raw_response, response = client(f'{api_url}/v{version}/products/{product_id}/{endpoint}', api_key, {
-        'start': start.isoformat(),
-        'end': end.isoformat(),
-    })
-    if not response:
-        return TestResult()
-    return TestResult(
-        status=1,
-        message=(
-            "Skipping that test because response is not empty."
-        )
-    )
 
 
 def test_missing_api_key(api_url, api_key, product_id, endpoint, version=2):
@@ -276,17 +258,39 @@ def not_allowed_method(api_url, api_key, product_id, endpoint, version=2):
     return TestResult()
 
 
-# def test_error_for_non_timeslot_product(api_url, api_key, product_id, endpoint, version=2):
-#     '''Testing timeslot availability for non timeslot product'''
-#     tomorrow = get_tomorrow()
-#     raw_response, response = client(f'{api_url}/v{version}/products/{product_id}/{endpoint}', api_key, {
-#         'start': tomorrow.isoformat(),
-#         'end': tomorrow.isoformat(),
-#     })
-#     api_error = get_api_error(raw_response, response)
-#     expected_error = ApiError(
-#         error_code=1002,
-#         error='Timeslot product expected',
-#         message=f'Requested timeslot availability for non timeslot product ID {product_id}',
-#     )
-#     return check_api_error(raw_response, api_error, expected_error)
+def product_with_provides_pricing(api_url, api_key, product_id, endpoint, version=2):
+    """Tests that the availability response for a product whose provides_pricing attribute is True contains the `price`
+    attribute for every variant id."""
+    catalog_response: Response
+    products: List[Product]
+    catalog_response, products = get_catalog(api_url, api_key, version)
+
+    if not product_provides_pricing(product_id, products):
+        return TestResult(
+            status=1,
+            message=(
+                "Skipping the test because the product does not provide pricing."
+            )
+        )
+
+    # retrieve the availability of the product
+    days: List[DailyVariants]
+    tomorrow = get_tomorrow()
+    days, raw_response = get_availability(
+        api_url,
+        api_key,
+        product_id,
+        version,
+        tomorrow,
+        tomorrow,
+    )
+
+    for day in days:
+        for variant in day.variants:
+            if not variant.price:
+                raise FailedTest(
+                    message=f'Product {product_id} provides pricing but the availability does not include the price attribute for every variant.',
+                    response=raw_response,
+                )
+
+    return TestResult()

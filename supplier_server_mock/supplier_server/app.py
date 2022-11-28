@@ -8,6 +8,8 @@ import werkzeug
 
 import arrow
 from flask import Flask, request, jsonify
+
+from .utils import product_provides_pricing
 from .auth import authorization_header
 from .validation import date_range_validator
 from . import constants, error_handlers, exceptions, utils
@@ -146,12 +148,17 @@ def reservation(product_id: str):
     expires_at = arrow.utcnow().shift(minutes=30)
     reservation_date = datetime.fromisoformat(day.isoformat() + " " + timeslot)
 
-    return jsonify(
-        {
-            'reservation_id': utils.encode_reservation_id(expires_at, tickets, product_id, reservation_date),
-            'expires_at': expires_at.isoformat(),
-        }
-    )
+    reservation_response = {
+        'reservation_id': utils.encode_reservation_id(expires_at, tickets, product_id, reservation_date),
+        'expires_at': expires_at.isoformat(),
+    }
+
+    if product_provides_pricing(product_id):
+        reservation_response['unit_price'] = {}
+        for variant in product_availability.get(timeslot_availability_key, {}).get('variants', []):
+            reservation_response['unit_price'][variant['id']] = variant['price']
+
+    return jsonify(reservation_response)
 
 
 @app.route('/v2/booking', methods=['POST'])
@@ -218,6 +225,13 @@ def cancel_booking(booking_id):
             3004,
             'Cancellation not possible',
             'The booking cannot be cancelled, the product does not allow cancellations',
+        )
+
+    if product['_tickets_already_used']:
+        raise exceptions.BadRequest(
+            3005,
+            'Tickets already used',
+            'The booking cannot be cancelled because tickets have already been used',
         )
 
     booking_for_time = datetime.fromisoformat(booked_for).replace(tzinfo=timezone.utc)

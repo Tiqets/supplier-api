@@ -2,6 +2,7 @@
 # then they should be done under a single test case.
 
 from datetime import datetime, timedelta, timezone
+from typing import Dict
 from typing import List
 
 import requests
@@ -10,7 +11,12 @@ from supplier_api_tester.v2.client import client
 from supplier_api_tester.v2.decorators import test_wrapper
 from supplier_api_tester.v2.exceptions import FailedTest
 from supplier_api_tester.v2.models import TestResult, ApiError
+from ..models import Product
+from ..models import Reservation
+from ..models import Response
 from ..utils.adapters import get_api_error
+from ..utils.catalog import get_catalog
+from ..utils.catalog import product_provides_pricing
 from ..utils.date import get_tomorrow
 from ..utils.adapters import get_reservation
 from ..utils.errors import check_api_error
@@ -233,4 +239,34 @@ def test_reservation(api_url, api_key, product_id, version=2):
             message='Reservation should be held at least 15 minutes.',
             response=raw_response,
         )
+    return TestResult()
+
+
+@test_wrapper
+def test_reservation_with_unit_prices(api_url, api_key, product_id, version=2):
+    """Testing reservation for product with provide_pricing=True"""
+    url = f'{api_url}/v{version}/products/{product_id}/reservation'
+    slot = get_reservation_slot(api_url, api_key, product_id)
+    json_payload: Dict = get_payload_for_reservation(api_url, api_key, product_id, slot)
+    raw_response, response = client(url, api_key, method=requests.post, json_payload=json_payload)
+    reservation: Reservation = get_reservation(raw_response, response)
+    catalog_response: Response
+    products: List[Product]
+    catalog_response, products = get_catalog(api_url, api_key, version)
+
+    if not product_provides_pricing(product_id, products):
+        return TestResult(
+            status=1,
+            message=(
+                "Skipping the test because the product does not provide pricing."
+            )
+        )
+
+    for variant_id in set(ticket.get('variant_id') for ticket in json_payload.get('tickets')):
+        if variant_id not in reservation.unit_price:
+            raise FailedTest(
+                message=f'Product {product_id} provides pricing but the reservation response does not include unit_price.',
+                response=raw_response,
+            )
+
     return TestResult()

@@ -121,6 +121,7 @@ def products_printer(products: List[Product]) -> None:
             'Cutoff time',
             'Required Additional Order Data',
             'Required Additional Visitors Data',
+            'Provides Pricing',
         ]
     ]
     rows.extend([
@@ -132,6 +133,7 @@ def products_printer(products: List[Product]) -> None:
             p.cutoff_time,
             ','.join(p.required_order_data) if p.required_order_data else '',
             ','.join(p.required_visitor_data) if p.required_visitor_data else '',
+            p.provides_pricing,
         ] for p in products]
     )
     table = AsciiTable(rows)

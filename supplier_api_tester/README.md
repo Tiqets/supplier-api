@@ -31,15 +31,15 @@ Listing the products catalog:
 
 ```sh
 supplier_products -u 'http://localhost:8000' -k 'secret' -v 2
-+---------+---------+-----------+------------+-------------+-------------------------------------------+-----------------------------------+
-| ID      | Name    | Timeslots | Refundable | Cutoff time | Required Additional Order Data            | Required Additional Visitors Data |
-+---------+---------+-----------+------------+-------------+-------------------------------------------+-----------------------------------+
-| A300-FX | A300-FX | True      | True       | 24          |                                           |                                   |
-| A400-FX | A400-FX | True      | False      | 0           | PICKUP_LOCATION,PASSPORT_ID               | FULL_NAME,PHONE                   |
-| A500-FX | A500-FX | False     | True       | 0           | PICKUP_LOCATION,PASSPORT_ID,FLIGHT_NUMBER |                                   |
-| A550-FX | A550-FX | False     | True       | 10          |                                           | EMAIL,DATE_OF_BIRTH               |
-| A600-FX | A600-FX | False     | False      | 0           | NATIONALITY                               |                                   |
-+---------+---------+-----------+------------+-------------+-------------------------------------------+-----------------------------------+
++---------+---------+-----------+------------+-------------+-------------------------------------------+-----------------------------------+-----------------------------------+
+| ID      | Name    | Timeslots | Refundable | Cutoff time | Required Additional Order Data            | Required Additional Visitors Data | Provides Pricing                  |
++---------+---------+-----------+------------+-------------+-------------------------------------------+-----------------------------------+-----------------------------------+
+| A300-FX | A300-FX | True      | True       | 24          |                                           |                                   | True                              |
+| A400-FX | A400-FX | True      | False      | 0           | PICKUP_LOCATION,PASSPORT_ID               | FULL_NAME,PHONE                   | False                             |
+| A500-FX | A500-FX | False     | True       | 0           | PICKUP_LOCATION,PASSPORT_ID,FLIGHT_NUMBER |                                   | True                              |
+| A550-FX | A550-FX | False     | True       | 10          |                                           | EMAIL,DATE_OF_BIRTH               | False                             |
+| A600-FX | A600-FX | False     | False      | 0           | NATIONALITY                               |                                   | False                             |
++---------+---------+-----------+------------+-------------+-------------------------------------------+-----------------------------------+-----------------------------------+
 ```
 
 Listing the products catalog for API v1.x:
@@ -99,37 +99,39 @@ supplier_tester -u 'http://localhost:8000' -k 'secret' -p 'A500-FX' -v 2
 AVAILABILITY TESTS
 ------------------
 
-+----+-------+-----------------------------------------------+
-| #  | Time  | Test name                                     |
-+----+-------+-----------------------------------------------+
-| 1  | 28ms  | Checking availability for the next 30 days    |
-| 2  | 4ms   | Request without API-Key                       |
-| 3  | 9ms   | Request with incorrect API-Key                |
-| 4  | 23ms  | Testing missing argument errors               |
-| 5  | 8ms   | Testing availability for non existing product |
-| 6  | 19ms  | Checking incorrect date format                |
-| 7  | 8ms   | Checking incorrect range error                |
-| 8  | 8ms   | Checking past date                            |
-| 9  | 112ms | Checking huge date range                      |
-| 10 | 23ms  | Testing methods that are not allowed          |
-+----+-------+-----------------------------------------------+
++----+-------+---------------------------------------------------+
+| #  | Time  | Test name                                         |
++----+-------+---------------------------------------------------+
+| 1  | 28ms  | Checking availability for the next 30 days        |
+| 2  | 4ms   | Request without API-Key                           |
+| 3  | 9ms   | Request with incorrect API-Key                    |
+| 4  | 23ms  | Testing missing argument errors                   |
+| 5  | 8ms   | Testing availability for non existing product     |
+| 6  | 19ms  | Checking incorrect date format                    |
+| 7  | 8ms   | Checking incorrect range error                    |
+| 8  | 8ms   | Checking past date                                |
+| 9  | 112ms | Checking huge date range                          |
+| 10 | 23ms  | Testing methods that are not allowed              |
+| 11 | 13ms  | Testing optional price attribute in availability  |
++----+-------+---------------------------------------------------+
 
 -----------------
 RESERVATION TESTS
 -----------------
 
-+---+------+------------------------------------------------+
-| # | Time | Test name                                      |
-+---+------+------------------------------------------------+
-| 1 | 5ms  | Request without API-Key                        |
-| 2 | 6ms  | Request with incorrect API-Key                 |
-| 3 | 33ms | Testing missing argument errors                |
-| 4 | 29ms | Reserving tickets for at least 1 variant       |
-| 5 | 30ms | Testing reservation for non-existing product   |
-| 6 | 47ms | Testing reservation with incorrect date format |
-| 7 | 21ms | Testing reservation with past date             |
-| 8 | 34ms | Testing methods that are not allowed           |
-+---+------+------------------------------------------------+
++---+------+-----------------------------------------------------------+
+| # | Time | Test name                                                 |
++---+------+-----------------------------------------------------------+
+| 1 | 5ms  | Request without API-Key                                   |
+| 2 | 6ms  | Request with incorrect API-Key                            |
+| 3 | 33ms | Testing missing argument errors                           |
+| 4 | 29ms | Reserving tickets for at least 1 variant                  |
+| 5 | 30ms | Testing reservation for non-existing product              |
+| 6 | 47ms | Testing reservation with incorrect date format            |
+| 7 | 21ms | Testing reservation with past date                        |
+| 8 | 34ms | Testing methods that are not allowed                      |
+| 9 | 50ms | Testing reservation for product with provide_pricing=True |
++---+------+-----------------------------------------------------------+
 
 -------------
 BOOKING TESTS
