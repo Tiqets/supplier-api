@@ -564,7 +564,7 @@ paths:
                   value:
                     expires_at: "2019-06-30T19:45:00+00:00"
                     reservation_id: "78940"
-                    pricing:
+                    unit_price:
                       "TcGz7ywywiWYURHEWD":
                         amount: "10"
                         currency: "EUR"
@@ -978,7 +978,7 @@ components:
           format: date-time
           example: "2019-06-30T19:45:00+00:00"
           description: Datetime string in format YYYY-MM-DDThh:mm:ss+00:00. Timezone is always UTC
-        pricing:
+        unit_price:
           type: object
           description: |
             If the product's `provides_pricing = true` then the response MUST specify the prices of all the
@@ -987,7 +987,7 @@ components:
             type: object
             properties:
               amount:
-                description: The price the customer will pay for this variant.
+                description: The unit price the customer will pay for a single ticket of this variant.
                 type: string
                 example: "4.20"
               currency:
