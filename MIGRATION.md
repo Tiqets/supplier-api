@@ -189,7 +189,7 @@ For details and examples please refer to the official [Reservation Endpoint Docu
 | `unit_price`      | added          |  N/A           |  optional    |
 
 If a product provides pricing information, ie. the product's attribute `provides_pricing=true`, then the response to a 
-reservation request for that product MUST include the attribute `pricing` with prices for all the variants in the 
+reservation request for that product MUST include the attribute `price_unit` with prices for all the variants in the 
 reservation. 
 
 ### Booking
