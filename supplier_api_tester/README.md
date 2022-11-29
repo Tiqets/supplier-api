@@ -35,10 +35,10 @@ supplier_products -u 'http://localhost:8000' -k 'secret' -v 2
 | ID      | Name    | Timeslots | Refundable | Cutoff time | Required Additional Order Data            | Required Additional Visitors Data | Provides Pricing                  |
 +---------+---------+-----------+------------+-------------+-------------------------------------------+-----------------------------------+-----------------------------------+
 | A300-FX | A300-FX | True      | True       | 24          |                                           |                                   | True                              |
-| A400-FX | A400-FX | True      | False      | 0           | PICKUP_LOCATION,PASSPORT_ID               | FULL_NAME,PHONE                   | False                             |
-| A500-FX | A500-FX | False     | True       | 0           | PICKUP_LOCATION,PASSPORT_ID,FLIGHT_NUMBER |                                   | True                              |
-| A550-FX | A550-FX | False     | True       | 10          |                                           | EMAIL,DATE_OF_BIRTH               | False                             |
-| A600-FX | A600-FX | False     | False      | 0           | NATIONALITY                               |                                   | False                             |
+| A400-FX | A400-FX | True      | False      | 0           | pickup_location,passport_id               | full_name,phone                   | False                             |
+| A500-FX | A500-FX | False     | True       | 0           | pickup_location,passport_id,flight_number |                                   | True                              |
+| A550-FX | A550-FX | False     | True       | 10          |                                           | email,date_of_birth               | False                             |
+| A600-FX | A600-FX | False     | False      | 0           | nationality                               |                                   | False                             |
 +---------+---------+-----------+------------+-------------+-------------------------------------------+-----------------------------------+-----------------------------------+
 ```
 
