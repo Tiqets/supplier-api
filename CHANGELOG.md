@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.2.0
+#### Reservation
+- Update the endpoint's response to accept an optional `unit_price` attribute that MUST be provided when the client makes a 
+reservation for a product whose attribute `provides_pricing=true`. 
+
 ## 2.1.1
 #### Booking Cancellation
 - Deprecate status code `3004` `Tickets already used` and replace it with `3005` `Tickets already used`. 

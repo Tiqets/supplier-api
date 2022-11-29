@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Tiqets Supplier API
-  version: 2.1.1
+  version: 2.2.0
   description: |
     The Tiqets Supplier API Specification allows Tiqets' Supply Partners to connect their booking systems to Tiqets.com
     if they aren't connected already.
@@ -506,27 +506,6 @@ paths:
                     email: "jon@snow.com"
                     phone: "+48 555 555 555"
                     country: "nl"
-              with_pricing:
-                summary: Reservation with pricing
-                value:
-                  datetime: "2022-12-26T17:00"
-                  tickets:
-                    - variant_id: "BzYBUNze"
-                      quantity: 2
-                      price:
-                        amount: "10"
-                        currency: "EUR"
-                    - variant_id: "kKdTxEC"
-                      quantity: 1
-                      price:
-                        amount: "8"
-                        currency: "EUR"
-                  customer:
-                    first_name: "Jon"
-                    last_name: "Snow"
-                    email: "jon@snow.com"
-                    phone: "+48 555 555 555"
-                    country: "nl"
               with_additional_data:
                 summary: Reservation containing additional data
                 value:
@@ -579,6 +558,24 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ReservationResponse"
+              examples:
+                product_with_pricing:
+                  summary: A reservation for a product with provides_pricing set to true
+                  value:
+                    expires_at: "2019-06-30T19:45:00+00:00"
+                    reservation_id: "78940"
+                    unit_price:
+                      "TcGz7ywywiWYURHEWD":
+                        amount: "10"
+                        currency: "EUR"
+                      "hKl5sDxP9ont4GB":
+                        amount: "5.75"
+                        currency: "EUR"
+                product_without_pricing:
+                  summary: A reservation for a product with provides_pricing set to false
+                  value:
+                    expires_at: "2019-06-30T19:45:00+00:00"
+                    reservation_id: "78940"
         "400":
           description: |
             Bad request
@@ -914,15 +911,6 @@ components:
         quantity:
           type: integer
           example: 2
-        price:
-          type: object
-          properties:
-            amount:
-              type: string
-              example: "4.20"
-            currency:
-              type: string
-              example: EUR
         required_visitor_data:
           type: array
           description: Additional details per visitor. Will only be provided if Tiqets has enabled these questions in their checkout flow for this product so be sure to list all the requred fields in the product catalog. Each object in the array will contain the number of required fields per visitor. So if the product requires both `full_name` and `email` and `quantity` equals 2 then 2 objects with 2 fields each will be provided (see the payload example).
@@ -990,6 +978,22 @@ components:
           format: date-time
           example: "2019-06-30T19:45:00+00:00"
           description: Datetime string in format YYYY-MM-DDThh:mm:ss+00:00. Timezone is always UTC
+        unit_price:
+          type: object
+          description: |
+            If the product's `provides_pricing = true` then the response MUST specify the prices of all the
+            variants in the reservation. If `provides_pricing = false` then this attribute can be omitted from the response.
+          additionalProperties:
+            type: object
+            properties:
+              amount:
+                description: The unit price the customer will pay for a single ticket of this variant.
+                type: string
+                example: "4.20"
+              currency:
+                type: string
+                example: "EUR"
+                description: The currency to interpret the `amount` attribute.
     Booking:
       type: object
       required:
