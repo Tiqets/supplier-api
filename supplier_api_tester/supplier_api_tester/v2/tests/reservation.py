@@ -245,11 +245,6 @@ def test_reservation(api_url, api_key, product_id, version=2):
 @test_wrapper
 def test_reservation_with_unit_prices(api_url, api_key, product_id, version=2):
     """Testing reservation for product with provide_pricing=True"""
-    url = f'{api_url}/v{version}/products/{product_id}/reservation'
-    slot = get_reservation_slot(api_url, api_key, product_id)
-    json_payload: Dict = get_payload_for_reservation(api_url, api_key, product_id, slot)
-    raw_response, response = client(url, api_key, method=requests.post, json_payload=json_payload)
-    reservation: Reservation = get_reservation(raw_response, response)
     catalog_response: Response
     products: List[Product]
     catalog_response, products = get_catalog(api_url, api_key, version)
@@ -262,10 +257,29 @@ def test_reservation_with_unit_prices(api_url, api_key, product_id, version=2):
             )
         )
 
+    url = f'{api_url}/v{version}/products/{product_id}/reservation'
+    slot = get_reservation_slot(api_url, api_key, product_id)
+    json_payload: Dict = get_payload_for_reservation(api_url, api_key, product_id, slot)
+    raw_response, response = client(url, api_key, method=requests.post, json_payload=json_payload)
+    reservation: Reservation = get_reservation(raw_response, response)
+
+    # we expect the reservation response to have unit_price
+    if not reservation.unit_price:
+        raise FailedTest(
+            message=f'Product {product_id} provides pricing but the response does not include unit_price.',
+            response=raw_response,
+        )
+
     for variant_id in set(ticket.get('variant_id') for ticket in json_payload.get('tickets')):
         if variant_id not in reservation.unit_price:
             raise FailedTest(
-                message=f'Product {product_id} provides pricing but the reservation response does not include unit_price.',
+                message=f'Product {product_id} provides pricing but the response is missing unit price for a variant',
+                response=raw_response,
+            )
+
+        if not reservation.unit_price.get(variant_id).currency or not reservation.unit_price.get(variant_id).amount:
+            raise FailedTest(
+                message=f'Product {product_id} provides pricing but the response is missing unit price (amount, currency)',
                 response=raw_response,
             )
 
