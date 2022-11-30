@@ -49,6 +49,7 @@ class Product:
     description: Optional[str]
     is_refundable: bool
     cutoff_time: int
+    provides_pricing: bool
     required_order_data: Optional[List[str]] = None
     required_visitor_data: Optional[List[str]] = None
 
@@ -64,7 +65,7 @@ class Variant:
     id: str
     name: str
     available_tickets: int
-    price: VariantPrice
+    price: Optional[VariantPrice] = None
 
 
 @dataclass
@@ -95,6 +96,7 @@ class ApiError:
 class Reservation:
     reservation_id: str
     expires_at: datetime
+    unit_price: Optional[Dict[str, VariantPrice]] = None
 
 
 @dataclass

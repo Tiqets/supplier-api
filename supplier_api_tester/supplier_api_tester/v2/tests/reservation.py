@@ -2,6 +2,7 @@
 # then they should be done under a single test case.
 
 from datetime import datetime, timedelta, timezone
+from typing import Dict
 from typing import List
 
 import requests
@@ -10,7 +11,12 @@ from supplier_api_tester.v2.client import client
 from supplier_api_tester.v2.decorators import test_wrapper
 from supplier_api_tester.v2.exceptions import FailedTest
 from supplier_api_tester.v2.models import TestResult, ApiError
+from ..models import Product
+from ..models import Reservation
+from ..models import Response
 from ..utils.adapters import get_api_error
+from ..utils.catalog import get_catalog
+from ..utils.catalog import product_provides_pricing
 from ..utils.date import get_tomorrow
 from ..utils.adapters import get_reservation
 from ..utils.errors import check_api_error
@@ -19,7 +25,7 @@ from ..utils.reservation import get_reservation_slot
 
 
 @test_wrapper
-def test_missing_api_key(api_url, api_key, product_id, version=2):
+def test_missing_api_key(api_url: str, api_key: str, product_id: str, version: int = 2):
     """Request without API-Key"""
     raw_response, _ = client(f'{api_url}/v{version}/products/{product_id}/reservation', api_key, method=requests.post, json_payload={}, headers={})
 
@@ -42,7 +48,7 @@ def test_missing_api_key(api_url, api_key, product_id, version=2):
 
 
 @test_wrapper
-def test_incorrect_api_key(api_url, api_key, product_id, version=2):
+def test_incorrect_api_key(api_url: str, api_key: str, product_id: str, version: int = 2):
     """Request with incorrect API-Key"""
     raw_response, _ = client(f'{api_url}/v{version}/products/{product_id}/reservation', api_key, method=requests.post, json_payload={}, headers={
         'API-Key': 'NON-EXISTING-API-KEY',
@@ -67,7 +73,7 @@ def test_incorrect_api_key(api_url, api_key, product_id, version=2):
 
 
 @test_wrapper
-def test_missing_argument_error(api_url, api_key, product_id, version=2):
+def test_missing_argument_error(api_url: str, api_key: str, product_id: str, version: int = 2):
     """Testing missing argument errors"""
     tomorrow = get_tomorrow()
     warnings: List[str] = []
@@ -139,7 +145,7 @@ def test_missing_argument_error(api_url, api_key, product_id, version=2):
 
 
 @test_wrapper
-def test_error_for_non_existing_product(api_url, api_key, product_id, version=2):
+def test_error_for_non_existing_product(api_url: str, api_key: str, product_id: str, version: int = 2):
     """Testing reservation for non-existing product"""
     url = f'{api_url}/v{version}/products/NON-EXISTING-PRODUCT-ID/reservation'
     slot = get_reservation_slot(api_url, api_key, product_id)
@@ -156,7 +162,7 @@ def test_error_for_non_existing_product(api_url, api_key, product_id, version=2)
 
 
 @test_wrapper
-def test_incorrect_date_format(api_url, api_key, product_id, version=2):
+def test_incorrect_date_format(api_url: str, api_key: str, product_id: str, version: int = 2):
     """Testing reservation with incorrect date format"""
     url = f'{api_url}/v{version}/products/{product_id}/reservation'
     bad_date_format = '05/05/2020'
@@ -175,7 +181,7 @@ def test_incorrect_date_format(api_url, api_key, product_id, version=2):
 
 
 @test_wrapper
-def test_past_date(api_url, api_key, product_id, version=2):
+def test_past_date(api_url: str, api_key: str, product_id: str, version: int = 2):
     """Testing reservation with past date"""
     url = f'{api_url}/v{version}/products/{product_id}/reservation'
     slot = get_reservation_slot(api_url, api_key, product_id)
@@ -194,7 +200,7 @@ def test_past_date(api_url, api_key, product_id, version=2):
 
 
 @test_wrapper
-def test_not_allowed_method(api_url, api_key, product_id, version=2):
+def test_not_allowed_method(api_url: str, api_key: str, product_id: str, version: int = 2):
     """Testing methods that are not allowed"""
     url = f'{api_url}/v{version}/products/{product_id}/reservation'
     slot = get_reservation_slot(api_url, api_key, product_id)
@@ -211,7 +217,7 @@ def test_not_allowed_method(api_url, api_key, product_id, version=2):
 
 
 @test_wrapper
-def test_reservation(api_url, api_key, product_id, version=2):
+def test_reservation(api_url: str, api_key: str, product_id: str, version: int = 2):
     """Reserving tickets for at least 1 variant"""
     url = f'{api_url}/v{version}/products/{product_id}/reservation'
     slot = get_reservation_slot(api_url, api_key, product_id)
@@ -233,4 +239,48 @@ def test_reservation(api_url, api_key, product_id, version=2):
             message='Reservation should be held at least 15 minutes.',
             response=raw_response,
         )
+    return TestResult()
+
+
+@test_wrapper
+def test_reservation_with_unit_prices(api_url: str, api_key: str, product_id: str, version: int = 2):
+    """Testing reservation for product with provide_pricing=True"""
+    catalog_response: Response
+    products: List[Product]
+    catalog_response, products = get_catalog(api_url, api_key, version)
+
+    if not product_provides_pricing(product_id, products):
+        return TestResult(
+            status=1,
+            message=(
+                "Skipping the test because the product does not provide pricing."
+            )
+        )
+
+    url = f'{api_url}/v{version}/products/{product_id}/reservation'
+    slot = get_reservation_slot(api_url, api_key, product_id)
+    json_payload: Dict = get_payload_for_reservation(api_url, api_key, product_id, slot)
+    raw_response, response = client(url, api_key, method=requests.post, json_payload=json_payload)
+    reservation: Reservation = get_reservation(raw_response, response)
+
+    # we expect the reservation response to have unit_price
+    if not reservation.unit_price:
+        raise FailedTest(
+            message=f'Product {product_id} provides pricing but the response does not include unit_price.',
+            response=raw_response,
+        )
+
+    for variant_id in set(ticket.get('variant_id') for ticket in json_payload.get('tickets')):
+        if variant_id not in reservation.unit_price:
+            raise FailedTest(
+                message=f'Product {product_id} provides pricing but the response is missing unit price for a variant',
+                response=raw_response,
+            )
+
+        if not reservation.unit_price.get(variant_id).currency or not reservation.unit_price.get(variant_id).amount:
+            raise FailedTest(
+                message=f'Product {product_id} provides pricing but the response is missing unit price (amount, currency)',
+                response=raw_response,
+            )
+
     return TestResult()

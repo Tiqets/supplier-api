@@ -6,10 +6,12 @@ PRODUCTS = [
         'is_refundable': True,
         'cutoff_time': 24,
         'max_tickets_per_order': 10,
+        'provides_pricing': True,
         # but these fields are not part of spec...
         '_ticket_content_type': 'CODE128',
         '_cancelled_bookings': {},
-        '_timeslot_available_tickets_as_sum': True  # available tickets is the sum among all variants
+        '_timeslot_available_tickets_as_sum': True,  # available tickets is the sum among all variants
+        '_tickets_already_used': False,
     },
     {
         'id': 'A400-FX',
@@ -19,11 +21,13 @@ PRODUCTS = [
         'is_refundable': False,
         'cutoff_time': 0,
         'max_tickets_per_order': 10,
-        'required_visitor_data': ['FULL_NAME', 'PHONE'],
-        'required_order_data': ['PICKUP_LOCATION', 'PASSPORT_ID'],
+        'provides_pricing': False,
+        'required_visitor_data': ['full_name', 'phone'],
+        'required_order_data': ['pickup_location', 'passport_id'],
         '_ticket_content_type': 'CODE128',
         '_cancelled_bookings': {},
-        '_timeslot_available_tickets_as_sum': False
+        '_timeslot_available_tickets_as_sum': False,
+        '_tickets_already_used': False,
     },
     {
         'id': 'A500-FX',
@@ -33,10 +37,12 @@ PRODUCTS = [
         'is_refundable': True,
         'cutoff_time': 0,
         'max_tickets_per_order': 25,
-        'required_order_data': ['PICKUP_LOCATION', 'PASSPORT_ID', 'FLIGHT_NUMBER'],
+        'provides_pricing': True,
+        'required_order_data': ['pickup_location', 'passport_id', 'flight_number'],
         '_ticket_content_type': 'CODE128',
         '_cancelled_bookings': {},
-        '_timeslot_available_tickets_as_sum': False
+        '_timeslot_available_tickets_as_sum': False,
+        '_tickets_already_used': False,
     },
     {
         'id': 'A550-FX',
@@ -45,10 +51,12 @@ PRODUCTS = [
         'description': 'Test barcode',
         'is_refundable': True,
         'cutoff_time': 10,
-        'required_visitor_data': ['EMAIL', 'DATE_OF_BIRTH'],
+        'required_visitor_data': ['email', 'date_of_birth'],
+        'provides_pricing': False,
         '_ticket_content_type': 'PDF',
         '_cancelled_bookings': {},
-        '_timeslot_available_tickets_as_sum': False
+        '_timeslot_available_tickets_as_sum': False,
+        '_tickets_already_used': False,
     },
     {
         'id': 'A600-FX',
@@ -57,10 +65,12 @@ PRODUCTS = [
         'is_refundable': False,
         'cutoff_time': 0,
         'max_tickets_per_order': 5,
-        'required_order_data': ['NATIONALITY'],
+        'required_order_data': ['nationality'],
+        'provides_pricing': False,
         '_ticket_content_type': 'CODE128',
         '_cancelled_bookings': {},
-        '_timeslot_available_tickets_as_sum': False
+        '_timeslot_available_tickets_as_sum': False,
+        '_tickets_already_used': True,
     },
 ]
 VARIANTS = ('Adult', 'Child')

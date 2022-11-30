@@ -30,6 +30,10 @@ def product_supports_timeslot(product_id: str) -> bool:
     return product_id in [p['id'] for p in PRODUCTS if p['use_timeslots']]
 
 
+def product_provides_pricing(product_id: str) -> bool:
+    return product_id in [p['id'] for p in PRODUCTS if p['provides_pricing']]
+
+
 def product_required_additional_order_data(product_id: str) -> Set[str]:
     for p in PRODUCTS:
         if p['id'] == product_id:
@@ -89,6 +93,8 @@ def get_availability(product_id: str, day: date) -> Dict:
                 ]
             }
         }
+
+        The `price` attribute is optional but MUST be present if the product's `provides_pricing` is `True`.
     """
 
     timeslots = [f'{day.isoformat()}T00:00']
@@ -103,6 +109,8 @@ def get_availability(product_id: str, day: date) -> Dict:
         return result
 
     number_of_digits = 1 if day.isoweekday() % 3 == 0 else 2
+
+    product_supports_pricing = product_provides_pricing(product_id)
 
     for timeslot in timeslots:
         max_tickets = str_to_int(day.isoformat(), number_of_digits)
@@ -120,15 +128,17 @@ def get_availability(product_id: str, day: date) -> Dict:
                 )
                 tickets_left -= variant_max_ticket
 
-            variants.append({
-                'id': str(i),
-                'name': variant,
-                'available_tickets': variant_max_ticket,
-                'price': {
+            current_variant = {
+                'id': str(i), 'name': variant, 'available_tickets': variant_max_ticket,
+            }
+
+            if product_supports_pricing:
+                current_variant['price'] = {
                     'amount': f"{Decimal('12.45') * i}",
                     'currency': PRODUCTS_CURRENCIES.get(product_id, 'EUR'),
-                },
-            })
+                }
+
+            variants.append(current_variant)
 
             if variant_max_ticket > timeslot_available_tickets:
                 timeslot_available_tickets = variant_max_ticket

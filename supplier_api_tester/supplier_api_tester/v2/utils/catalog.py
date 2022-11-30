@@ -16,3 +16,10 @@ def get_catalog(
     raw_response, response = client(url, api_key, method=requests.get, params={})
     products = get_products(raw_response, response)
     return raw_response, products
+
+
+def product_provides_pricing(product_id: str, products: List[Product]) -> bool:
+    for product in products:
+        if product.id == product_id and product.provides_pricing:
+            return True
+    return False

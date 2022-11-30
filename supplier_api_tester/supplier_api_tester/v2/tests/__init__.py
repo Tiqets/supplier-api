@@ -14,6 +14,7 @@ AVAILABILITY_TEST = (
     availability_variants.past_start_date,
     availability_variants.huge_date_range,
     availability_variants.not_allowed_method,
+    availability_variants.product_provides_pricing,
 )
 
 RESERVATION_TEST = (
@@ -25,6 +26,7 @@ RESERVATION_TEST = (
     reservation.test_incorrect_date_format,
     reservation.test_past_date,
     reservation.test_not_allowed_method,
+    reservation.test_reservation_with_unit_prices,
 )
 
 BOOKING_TEST = (
