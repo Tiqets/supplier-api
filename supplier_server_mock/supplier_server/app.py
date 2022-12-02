@@ -111,7 +111,7 @@ def reservation(product_id: str):
 
     # map variant ids to available tickets
     variant_quantity_mapping: Dict[str, int] = {
-        variant['id']: variant['available_tickets']
+        str(variant['id']): variant['available_tickets']
         for variant in product_availability.get(timeslot_availability_key, {}).get('variants', [])
     }
 
@@ -119,9 +119,10 @@ def reservation(product_id: str):
     product_requires_additional_visitors_data = utils.product_required_additional_visitors_data(product_id)
 
     for ticket in tickets:
+        ticket_variant_id = str(ticket['variant_id'])
         if (
-                not variant_quantity_mapping.get(str(ticket['variant_id']))
-                or (ticket['quantity'] > variant_quantity_mapping.get(ticket['variant_id']))
+                not variant_quantity_mapping.get(ticket_variant_id)
+                or (ticket['quantity'] > variant_quantity_mapping.get(ticket_variant_id))
         ):
             raise exceptions.BadRequest(
                 3000,
