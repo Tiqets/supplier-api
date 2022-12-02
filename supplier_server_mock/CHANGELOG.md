@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.0.3
+
+- Fix a bug in the Mock Server when handling reservation requests. For products that provide pricing
+(`provides_pricing=True`) we need to return unit prices (`unit_price`) only for the variant ids that are part of the 
+reservation.
+
 ## 2.0.2
 
 - update the server to match the API specification v2.2.0
