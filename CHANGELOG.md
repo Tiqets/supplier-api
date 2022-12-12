@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.2.2
+
+- Introduces minor syntactic and content changes to make the API specification and documentation more readable.
+
+## 2.2.1
+
+- Introduces minor syntactic changes to make the API specification and documentation more readable.
+
 ## 2.2.0
 #### Reservation
 - Update the endpoint's response to accept an optional `unit_price` attribute that MUST be provided when the client makes a 
