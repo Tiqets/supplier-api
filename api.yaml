@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Tiqets Supplier API
-  version: 2.2.1
+  version: 2.2.2
   description: |
     The Tiqets Supplier API Specification allows Tiqets' Supply Partners to connect their booking systems to Tiqets.com
     if they aren't connected already.
@@ -28,13 +28,17 @@ info:
     ### Optional endpoints
     There are no optional endpoints.
     All endpoints must be implemented.
-    Failing to do so will block integrators from being certified and allows to go to production.
+    Failing to do so will block implementers from being certified and allows to go to production.  
 
     ### Response times
-
     Maximum response times of the various API endpoints:
       * Under 5 seconds.
-      * Availability calls with a data range of just 1 day: < 200ms
+      * Availability calls with a data range of just 1 day: < 200ms  
+
+    ### Flexibility towards unexpected (new) fields
+    In the future Tiqets MAY add new fields to the specification.
+    Although we intend to keep implementers (you) updated about changes the implementation MUST NOT fail when new, unexpected data is received in the incoming requests.
+    Eg.: We MAY start sending the customer's language preference along in the payload to the reservation endpoint. That extra field MUST NOT cause your implementation to fail for syntax reasons or payload validation reasons.
 
     # Concepts
 
@@ -182,10 +186,10 @@ tags:
     description: |
       The booking endpoints allow Tiqets to create bookings by confirming reservations and, to cancel previous bookings.
 x-tagGroups:
-  - name: Supplier API Endpoints
+  - name: Endpoints
     tags:
-      - Availability
       - Product Catalog
+      - Availability
       - Reservation
       - Booking
 paths:
@@ -211,10 +215,11 @@ paths:
         - Availability
       summary: Availability
       description: |
-        The availability endpoint lists the variants (commonly referred to by the industry as "Ticket Types" or
-        "Discounts") that are currently available. The endpoint also indicates the number of available variants (or
-        tickets) and, optionally, their price, defined by the `amount` and the `currency`. The `amount` **MUST** be the
-        price that a customer would pay at the venue’s ticket office and **MUST** include any applicable local taxes.
+        The availability endpoint lists the available "variants".  
+        Variants are commonly referred to by the industry as "Ticket Types" or "Discounts".  
+
+        The endpoint also returns the available quantities and (optionally) their price, defined by the `amount` and the `currency`.  
+        The `amount` MUST represent "Face Value": The price that a customer would pay at the venue's ticket office and MUST include all applicable local taxes.
 
         ### Note on pricing information:
         ```
@@ -238,7 +243,7 @@ paths:
           - **Expected response:** Availability for the 2 months that can be provided, never an error.
 
         **Example #2 to illustrate the above**:
-          - An availability request is made for an existing product and a date range that isn't defined yet in the Supplier Partner's system.
+          - An availability request is made for an existing product and a date range that isn't defined yet in the Supplier's Booking Software system.
           - **Expected response**: An empty object (```{}```).
 
         The same data structure is used regardless of whether the product supports timeslots or not.
@@ -600,8 +605,17 @@ paths:
         - Reservation
       summary: Reservation
       description: |
-        When a customer commits to the purchase of tickets, right before he enters the payment flow, Tiqets will reserve the tickets.
-        This reservation should be held **at least 15 minutes**. If the customer confirms the booking later, Tiqets will create a new reservation and confirm it inmediately, but won't send a request to cancel the previous one.
+        The reservation data contains all data that Tiqets has available for the order.  
+        At a bare minimum that is:
+        - The ordered items and their quantities;
+        - Personal information of the main booker (possibly anonymized);
+
+        Depending on the configuration of your product the request may also include:
+        - Additional information at the booking level;
+        - Additional information at the ticket (individual visitor) level;
+        - Pricing information - The prices that Tiqets expects to be paying for the order;
+
+        Please ensure to carefully validate all input data before confirming the reservation.
       operationId: reservation
       parameters:
         - name: product_id
