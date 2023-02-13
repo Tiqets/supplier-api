@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Tiqets Supplier API
-  version: 2.2.2
+  version: 2.2.3
   description: |
     The Tiqets Supplier API Specification allows Tiqets' Supply Partners to connect their booking systems to Tiqets.com
     if they aren't connected already.
@@ -100,7 +100,7 @@ info:
     |---------------|-------------------------------------------------------------|
     |         `403` | Forbidden - Missing or incorrect API key                    |
     |         `405` | Method Not Allowed - Incorrect HTTP method was used         |
-    |         `500` | Service Error - Please report that                          |
+    |         `500` | Service Error                         |
 
     # Context specific errors
 
@@ -585,9 +585,9 @@ paths:
           description: |
             Bad request
 
-            ## Internal error codes
+            ## Context Specific Error Codes
 
-            | Internal error code |           Error           |                                         Message                                        |
+            | Error code          |           Error           |                                         Message                                        |
             |---------------------|---------------------------|----------------------------------------------------------------------------------------|
             |                1000 | Missing argument          | Required argument `ATTRIBUTE_NAME` was not found                                       |
             |                1001 | Missing product           | Product with ID `ID_NUMBER` doesn't exist                                              |
@@ -808,20 +808,21 @@ paths:
           description: |
             Bad request
 
-            ## Internal error codes
+            ## Context Specific Error Codes
 
-            | Internal error code |             Error               |                                            Message                                                   |
-            |---------------------|---------------------------------|------------------------------------------------------------------------------------------------------|
-            |                1000 | Missing argument                | Required argument `ATTRIBUTE_NAME` was not found.                                                    |
-            |                1001 | Missing product                 | Product with ID `ID_NUMBER` doesn't exist.                                                           |
-            |                1003 | Missing required fields         | Eg. Missing data for field `full_name`.                                                              |
-            |                2000 | Malformed datetime              | Incorrect date format, please use the `YYYY-MM-DDTHH:MM`.                                            |
-            |                2002 | Invalid datetime                | The given date/time doesn't exist in the system.                                                     |
-            |                2003 | Wrong variant ID                | Given variant id doesn't belong to the given date/timeslot.                                          |
-            |                2004 | Incorrect type                  | Expected `ATTRIBUTE_NAME` to be a string, got `TYPE` instead.                                        |
-            |                2005 | Invalid Value                   | Eg. The phone number must not contain dots.                                                          |
-            |                2009 | Incorrect date                  | Eg. Cannot use a date in the past or, the given date is too far ahead in the future (max 6 months).  |
-            |                3000 | Availability error              | The requested number of tickets is not longer available for a given variant and/or date/timeslot.    |
+            | Error code          |             Error               |                                                    Message                                                                       |
+            |---------------------|---------------------------------|----------------------------------------------------------------------------------------------------------------------------------|
+            |                1000 | Missing argument                | Required argument `ATTRIBUTE_NAME` was not found.                                                                                |
+            |                1001 | Missing product                 | Product with ID `ID_NUMBER` doesn't exist.                                                                                       |
+            |                1003 | Missing required fields         | Eg. Missing data for field `full_name`.                                                                                          |
+            |                2000 | Malformed datetime              | Incorrect date format, please use the `YYYY-MM-DDTHH:MM`.                                                                        |
+            |                2002 | Invalid datetime                | The given date/time doesn't exist in the system.                                                                                 |
+            |                2003 | Wrong variant ID                | Given variant id doesn't belong to the given date/timeslot.                                                                      |
+            |                2004 | Incorrect type                  | Expected `ATTRIBUTE_NAME` to be a string, got `TYPE` instead.                                                                    |
+            |                2005 | Invalid Value                   | Eg. The phone number must not contain dots.                                                                                      |
+            |                2009 | Incorrect date                  | Eg. Cannot use a date in the past or, the given date is too far ahead in the future (max 6 months).                              |
+            |                3000 | Availability error              | The requested number of tickets is not longer available for a given variant and/or date/timeslot.                                |
+            |                3006 | Insufficient funds              | The value of the order exceeds the remaining pre-paid funds                                                                      |
           content:
             application/json:
               schema:
@@ -915,14 +916,15 @@ paths:
           description: |
             Bad request
 
-            ## Internal error codes
+            ## Context Specific Error Codes
 
-            | Internal error code |          Error           |                         Message                              |
+            | Error code          |          Error           |                         Message                              |
             |---------------------|--------------------------|--------------------------------------------------------------|
             |                1000 | Missing argument         | Required argument `ATTRIBUTE_NAME` was not found             |
             |                2004 | Incorrect type           | Expected `ATTRIBUTE_NAME` to be a string, got `TYPE` instead |
             |                3001 | Reservation expired      | Your reservation has expired `MINUTES` minutes ago           |
             |                3002 | Incorrect reservation ID | Given reservation ID is incorrect                            |
+            |                3006 | Insufficient funds       | The value of the order exceeds the remaining pre-paid funds  |
           content:
             application/json:
               schema:
@@ -951,10 +953,10 @@ paths:
           description: |
             Bad request
 
-            ## Internal error codes
+            ## Context Specific Error Codes
 
-            | Internal error code |          Error             |                         Message                                            |
-            |---------------------|----------------------------|----------------------------------------------------------------------------|
+            | Error code           |          Error            |                         Message                                            |
+            |----------------------|---------------------------|----------------------------------------------------------------------------|
             |                1004  | Missing booking           | Booking with ID `ID_NUMBER` doesn't exist                                  |
             |                2009  | Incorrect date            | The booking can only be cancelled `HOURS` hours in advance                 |
             |                3003  | Already Cancelled         | The booking with ID `BOOKING_ID` has already been cancelled                |
