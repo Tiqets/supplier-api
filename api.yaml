@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Tiqets Supplier API
-  version: 2.2.2
+  version: 2.2.3
   description: |
     The Tiqets Supplier API Specification allows Tiqets' Supply Partners to connect their booking systems to Tiqets.com
     if they aren't connected already.
@@ -28,12 +28,12 @@ info:
     ### Optional endpoints
     There are no optional endpoints.
     All endpoints must be implemented.
-    Failing to do so will block implementers from being certified and allows to go to production.  
+    Failing to do so will block implementers from being certified and allows to go to production.
 
     ### Response times
     Maximum response times of the various API endpoints:
       * Under 5 seconds.
-      * Availability calls with a data range of just 1 day: < 200ms  
+      * Availability calls with a data range of just 1 day: < 200ms
 
     ### Flexibility towards unexpected (new) fields
     In the future Tiqets MAY add new fields to the specification.
@@ -215,10 +215,10 @@ paths:
         - Availability
       summary: Availability
       description: |
-        The availability endpoint lists the available "variants".  
-        Variants are commonly referred to by the industry as "Ticket Types" or "Discounts".  
+        The availability endpoint lists the available "variants".
+        Variants are commonly referred to by the industry as "Ticket Types" or "Discounts".
 
-        The endpoint also returns the available quantities and (optionally) their price, defined by the `amount` and the `currency`.  
+        The endpoint also returns the available quantities and (optionally) their price, defined by the `amount` and the `currency`.
         The `amount` MUST represent "Face Value": The price that a customer would pay at the venue's ticket office and MUST include all applicable local taxes.
 
         ### Note on pricing information:
@@ -605,7 +605,7 @@ paths:
         - Reservation
       summary: Reservation
       description: |
-        The reservation data contains all data that Tiqets has available for the order.  
+        The reservation data contains all data that Tiqets has available for the order.
         At a bare minimum that is:
         - The ordered items and their quantities;
         - Personal information of the main booker (possibly anonymized);
@@ -822,6 +822,7 @@ paths:
             |                2005 | Invalid Value                   | Eg. The phone number must not contain dots.                                                          |
             |                2009 | Incorrect date                  | Eg. Cannot use a date in the past or, the given date is too far ahead in the future (max 6 months).  |
             |                3000 | Availability error              | The requested number of tickets is not longer available for a given variant and/or date/timeslot.    |
+            |                3006 | Insufficient Funds              | There are not enough funds in your account to perform this operation.                                |
           content:
             application/json:
               schema:
@@ -917,12 +918,13 @@ paths:
 
             ## Internal error codes
 
-            | Internal error code |          Error           |                         Message                              |
-            |---------------------|--------------------------|--------------------------------------------------------------|
-            |                1000 | Missing argument         | Required argument `ATTRIBUTE_NAME` was not found             |
-            |                2004 | Incorrect type           | Expected `ATTRIBUTE_NAME` to be a string, got `TYPE` instead |
-            |                3001 | Reservation expired      | Your reservation has expired `MINUTES` minutes ago           |
-            |                3002 | Incorrect reservation ID | Given reservation ID is incorrect                            |
+            | Internal error code | Error                    | Message                                                               |
+            | ------------------- | ------------------------ | --------------------------------------------------------------------- |
+            | 1000                | Missing argument         | Required argument `ATTRIBUTE_NAME` was not found                      |
+            | 2004                | Incorrect type           | Expected `ATTRIBUTE_NAME` to be a string, got `TYPE` instead          |
+            | 3001                | Reservation expired      | Your reservation has expired `MINUTES` minutes ago                    |
+            | 3002                | Incorrect reservation ID | Given reservation ID is incorrect                                     |
+            | 3006                | Insufficient Funds       | There are not enough funds in your account to perform this operation. |
           content:
             application/json:
               schema:
