@@ -145,7 +145,7 @@ info:
 
   contact:
     email: apisupport@tiqets.com
-  version: 1.6.0
+  version: 1.6.1
 tags:
   - name: Availability
     description: |
@@ -422,6 +422,7 @@ paths:
             |                2006 | Superfluous timeslot parameter | This product doesn't use timeslots.                                                           |
             |                2009 | Incorrect date                 | Eg. Cannot use the past date or Given date is too far ahead in the future (max 6 months)      |
             |                3000 | Availability error             | Quantity (3) is not available anymore for a given variant (id: 4337) and time slot (id: 5567) |
+            |                3006 | Insufficient funds             | The value of the order exceeds the remaining pre-paid funds                                   |
           content:
             application/json:
               schema:
@@ -455,12 +456,13 @@ paths:
 
             ## Internal error codes
 
-            | Internal error code |          Error           |                         Message                          |
-            |---------------------|--------------------------|----------------------------------------------------------|
-            |                1000 | Missing argument         | Required argument ATTRIBUTE_NAME was not found           |
-            |                2004 | Incorrect type           | Expected ATTRIBUTE_NAME to be a string, got TYPE instead |
-            |                3001 | Reservation expired      | Your reservation has expired MINUTES minutes ago         |
-            |                3002 | Incorrect reservation ID | Given reservation ID is incorrect                        |
+            | Internal error code |          Error           |                         Message                             |
+            |---------------------|--------------------------|-------------------------------------------------------------|
+            |                1000 | Missing argument         | Required argument ATTRIBUTE_NAME was not found              |
+            |                2004 | Incorrect type           | Expected ATTRIBUTE_NAME to be a string, got TYPE instead    |
+            |                3001 | Reservation expired      | Your reservation has expired MINUTES minutes ago            |
+            |                3002 | Incorrect reservation ID | Given reservation ID is incorrect                           |
+            |                3006 | Insufficient funds       | The value of the order exceeds the remaining pre-paid funds |
           content:
             application/json:
               schema:
