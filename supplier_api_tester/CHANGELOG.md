@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.3
+
+- bump `requests` library to v2.28.2
+
 ## 2.0.2
 
 - update the CLI testing tool to match the API specification v2.2.0
