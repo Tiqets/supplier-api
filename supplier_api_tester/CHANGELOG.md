@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.4
+
+- fix bug in reservation test when the time/date values of a timeslot contain a single digit. Eg. use `09:15` instead of `9:15`  
+
 ## 2.0.3
 
 - bump `requests` library to v2.28.2
