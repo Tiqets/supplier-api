@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.4
+
+- Adding 3008 error (Maximum tickets per order exceeded) as a possible error for the reservation endpoint.
+
 ## 2.2.3
 
 - Adding 3006 error (Insufficient Funds) as a possible error for the reservation and booking endpoints.

@@ -55,18 +55,19 @@ def parse_availability_variants(raw_response: Response, response: Dict) -> List[
             message='The response should be a JSON Object',
             response=raw_response,
         )
-
     available_variants: List[DailyVariants] = []
     try:
         for day, day_availability in response.items():
             # extract timeslot component from the day value: YYYY-MM-DDTHH:MM
             date_time_value = datetime.fromisoformat(day)
+            timeslot_hour: str = str(date_time_value.time().hour)
+            timeslot_minutes: str = str(date_time_value.time().minute)
             available_variants.append(
                 dacite.from_dict(
                     data_class=DailyVariants,
                     data={
                         'date': str(date_time_value.date()),
-                        'timeslot': f'{date_time_value.time().hour}:{date_time_value.time().minute}',
+                        'timeslot': f'{timeslot_hour.zfill(2)}:{timeslot_minutes.zfill(2)}',
                         'available_tickets': day_availability.get('available_tickets', 0),
                         'variants': [
                             {**v}
