@@ -2,7 +2,7 @@
 
 ## 2.0.6
 
-- bugfix: fix function `supplier_api_tester.v2.utils.adapters.get_api_error()` to handle `None` response.
+- bugfix: fix function `supplier_api_tester.v2.utils.adapters.get_api_error()` to handle non-Json error responses.
 
 ## 2.0.5
 
