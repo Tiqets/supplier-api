@@ -200,6 +200,12 @@ def get_booking(raw_response: Response, response) -> Booking:
 def get_api_error(raw_response: Response, response) -> ApiError:
     """Unpacking 400 error JSON structure"""
     if raw_response.ok:
+        if type(response) is not dict:
+            raise FailedTest(
+                message='400 error response should be a JSON Object',
+                response=raw_response,
+            )
+
         raise FailedTest(
             message=f'Expected HTTP 400 but got HTTP {response.get("status_code")} instead.',
             response=raw_response,
