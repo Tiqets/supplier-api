@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Tiqets Supplier API
-  version: 2.2.4
+  version: 2.2.41
   description: |
     The Tiqets Supplier API Specification allows Tiqets' Supply Partners to connect their booking systems to Tiqets.com
     if they aren't connected already.
@@ -1062,12 +1062,18 @@ components:
           description: Specify the maximum amount of tickets that can be added to a single order. The absence of this field will mean that the product doesn't have such limits.
         required_order_data:
           type: array
-          description: List of additional fields that need to be provided while creating a reservation. Each field will contain a piece of information about the whole order.
+          description: |
+            List of _additional_, order-level details that must be included when creating a reservation.  
+            Tiqets _always_ collects the `name`, `email` and `phone number` of the main booker which is why there are no values for that in this list.  
+            ⚠️ This list is expected to be empty, except for exceptional cases.
           items:
             $ref: "#/components/schemas/RequiredOrderData"
         required_visitor_data:
           type: array
-          description: List of additional fields that need to be provided while creating a reservation. Each field will contain a piece of information about each visitor.
+          description: |
+            List of _additional_ details that must be included for EVERY TRAVELER in the group when creating a reservation.  
+            By default, Tiqets does not collect any details from individual travelers.  
+            ⚠️ This list is expected to be empty, except for exceptional cases.
           items:
             $ref: "#/components/schemas/RequiredVisitorData"
     VisitorData:
