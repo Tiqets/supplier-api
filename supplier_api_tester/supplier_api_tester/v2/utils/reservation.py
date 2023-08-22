@@ -7,6 +7,7 @@ from typing import Union
 from supplier_api_tester.v2.exceptions import FailedTest
 from supplier_api_tester.v2.models import DailyVariants, Timeslot
 from supplier_api_tester.v2.models import Product
+from supplier_api_tester.v2.models import RequiredVisitorData
 from supplier_api_tester.v2.utils.availability import get_availability
 from supplier_api_tester.v2.utils.catalog import get_catalog
 
@@ -96,16 +97,18 @@ def get_required_order_data_payload(product: Product) -> Dict:
     required_order_data: Dict = {}
     for required_field_name in product.required_order_data:
         # get a (random) value for the field
-        required_order_data[required_field_name] = f'test {required_field_name.lower()}'
+        required_order_data[required_field_name.value] = f'test {required_field_name.value.lower()}'
     return required_order_data
 
 
-def get_required_visitors_data_payload(required_visitor_data: List[str], variant_quantity: int) -> List[Dict]:
+def get_required_visitors_data_payload(
+        required_visitor_data: Optional[List[RequiredVisitorData]], variant_quantity: int
+) -> List[Dict]:
     required_visitors_data: List[Dict] = []
     for i in range(1, variant_quantity + 1):
         data = {}
         for required_field_name in required_visitor_data:
             # get a (random) value for the field
-            data[required_field_name] = f'test {required_field_name.lower()} {i}'
+            data[required_field_name.value] = f'test {required_field_name.value.lower()} {i}'
         required_visitors_data.append(data)
     return required_visitors_data

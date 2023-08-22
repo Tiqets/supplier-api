@@ -131,8 +131,8 @@ def products_printer(products: List[Product]) -> None:
             p.use_timeslots,
             p.is_refundable,
             p.cutoff_time,
-            ','.join(p.required_order_data) if p.required_order_data else '',
-            ','.join(p.required_visitor_data) if p.required_visitor_data else '',
+            ','.join([x.value for x in p.required_order_data]) if p.required_order_data else '',
+            ','.join([x.value for x in p.required_visitor_data]) if p.required_visitor_data else '',
             p.provides_pricing,
         ] for p in products]
     )
