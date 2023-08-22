@@ -41,5 +41,4 @@ BOOKING_TEST = (
 
 PRODUCT_CATALOG = (
     product_catalog.test_get_products,
-    product_catalog.test_products_required_additional_fields,
 )

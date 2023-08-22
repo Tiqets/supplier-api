@@ -10,6 +10,8 @@ from requests.models import Response
 
 from supplier_api_tester.v2.exceptions import FailedTest
 from supplier_api_tester.v2.models import ApiError, Booking, DailyVariants, Product, Reservation
+from supplier_api_tester.v2.models import RequiredOrderData
+from supplier_api_tester.v2.models import RequiredVisitorData
 
 
 def check_base64(item):
@@ -104,6 +106,7 @@ def get_products(raw_response: Response, response: Dict) -> List[Product]:
             dacite.from_dict(
                 data_class=Product,
                 data=product,
+                config=dacite.Config(cast=[RequiredOrderData, RequiredVisitorData])
             )
             for product in response
         ]
@@ -111,6 +114,7 @@ def get_products(raw_response: Response, response: Dict) -> List[Product]:
         dacite.exceptions.WrongTypeError,
         dacite.exceptions.MissingValueError,
         dacite.exceptions.UnexpectedDataError,
+        ValueError,
     ) as e:
         raise FailedTest(
             message=f'Incorrect JSON format in response from the /products endpoint: {format_error_message(e)}',

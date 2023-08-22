@@ -1,6 +1,24 @@
 from dataclasses import dataclass
 from datetime import date, datetime
+from enum import Enum
 from typing import Optional, List, Dict
+
+
+class RequiredOrderData(Enum):
+    pickup_location = 'pickup_location'
+    dropoff_location = 'dropoff_location'
+    nationality = 'nationality'
+    flight_number = 'flight_number'
+    passport_id = 'passport_id'
+
+
+class RequiredVisitorData(Enum):
+    full_name = 'full_name'
+    email = 'email'
+    phone = 'phone'
+    address = 'address'
+    passport_id = 'passport_id'
+    date_of_birth = 'date_of_birth'
 
 
 @dataclass
@@ -50,8 +68,8 @@ class Product:
     is_refundable: bool
     cutoff_time: int
     provides_pricing: bool
-    required_order_data: Optional[List[str]] = None
-    required_visitor_data: Optional[List[str]] = None
+    required_order_data: Optional[List[RequiredOrderData]] = None
+    required_visitor_data: Optional[List[RequiredVisitorData]] = None
 
 
 @dataclass
