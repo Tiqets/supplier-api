@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.1.0
+
+- add new tests to validate the required additional visitor and order-level fields for the products in the catalog.
+- upgrade `dacite` to v1.8.1
+
 ## 2.0.6
 
 - bugfix: fix function `supplier_api_tester.v2.utils.adapters.get_api_error()` to handle non-Json error responses.
