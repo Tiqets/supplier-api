@@ -77,6 +77,9 @@ class VariantPrice:
     currency: str
     amount: str
 
+    def __str__(self):
+        return f'{self.amount} {self.currency}'
+
 
 @dataclass
 class Variant:

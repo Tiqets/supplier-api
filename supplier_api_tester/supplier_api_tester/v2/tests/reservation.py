@@ -259,6 +259,9 @@ def test_reservation_with_unit_prices(api_url: str, api_key: str, product_id: st
 
     url = f'{api_url}/v{version}/products/{product_id}/reservation'
     slot = get_reservation_slot(api_url, api_key, product_id)
+    variant_price_map_availability = {
+        variant.id: variant.price for variant in slot.variants
+    }
     json_payload: Dict = get_payload_for_reservation(api_url, api_key, product_id, slot)
     raw_response, response = client(url, api_key, method=requests.post, json_payload=json_payload)
     reservation: Reservation = get_reservation(raw_response, response)
@@ -270,16 +273,24 @@ def test_reservation_with_unit_prices(api_url: str, api_key: str, product_id: st
             response=raw_response,
         )
 
-    for variant_id in set(ticket.get('variant_id') for ticket in json_payload.get('tickets')):
+    for variant_id in {ticket.get('variant_id') for ticket in json_payload.get('tickets')}:
         if variant_id not in reservation.unit_price:
             raise FailedTest(
                 message=f'Product {product_id} provides pricing but the response is missing unit price for a variant',
                 response=raw_response,
             )
 
-        if not reservation.unit_price.get(variant_id).currency or not reservation.unit_price.get(variant_id).amount:
+        variant_unit_price = reservation.unit_price[variant_id]
+
+        if not variant_unit_price.currency or not variant_unit_price.amount:
             raise FailedTest(
                 message=f'Product {product_id} provides pricing but the response is missing unit price (amount, currency)',
+                response=raw_response,
+            )
+
+        if variant_unit_price != variant_price_map_availability.get(variant_id):
+            raise FailedTest(
+                message=f'The reservation response returned a different price for variant {variant_id} - { variant_price_map_availability.get(variant_id)} (availability) vs {variant_unit_price} (reservation)',
                 response=raw_response,
             )
 
