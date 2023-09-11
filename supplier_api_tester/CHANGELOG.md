@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.0
+
+- Testing if the price in the reservation response is the same as it was in the availability response
+
 ## 2.1.0
 
 - add new tests to validate the required additional visitor and order-level fields for the products in the catalog.
@@ -11,11 +15,11 @@
 
 ## 2.0.5
 
-- update `requests` library to v2.31.0 
+- update `requests` library to v2.31.0
 
 ## 2.0.4
 
-- fix bug in reservation test when the time/date values of a timeslot contain a single digit. Eg. use `09:15` instead of `9:15`  
+- fix bug in reservation test when the time/date values of a timeslot contain a single digit. Eg. use `09:15` instead of `9:15`
 
 ## 2.0.3
 
@@ -27,7 +31,7 @@
 
 ## 2.0.1
 
-- Rename VariantPrice's field `face_value` to `amount` 
+- Rename VariantPrice's field `face_value` to `amount`
 
 ## 2.0.0
 
@@ -41,7 +45,7 @@
 
 ## 1.6.4
 
-- security related update 
+- security related update
 
 ## 1.6.3
 
