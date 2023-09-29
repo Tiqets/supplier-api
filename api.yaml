@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Tiqets Supplier API
-  version: 2.2.41
+  version: 2.3.0
   description: |
     The Tiqets Supplier API Specification allows Tiqets' Supply Partners to connect their booking systems to Tiqets.com
     if they aren't connected already.
@@ -100,7 +100,16 @@ info:
     |---------------|-------------------------------------------------------------|
     |         `403` | Forbidden - Missing or incorrect API key                    |
     |         `405` | Method Not Allowed - Incorrect HTTP method was used         |
-    |         `500` | Service Error                         |
+    |         `5xx` | Service Error                                               |
+
+    **5xx Errors** 
+
+    Errors in the 500 range indicate a significant issue occurred. Therefore, we do not expect you to respond with
+     a properly structured JSON response that outlines the exact cause of the problem. 
+    Instead, we will log any 5xx range errors and consider that your system was not available at that moment. Additionally,
+     we will log your response for debugging purposes later. 
+
+    For all 400 range errors we *do require* a properly structured JSON response that precisely describes what went wrong. 
 
     # Context specific errors
 
@@ -207,6 +216,18 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Products"
+        "500":
+          description: |
+            Internal Server Error **AND OTHER 5xx RANGE ERRORS.**
+
+            # Catch all for inability to fulfill requests
+            You may return **any error in the 5xx range** to indicate that something unexpected went wrong, blocking you
+             from properly responding to the request. 
+
+            We do not expect you to respond with properly structured JSON, but we strongly encourage you to provide a
+             response that is informative enough to help identify the problem. 
+
+            We will log your response and conclude that your system wasn't available at the moment.
       security:
         - authorization_header: []
   "/v2/products/{product_id}/availability":
@@ -311,7 +332,7 @@ paths:
                           }
                         ]
                       },
-                      2022-12-19T17:30: {
+                      "2022-12-19T17:30": {
                         "available_tickets": 63,
                         "variants": [
                           {
@@ -597,6 +618,18 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/BadRequest"
+        "500":
+          description: |
+            Internal Server Error **AND OTHER 5xx RANGE ERRORS.**
+
+            # Catch all for inability to fulfill requests
+            You may return **any error in the 5xx range** to indicate that something unexpected went wrong, blocking you
+             from properly responding to the request. 
+
+            We do not expect you to respond with properly structured JSON, but we strongly encourage you to provide a
+             response that is informative enough to help identify the problem. 
+
+            We will log your response and conclude that your system wasn't available at the moment.
       security:
         - authorization_header: []
   /v2/products/{product_id}/reservation:
@@ -828,6 +861,19 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/BadRequest"
+        "500":
+          description: |
+            Internal Server Error **AND OTHER 5xx RANGE ERRORS.**
+
+            # Catch all for inability to fulfill requests
+            You may return **any error in the 5xx range** to indicate that something unexpected went wrong, blocking you
+             from properly responding to the request. 
+
+            We do not expect you to respond with properly structured JSON, but we strongly encourage you to provide a
+             response that is informative enough to help identify the problem. 
+
+            We will log your response and conclude that your system wasn't available at the moment.
+            
       security:
         - authorization_header: []
   "/v2/booking":
@@ -930,6 +976,18 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/BadRequest"
+        "500":
+          description: |
+            Internal Server Error **AND OTHER 5xx RANGE ERRORS.**
+
+            # Catch all for inability to fulfill requests
+            You may return **any error in the 5xx range** to indicate that something unexpected went wrong, blocking you
+             from properly responding to the request. 
+
+            We do not expect you to respond with properly structured JSON, but we strongly encourage you to provide a
+             response that is informative enough to help identify the problem. 
+
+            We will log your response and conclude that your system wasn't available at the moment.
       security:
         - authorization_header: []
   "/v2/booking/{booking_id}":
@@ -967,6 +1025,18 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/BadRequest"
+        "500":
+          description: |
+            Internal Server Error **AND OTHER 5xx RANGE ERRORS.**
+
+            # Catch all for inability to fulfill requests
+            You may return **any error in the 5xx range** to indicate that something unexpected went wrong, blocking you
+             from properly responding to the request. 
+
+            We do not expect you to respond with properly structured JSON, but we strongly encourage you to provide a
+             response that is informative enough to help identify the problem. 
+
+            We will log your response and conclude that your system wasn't available at the moment.
       security:
         - authorization_header: []
 components:
@@ -1037,10 +1107,6 @@ components:
           type: string
           maxLength: 64
           description: Permanent and unique ID of a single product. Must use printable ASCII characters. If applicable, consider concatenating or `base64` encoding a set of values that are meaningful for your system.
-          examples:
-            - "UFJELUEtMTIzNDU="
-            - "123456789"
-            - "PRD-123-ABC"
         name:
           type: string
         description:
@@ -1133,8 +1199,7 @@ components:
       properties:
         id:
           type: string
-          description: "The ID of the variant. See the **Concepts** section above for details on the requirements of variant
-          IDs."
+          description: "The ID of the variant. See the **Concepts** section above for details on the requirements of variant IDs."
         name:
           type: string
           description: The name of the variant
@@ -1182,9 +1247,9 @@ components:
           type: string
           example: "2019-06-26T15:30"
           description: "ISO format `YYYY-MM-DDTHH:MM`. If a product requires/supports timeslots then the `datetime`
-          attribute must be parsed to extract the specific timeslot for the reservation. If, on the other hand, a product
-          does not support/require timeslots then the time component of this attribute will be set to `T00:00` and can be
-          safely ignored. See the payload examples for details."
+            attribute must be parsed to extract the specific timeslot for the reservation. If, on the other hand, a product
+            does not support/require timeslots then the time component of this attribute will be set to `T00:00` and can be
+            safely ignored. See the payload examples for details."
         tickets:
           type: array
           items:
