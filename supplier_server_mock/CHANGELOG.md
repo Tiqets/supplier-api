@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.0.4
+
+- upgrade version of `uWSGI` to `2.0.22`
+- upgrade version of `Flask` to `2.2.5`
+
 ## 2.0.3
 
 - Fix a bug in the Mock Server when handling reservation requests. For products that provide pricing
