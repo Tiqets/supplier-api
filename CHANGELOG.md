@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.3.0
+
+- Extended the specification to explicitly allow HTTP 500 error responses in case of server failure
+- Fixed some minor OpenAPI compliancy errors
+
 ## 2.2.4
 
 - Adding 3008 error (Maximum tickets per order exceeded) as a possible error for the reservation endpoint.
