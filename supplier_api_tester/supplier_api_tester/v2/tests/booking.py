@@ -206,6 +206,14 @@ def test_cancellation(api_url, api_key, product_id, version=2):
         booking_for_time = datetime.fromisoformat(slot.date.isoformat())
     cancellation_time = datetime.utcnow()
     if booking_for_time < cancellation_time:
+        if raw_response.status_code == 204:
+            # The API has acceptect the cancellation
+            if product.use_timeslots:
+                message = 'The cancellation was accepted even though it was triggered after the start time of the timeslot. Is that an intended behavior?'
+            else:
+                message = 'The cancellation was accepted even though it was triggered on the same day as the booked date. Is that an intended behavior?'
+            return TestResult(status=1, message=message)
+
         api_error = get_api_error(raw_response, response)
         expected_error = ApiError(
             error_code=2009,
@@ -217,6 +225,13 @@ def test_cancellation(api_url, api_key, product_id, version=2):
     difference = booking_for_time - cancellation_time
     hours_in_advance = round(difference.total_seconds()/3600)
     if product.cutoff_time != 0 and product.cutoff_time > hours_in_advance:
+        if raw_response.status_code == 204:
+            # The API has acceptect the cancellation
+            if product.use_timeslots:
+                message = 'The cancellation was accepted even though it was triggered after the start time of the timeslot. Is that an intended behavior?'
+            else:
+                message = 'The cancellation was accepted even though it was triggered on the same day as the booked date. Is that an intended behavior?'
+            return TestResult(status=1, message=message)
         api_error = get_api_error(raw_response, response)
         expected_error = ApiError(
             error_code=2009,

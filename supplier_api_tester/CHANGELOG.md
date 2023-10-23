@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.1
+
+- Booking test: recognizing a case in which the cancellation was accepted after the cancellation window
+
 ## 2.2.0
 
 - Testing if the price in the reservation response is the same as it was in the availability response
