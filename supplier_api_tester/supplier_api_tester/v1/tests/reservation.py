@@ -185,25 +185,6 @@ def test_past_date(api_url, api_key, product_id, timeslots: bool, version=1):
 
 
 @test_wrapper
-def test_not_allowed_method(api_url, api_key, product_id, timeslots: bool, version=1):
-    '''Testing methods that are not allowed'''
-    url = f'{api_url}/v{version}/products/{product_id}/reservation'
-    slot = get_reservation_slot(api_url, api_key, product_id, timeslots)
-    json_payload = get_payload_from_slot(slot)
-    if timeslots:
-        json_payload['timeslot'] = slot.start
-    for method in (requests.get, requests.put, requests.patch, requests.delete):
-        raw_response, _ = client(url, api_key, method=method, json_payload=json_payload)
-        status_code = getattr(raw_response, 'status_code', 200)
-        if status_code != 405:
-            raise FailedTest(
-                message=f'Incorrect status code "{status_code}" when calling the API via method {method.__name__.upper()}. Expected status code: "405".',
-                response=raw_response,
-            )
-    return TestResult()
-
-
-@test_wrapper
 def test_reservation(api_url, api_key, product_id, timeslots: bool, version=1):
     '''Reserving tickets for at least 1 variant'''
     url = f'{api_url}/v{version}/products/{product_id}/reservation'

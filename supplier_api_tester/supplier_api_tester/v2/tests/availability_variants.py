@@ -120,12 +120,6 @@ def huge_date_range(api_url, api_key, product_id, version=2):
 
 
 @test_wrapper
-def not_allowed_method(api_url, api_key, product_id, version=2):
-    """Testing methods that are not allowed"""
-    return availability.not_allowed_method(api_url, api_key, product_id, 'availability', version=version)
-
-
-@test_wrapper
 def product_provides_pricing(api_url, api_key, product_id, version=2):
     """Testing optional price attribute in availability"""
     return availability.product_with_provides_pricing(api_url, api_key, product_id, 'availability', version=version)

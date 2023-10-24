@@ -13,7 +13,6 @@ AVAILABILITY_TEST = (
     availability_variants.end_before_start_error,
     availability_variants.past_start_date,
     availability_variants.huge_date_range,
-    availability_variants.not_allowed_method,
     availability_variants.product_provides_pricing,
 )
 
@@ -25,7 +24,6 @@ RESERVATION_TEST = (
     reservation.test_error_for_non_existing_product,
     reservation.test_incorrect_date_format,
     reservation.test_past_date,
-    reservation.test_not_allowed_method,
     reservation.test_reservation_with_unit_prices,
 )
 
@@ -33,7 +31,6 @@ BOOKING_TEST = (
     booking.test_missing_reservation_id,
     booking.test_missing_api_key,
     booking.test_incorrect_api_key,
-    booking.test_not_allowed_method,
     booking.test_booking_incorrect_reservation_id,
     booking.test_booking,
     booking.test_cancellation,

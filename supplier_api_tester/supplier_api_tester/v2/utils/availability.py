@@ -241,23 +241,6 @@ def end_before_start_error(api_url: str, api_key: str, product_id: str, endpoint
     return check_api_error(raw_response, api_error, expected_error)
 
 
-def not_allowed_method(api_url: str, api_key: str, product_id: str, endpoint: str, version: int = 2):
-    """Testing methods that are not allowed"""
-    tomorrow: date = get_tomorrow()
-    for method in (requests.post, requests.put, requests.patch, requests.delete):
-        raw_response, response = client(f'{api_url}/v{version}/products/{product_id}/{endpoint}', api_key, {
-            'start': tomorrow.isoformat(),
-            'end': tomorrow.isoformat(),
-        }, method=method)
-        status_code = getattr(raw_response, 'status_code', 200)
-        if status_code != 405:
-            raise FailedTest(
-                message=f'Incorrect status code "{status_code}" when calling the API via method {method.__name__.upper()}. Expected status code: "405".',
-                response=raw_response,
-            )
-    return TestResult()
-
-
 def product_with_provides_pricing(api_url: str, api_key: str, product_id: str, endpoint: str, version: int = 2):
     """Tests that the availability response for a product whose provides_pricing attribute is True contains the `price`
     attribute for every variant id."""

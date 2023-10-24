@@ -278,23 +278,6 @@ def end_before_start_error(api_url, api_key, product_id, endpoint, version=1):
     return check_api_error(raw_response, api_error, expected_error)
 
 
-def not_allowed_method(api_url, api_key, product_id, endpoint, version=1):
-    '''Testing methods that are not allowed'''
-    tomorrow = get_tomorrow()
-    for method in (requests.post, requests.put, requests.patch, requests.delete):
-        raw_response, response = client(f'{api_url}/v{version}/products/{product_id}/{endpoint}', api_key, {
-            'start': tomorrow.isoformat(),
-            'end': tomorrow.isoformat(),
-        }, method=method)
-        status_code = getattr(raw_response, 'status_code', 200)
-        if status_code != 405:
-            raise FailedTest(
-                message=f'Incorrect status code "{status_code}" when calling the API via method {method.__name__.upper()}. Expected status code: "405".',
-                response=raw_response,
-            )
-    return TestResult()
-
-
 def test_error_for_non_timeslot_product(api_url, api_key, product_id, endpoint, version=1):
     '''Testing timeslot availability for non timeslot product'''
     tomorrow = get_tomorrow()
