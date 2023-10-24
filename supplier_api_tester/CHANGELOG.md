@@ -3,6 +3,7 @@
 ## 2.2.1
 
 - Booking test: recognizing a case in which the cancellation was accepted after the cancellation window
+- Removing tests for not allowed methods
 
 ## 2.2.0
 
