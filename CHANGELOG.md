@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.6.2
+- Added a warning that this version is no longer supported for new integrators
+- Added error code 3005 "tickets already used" error, just like in V2
+
 ## 1.6.0
 
 - Add new field `order_reference` to booking step.
