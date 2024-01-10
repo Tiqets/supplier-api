@@ -149,7 +149,7 @@ info:
 
   contact:
     email: apisupport@tiqets.com
-  version: 1.6.2
+  version: 1.6.3
 tags:
   - name: Availability
     description: |
@@ -758,13 +758,14 @@ components:
         barcode_format:
           type: string
           enum:
-            - QRCODE
+            - AZTEC-BYTES
             - CODE128
             - CODE39
-            - ITF
             - DATAMATRIX
             - EAN13
+            - ITF
             - PDF
+            - QRCODE
         barcode_position:
           type: string
           description: |
@@ -778,8 +779,9 @@ components:
           type: string
           description: |
             If "barcode_format" is set to "PDF" then include a base64 encoded PDF.
-
             Can be omitted if barcode_position is set to ticket.
+
+            If `barcode_format` is set to `"AZTEC-BYTES"` the `barcode` field(s) must contain a Base64 encoded string.
         tickets:
           type: object
           description: Can be omitted if barcode_position is set to order
