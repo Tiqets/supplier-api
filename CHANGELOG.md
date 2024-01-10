@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.3.1
+
+- Added support for a new barcode type: aztec-bytes
+- Ordered barcode types alphabetically
+- Removed double quotes around fieldnames in comments
+
 ## 2.3.0
 
 - Extended the specification to explicitly allow HTTP 500 error responses in case of server failure

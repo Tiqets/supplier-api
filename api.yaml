@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Tiqets Supplier API
-  version: 2.3.0
+  version: 2.3.1
   description: |
     The Tiqets Supplier API Specification allows Tiqets' Supply Partners to connect their booking systems to Tiqets.com
     if they aren't connected already.
@@ -1335,13 +1335,14 @@ components:
         barcode_format:
           type: string
           enum:
-            - QRCODE
+            - AZTEC-BYTES
             - CODE128
             - CODE39
-            - ITF
             - DATAMATRIX
             - EAN13
+            - ITF
             - PDF
+            - QRCODE
         barcode_scope:
           type: string
           description: |
@@ -1355,12 +1356,13 @@ components:
         barcode:
           type: string
           description: |
-            If `"barcode_format"` is set to `"PDF"` then include a base64 encoded PDF.
-
-            Can be omitted if `"barcode_scope"` is set to `"ticket"`.
+            If `barcode_format` is set to `"PDF"` then include a base64 encoded PDF.
+            Can be omitted if `barcode_scope` is set to `"ticket"`.
+            
+            If `barcode_format` is set to `"AZTEC-BYTES"` the `barcode` field(s) must contain a Base64 encoded string.
         tickets:
           type: object
-          description: Can be omitted if `"barcode_scope"` is set to `"order"`
+          description: Can be omitted if `barcode_scope` is set to `"order"`
           properties:
             variant_id:
               type: array
