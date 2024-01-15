@@ -116,6 +116,16 @@ def get_products(raw_response: Response, response: Dict) -> List[Product]:
         dacite.exceptions.UnexpectedDataError,
         ValueError,
     ) as e:
+        if 'is not a valid RequiredVisitorData' in str(e):
+            raise FailedTest(
+                message=f'Invalid values defined for required_visitor_data ({format_error_message(e)}). Please review the online documentation to see which values are supported.',
+                response=raw_response,
+            )
+        elif 'is not a valid RequiredOrderData' in str(e):
+            raise FailedTest(
+                message=f'Invalid values defined for required_order_data ({format_error_message(e)}). Please review the online documentation to see which values are supported.',
+                response=raw_response,
+            )
         raise FailedTest(
             message=f'Incorrect JSON format in response from the /products endpoint: {format_error_message(e)}',
             response=raw_response,
