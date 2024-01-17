@@ -200,8 +200,18 @@ def booking():
     for variant_id, quantity in variant_quantity_map.items():
         if product["_ticket_content_type"] == "PDF":
             barcodes = [utils.encode_barcode(f'{reservation_id}{variant_id}{i}') for i in range(quantity)]
+        elif product["_ticket_content_type"] == "AZTEC-BYTES":
+            barcodes = [
+                utils.encode_barcode(
+                    str(utils.str_to_int(f'{reservation_id}{variant_id}{i}', 10))
+                )
+                for i in range(quantity)
+            ]
         else:
-            barcodes = [str(utils.str_to_int(f'{reservation_id}{variant_id}{i}', 10)) for i in range(quantity)]
+            barcodes = [
+                str(utils.str_to_int(f'{reservation_id}{variant_id}{i}', 10))
+                for i in range(quantity)
+            ]
         tickets[variant_id] = barcodes
 
     booking_id = utils.encode_booking_id(booking_date.isoformat(), product_id)

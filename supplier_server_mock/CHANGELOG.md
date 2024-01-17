@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.5
+
+- Update catalog product `A600-FX` to use `AZTEC-BYTES` barcode format.
+
 ## 2.0.4
 
 - upgrade version of `uWSGI` to `2.0.22`

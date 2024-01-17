@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.3
+
+- Add new test for testing the barcode formats.
+
 ## 2.2.1
 
 - Booking test: recognizing a case in which the cancellation was accepted after the cancellation window

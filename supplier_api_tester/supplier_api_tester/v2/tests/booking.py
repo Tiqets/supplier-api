@@ -1,6 +1,6 @@
 # If multiple checks can be done using the same response
 # then they should be done under a single test case.
-
+import base64
 from datetime import datetime
 import time
 
@@ -137,6 +137,40 @@ def test_booking(api_url, api_key, product_id, version=2):
                     response=raw_response,
                 )
 
+    return TestResult()
+
+
+@test_wrapper
+def test_barcodes(api_url, api_key, product_id, version=2):
+    """Barcodes match the expected barcode format."""
+    url = f'{api_url}/v{version}/products/{product_id}/reservation'
+    slot = get_reservation_slot(api_url, api_key, product_id)
+    json_payload = get_payload_for_reservation(api_url, api_key, product_id, slot, variant_quantity=2, min_quantity=3)
+    raw_response, response = client(url, api_key, method=requests.post, json_payload=json_payload)
+    reservation = get_reservation(raw_response, response)
+
+    url = f'{api_url}/v{version}/booking'
+    raw_response, response = client(url, api_key, method=requests.post, json_payload={
+        'reservation_id': reservation.reservation_id,
+        'order_reference': reference_id(),
+    })
+    booking = get_booking(raw_response, response)
+    barcodes: list[str] = []
+
+    if booking.barcode_format.lower() in ['aztec-bytes', 'pdf']:
+        if booking.barcode_scope == 'order':
+            barcodes.append(booking.barcode)
+        else:
+            for _, tickets in booking.tickets.items():
+                barcodes.extend(tickets)
+        for barcode in barcodes:
+            try:
+                base64.b64decode(barcode).decode('utf-8')
+            except Exception:
+                return TestResult(
+                    status=2,
+                    message=f'Expected base64-encoded string for barcode type {booking.barcode_format}: {barcode}',
+                )
     return TestResult()
 
 

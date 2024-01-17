@@ -51,7 +51,8 @@ BOOKING_TEST = (
     booking.test_incorrect_api_key,
     booking.test_booking_incorrect_reservation_id,
     booking.test_booking,
-    booking.test_cancellation
+    booking.test_cancellation,
+    booking.test_barcodes,
 )
 
 PRODUCT_CATALOG = (
