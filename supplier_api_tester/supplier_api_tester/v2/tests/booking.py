@@ -122,6 +122,8 @@ def test_booking(api_url, api_key, product_id, version=2):
         'order_reference': reference_id(),
     })
     booking = get_booking(raw_response, response)
+    barcodes: list[str] = []
+
     if booking.barcode_scope == 'ticket':
         for variant_id, tickets_quantity in variant_quantity_map.items():
             tickets_for_variant = booking.tickets.get(variant_id)
@@ -137,26 +139,6 @@ def test_booking(api_url, api_key, product_id, version=2):
                     response=raw_response,
                 )
 
-    return TestResult()
-
-
-@test_wrapper
-def test_barcodes(api_url, api_key, product_id, version=2):
-    """Barcodes match the expected barcode format."""
-    url = f'{api_url}/v{version}/products/{product_id}/reservation'
-    slot = get_reservation_slot(api_url, api_key, product_id)
-    json_payload = get_payload_for_reservation(api_url, api_key, product_id, slot, variant_quantity=2, min_quantity=3)
-    raw_response, response = client(url, api_key, method=requests.post, json_payload=json_payload)
-    reservation = get_reservation(raw_response, response)
-
-    url = f'{api_url}/v{version}/booking'
-    raw_response, response = client(url, api_key, method=requests.post, json_payload={
-        'reservation_id': reservation.reservation_id,
-        'order_reference': reference_id(),
-    })
-    booking = get_booking(raw_response, response)
-    barcodes: list[str] = []
-
     if booking.barcode_format.lower() in ['aztec-bytes', 'pdf']:
         if booking.barcode_scope == 'order':
             barcodes.append(booking.barcode)
@@ -171,6 +153,7 @@ def test_barcodes(api_url, api_key, product_id, version=2):
                     status=2,
                     message=f'Expected base64-encoded string for barcode type {booking.barcode_format}: {barcode}',
                 )
+
     return TestResult()
 
 

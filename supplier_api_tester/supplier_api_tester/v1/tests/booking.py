@@ -102,7 +102,7 @@ def test_booking_incorrect_reservation_id(api_url, api_key, product_id, timeslot
 
 @test_wrapper
 def test_booking(api_url, api_key, product_id, timeslots: bool, version=1):
-    '''Booking tickets for at least 1 variant'''
+    """Booking tickets for at least 1 variant"""
     url = f'{api_url}/v{version}/products/{product_id}/reservation'
     slot = get_reservation_slot(api_url, api_key, product_id, timeslots)
     variant_quantity_map = {
@@ -121,6 +121,8 @@ def test_booking(api_url, api_key, product_id, timeslots: bool, version=1):
         'order_reference': reference_id(),
     })
     booking = get_booking(raw_response, response)
+    barcodes: list[str] = []
+
     if booking.barcode_position == 'ticket':
         for variant_id, tickets_quantity in variant_quantity_map.items():
             tickets_for_variant = booking.tickets.get(variant_id)
@@ -134,6 +136,21 @@ def test_booking(api_url, api_key, product_id, timeslots: bool, version=1):
                     message=
                     f'Expected {tickets_quantity} codes for variant {variant_id} but got only {len(tickets_for_variant)}',
                     response=raw_response,
+                )
+
+    if booking.barcode_format.lower() in ['aztec-bytes', 'pdf']:
+        if booking.barcode_position == 'order':
+            barcodes.append(booking.barcode)
+        else:
+            for _, tickets in booking.tickets.items():
+                barcodes.extend(tickets)
+        for barcode in barcodes:
+            try:
+                base64.b64decode(barcode).decode('utf-8')
+            except Exception:
+                return TestResult(
+                    status=2,
+                    message=f'Expected base64-encoded string for barcode type {booking.barcode_format}: {barcode}',
                 )
 
     return TestResult()
@@ -239,41 +256,4 @@ def test_cancellation(api_url, api_key, product_id, timeslots: bool, version=1):
         message=f"Booking with ID {booking_id} doesn't exist",
     )
     check_api_error(raw_response, api_error, expected_error)
-    return TestResult()
-
-
-@test_wrapper
-def test_barcodes(api_url, api_key, product_id, timeslots: bool, version=1):
-    """Barcodes match the expected barcode format."""
-    url = f'{api_url}/v{version}/products/{product_id}/reservation'
-    slot = get_reservation_slot(api_url, api_key, product_id, timeslots)
-
-    json_payload = get_payload_from_slot(slot, variant_quantity=2, min_quantity=3)
-    if timeslots:
-        json_payload['timeslot'] = slot.start
-    raw_response, response = client(url, api_key, method=requests.post, json_payload=json_payload)
-    reservation = get_reservation(raw_response, response)
-
-    url = f'{api_url}/v{version}/booking'
-    raw_response, response = client(url, api_key, method=requests.post, json_payload={
-        'reservation_id': reservation.reservation_id,
-        'order_reference': reference_id(),
-    })
-    booking = get_booking(raw_response, response)
-    barcodes: list[str] = []
-
-    if booking.barcode_format.lower() in ['aztec-bytes', 'pdf']:
-        if booking.barcode_position == 'order':
-            barcodes.append(booking.barcode)
-        else:
-            for _, tickets in booking.tickets.items():
-                barcodes.extend(tickets)
-        for barcode in barcodes:
-            try:
-                base64.b64decode(barcode).decode('utf-8')
-            except Exception:
-                return TestResult(
-                    status=2,
-                    message=f'Expected base64-encoded string for barcode type {booking.barcode_format}: {barcode}',
-                )
     return TestResult()
