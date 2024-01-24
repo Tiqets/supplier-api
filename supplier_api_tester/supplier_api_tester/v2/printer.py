@@ -67,9 +67,6 @@ def results_printer(results, no_colors=False):
         if not detailed_report and result.response:
             detailed_report = True
     table = AsciiTable(table_data)
-    if not table.ok:
-        error_printer('The terminal is not wide enough to display the results', no_colors)
-        return
 
     if any_message:
         columns_count = len(headers) - 1

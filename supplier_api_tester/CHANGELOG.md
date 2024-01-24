@@ -4,6 +4,11 @@
 
 - Add new test for testing the barcode formats.
 
+## 2.2.2
+
+- Additional warning if any customer data was requested
+- Custom warning for incorrect values of required_order_data or required_visitor_data
+
 ## 2.2.1
 
 - Booking test: recognizing a case in which the cancellation was accepted after the cancellation window
