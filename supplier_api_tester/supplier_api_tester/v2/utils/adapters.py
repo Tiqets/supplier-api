@@ -183,7 +183,9 @@ def get_booking(raw_response: Response, response) -> Booking:
             response=raw_response,
         )
 
-    if booking.barcode_format not in ('QRCODE', 'CODE128', 'CODE39', 'ITF', 'DATAMATRIX', 'EAN13', 'PDF'):
+    if booking.barcode_format not in (
+            'QRCODE', 'CODE128', 'CODE39', 'ITF', 'DATAMATRIX', 'EAN13', 'PDF', 'AZTEC-BYTES'
+    ):
 
         raise FailedTest(
             message=f'Incorrect barcode format ({booking.barcode_format})',

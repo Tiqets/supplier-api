@@ -1,6 +1,6 @@
 # If multiple checks can be done using the same response
 # then they should be done under a single test case.
-
+import base64
 from datetime import datetime
 import time
 
@@ -122,6 +122,8 @@ def test_booking(api_url, api_key, product_id, version=2):
         'order_reference': reference_id(),
     })
     booking = get_booking(raw_response, response)
+    barcodes: list[str] = []
+
     if booking.barcode_scope == 'ticket':
         for variant_id, tickets_quantity in variant_quantity_map.items():
             tickets_for_variant = booking.tickets.get(variant_id)
@@ -135,6 +137,21 @@ def test_booking(api_url, api_key, product_id, version=2):
                     message=
                     f'Expected {tickets_quantity} codes for variant {variant_id} but got {len(tickets_for_variant)}',
                     response=raw_response,
+                )
+
+    if booking.barcode_format.lower() in ['aztec-bytes', 'pdf']:
+        if booking.barcode_scope == 'order':
+            barcodes.append(booking.barcode)
+        else:
+            for _, tickets in booking.tickets.items():
+                barcodes.extend(tickets)
+        for barcode in barcodes:
+            try:
+                base64.b64decode(barcode).decode('utf-8')
+            except Exception:
+                return TestResult(
+                    status=2,
+                    message=f'Expected base64-encoded string for barcode type {booking.barcode_format}: {barcode}',
                 )
 
     return TestResult()

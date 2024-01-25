@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.3
+
+- Add new test for testing the barcode formats.
+
 ## 2.2.2
 
 - Additional warning if any customer data was requested

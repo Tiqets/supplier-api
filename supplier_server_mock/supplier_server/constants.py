@@ -67,7 +67,7 @@ PRODUCTS = [
         'max_tickets_per_order': 5,
         'required_order_data': ['nationality'],
         'provides_pricing': False,
-        '_ticket_content_type': 'CODE128',
+        '_ticket_content_type': 'AZTEC-BYTES',
         '_cancelled_bookings': {},
         '_timeslot_available_tickets_as_sum': False,
         '_tickets_already_used': True,
