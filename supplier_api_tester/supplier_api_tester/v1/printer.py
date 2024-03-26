@@ -1,45 +1,22 @@
-from textwrap import wrap
 from typing import List
 from .models import Product
 
-from terminaltables import AsciiTable
 
-
-class Colors:
+class Color:
     OK = '\033[92m'
+    GREEN = '\033[92m'
     WARNING = '\033[93m'
     FAIL = '\033[91m'
-    ENDC = '\033[0m'
-
-
-def error_printer(error: str, no_colors: bool = False) -> None:
-    rows = [['Error']]
-    if no_colors:
-        data_row = [
-            error,
-        ]
-    else:
-        data_row = [
-            f'{Colors.FAIL}{error}{Colors.ENDC}',
-        ]
-    rows.extend([data_row])
-    table = AsciiTable(rows)
-    print(table.table)
+    END = '\033[0m'
+    GRAY = '\033[90m'
 
 
 def results_printer(results, no_colors=False):
-    any_message = any(bool(r.message) for r in results)
-    headers = ['#', 'Time', 'Test name']
     detailed_report = False
-    if no_colors:
-        headers.append('Result')
-    if any_message:
-        headers.append('Description')
-    table_data = [headers]
     text_colors = {
-        0: Colors.OK,
-        1: Colors.WARNING,
-        2: Colors.FAIL,
+        0: Color.OK,
+        1: Color.WARNING,
+        2: Color.FAIL,
     }
     text_statuses = {
         0: 'OK',
@@ -48,35 +25,16 @@ def results_printer(results, no_colors=False):
     }
     for i, result in enumerate(results, 1):
         if no_colors:
-            data_row = [
-                i,
-                f'{result.duration}ms',
-                result.title,
-                text_statuses[result.status],
-            ]
+            print(f'{text_statuses[result.status]}  #{str(i).rjust(2, " ")} [{str(result.duration).rjust(3, " ")}ms] {result.title}')
+            if result.message:
+                print(f'┃  {result.message}')
         else:
             text_color = text_colors[result.status]
-            data_row = [
-                i,
-                f'{text_color}{result.duration}ms{Colors.ENDC}',
-                f'{text_color}{result.title}{Colors.ENDC}',
-            ]
-        if any_message:
-            data_row.append(result.message or '')
-        table_data.append(data_row)
+            print(f'{text_color}█  #{str(i).rjust(2, " ")} [{str(result.duration).rjust(3, " ")}ms] {result.title}{Color.END}')
+            if result.message:
+                print(f'{text_color}┃  {result.message}{Color.END}')
         if not detailed_report and result.response:
-            detailed_report = True
-    table = AsciiTable(table_data)
-    if not table.ok:
-        error_printer('The terminal is not wide enough to display the results', no_colors)
-        return
-
-    if any_message:
-        columns_count = len(headers) - 1
-        message_size = table.column_max_width(columns_count)
-        for column in table.table_data:
-            column[columns_count] = '\n'.join(wrap(column[columns_count], message_size))
-    print(table.table)
+             detailed_report = True
 
     if detailed_report:
         print('\nREPORTS FROM FAILED TESTS\n')
@@ -96,31 +54,33 @@ def results_printer(results, no_colors=False):
                     print('\nRESPONSE')
                     print(result.response.body)
                 else:
-                    print(f'{Colors.FAIL}--- #{i} {result.title} ---{Colors.ENDC}')
-                    print(f'\n{Colors.WARNING}URL{Colors.ENDC}')
+                    print(f'{Color.FAIL}--- #{i} {result.title} ---{Color.END}')
+                    print(f'\n{Color.WARNING}URL{Color.END}')
                     print(result.response.url)
-                    print(f'\n{Colors.WARNING}STATUS_CODE{Colors.ENDC}')
+                    print(f'\n{Color.WARNING}STATUS_CODE{Color.END}')
                     print(result.response.status_code)
-                    print(f'\n{Colors.WARNING}HEADERS{Colors.ENDC}')
+                    print(f'\n{Color.WARNING}HEADERS{Color.END}')
                     for header, value in result.response.headers.items():
                         print(f'{header}: {value}')
-                    print(f'\n{Colors.WARNING}PAYLOAD{Colors.ENDC}')
+                    print(f'\n{Color.WARNING}PAYLOAD{Color.END}')
                     print(result.response.payload)
-                    print(f'\n{Colors.WARNING}RESPONSE{Colors.ENDC}')
+                    print(f'\n{Color.WARNING}RESPONSE{Color.END}')
                     print(result.response.body)
                 print()
 
 
+def pdetail(key: str, value: str):
+    value_str = value
+    if isinstance(value, bool):
+        value_str = 'yes' if value else 'no' 
+    print(f'{Color.GRAY}{key}:{Color.END} {value_str}')
+
 def products_printer(products: List[Product]) -> None:
-    rows = [['ID', 'Name', 'Timeslots', 'Refundable', 'Cutoff time']]
-    rows.extend([
-        [
-            p.id,
-            p.name,
-            p.use_timeslots,
-            p.is_refundable,
-            p.cutoff_time,
-        ] for p in products]
-    )
-    table = AsciiTable(rows)
-    print(table.table)
+    for p in products:
+        print(f'{Color.GREEN}{p.name}{Color.END}')
+        pdetail('ID', p.id)
+        pdetail('Timeslots', p.use_timeslots)
+        pdetail('Refundable', p.is_refundable)
+        pdetail('Cutoff time', p.cutoff_time)
+        print('')
+    print(f'Products found: {len(products)}')

@@ -7,9 +7,9 @@ from supplier_api_tester.v2.utils.catalog import get_catalog
 
 def print_title(title):
     print()
-    print('-' * len(title))
+    print('─' * len(title))
     print(title)
-    print('-' * len(title))
+    print('─' * len(title))
     print()
 
 
