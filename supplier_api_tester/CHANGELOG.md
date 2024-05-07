@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.5
+
+- Handle unexpected API responses when fetching availability. This will cause any test that requires corrected availability to be skipped.
+
 ## 2.2.3
 
 - Add new test for testing the barcode formats.

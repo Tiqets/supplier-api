@@ -2,7 +2,6 @@ from datetime import date, datetime, timedelta
 
 from typing import List, Tuple
 
-import requests
 from requests.models import Response
 
 from supplier_api_tester.v2.client import client
@@ -31,6 +30,16 @@ def get_availability(
         'start': start_date.isoformat(),
         'end': end_date.isoformat(),
     })
+    if raw_response.status_code == 400:
+        error_code = response.get("error_code")
+        message = response.get("message")
+        error = response.get("error")
+        raise FailedTest(
+            message=(
+                f'Skipping test due to an unexpected API response. Error Code: {error_code} Message: {message} Error: {error}'
+            ),
+            response=raw_response,
+        )
     days: List[DailyVariants] = parse_availability_variants(raw_response, response)
     return days, raw_response
 
