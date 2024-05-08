@@ -1,3 +1,3 @@
 requests==2.31.0
 dacite==1.8.1
-clickclick==1.2.2
+clickclick==20.10.2
