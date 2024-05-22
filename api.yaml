@@ -70,13 +70,14 @@ info:
 
     * Remain the same regardless of dates and timeslots.
     (If you use fluctuating IDs in your own systems you must ensure that Tiqets receives a constant, non-varying value.)
-    * Be strings that comply with the following regular expression: `/[A-Za-z0-9_\-]{1,16}/`
+    * Be strings that comply with the following regular expression: `/[A-Za-z0-9_\-]{1,64}/`
     Examples:
       * "1"
       * "ABC-123"
       * "20193112"
       * "a3_cd-E22331"
       * "1234567890123456789012"
+      * "eyJwIjoxMjMsICJ0IjpbMyw1NiwzNDUsODc2LDM0XX0="
 
     ### Date and Time Values
 
