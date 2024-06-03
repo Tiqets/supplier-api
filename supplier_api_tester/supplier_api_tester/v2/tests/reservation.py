@@ -19,7 +19,7 @@ from ..utils.catalog import get_catalog
 from ..utils.catalog import product_provides_pricing
 from ..utils.date import get_tomorrow
 from ..utils.adapters import get_reservation
-from ..utils.errors import check_api_error
+from ..utils.errors import check_api_error, raise_for_unexpected_response_error
 from ..utils.reservation import get_payload_for_reservation
 from ..utils.reservation import get_reservation_slot
 
@@ -206,6 +206,7 @@ def test_reservation(api_url: str, api_key: str, product_id: str, version: int =
     slot = get_reservation_slot(api_url, api_key, product_id)
     json_payload = get_payload_for_reservation(api_url, api_key, product_id, slot)
     raw_response, response = client(url, api_key, method=requests.post, json_payload=json_payload)
+    raise_for_unexpected_response_error(raw_response, response)
     reservation = get_reservation(raw_response, response)
     if not reservation.reservation_id:
         raise FailedTest(

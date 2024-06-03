@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.2.7
+
+- Extended the maximum length of the variant ID from 16 chars to 64 chars and added another example to the list.
+- Skip Reservation and Booking tests if the response from the API is unexpected.
+
 ## 2.2.6
 
 - Upgrade `clickclick` to v20.10.2
