@@ -4,6 +4,7 @@
 
 - Extended the maximum length of the variant ID from 16 chars to 64 chars and added another example to the list.
 - Skip Reservation and Booking tests if the response from the API is unexpected.
+- Upgrade `requests` library to version `2.32.0`
 
 ## 2.2.6
 
