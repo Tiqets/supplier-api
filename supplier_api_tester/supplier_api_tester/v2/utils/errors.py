@@ -22,3 +22,19 @@ def check_api_error(raw_response: Response, api_error, expected_error) -> TestRe
             message=f'Incorrect message text "{api_error.message}". Expected text should start with: "{expected_error.message}"',
         )
     return TestResult()
+
+
+def raise_for_unexpected_response_error(raw_response: Response, response) -> None:
+    if raw_response.status_code == 400:
+        if type(response) is not dict:
+            raise FailedTest(
+                message='The error response should be a JSON Object',
+                response=raw_response,
+            )
+
+        raise FailedTest(
+            message=(
+                f'Skipping test due to an unexpected API response. Error Code: {response.get("error_code")} Message: {response.get("message")} Error: {response.get("error")}'
+            ),
+            response=raw_response,
+        )

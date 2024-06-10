@@ -14,7 +14,7 @@ from ..utils.adapters import get_reservation, get_booking, get_api_error
 from ..utils.catalog import get_catalog
 from ..utils.reservation import get_payload_for_reservation
 from ..utils.reservation import get_reservation_slot
-from ..utils.errors import check_api_error
+from ..utils.errors import check_api_error, raise_for_unexpected_response_error
 
 
 def reference_id() -> str:
@@ -114,6 +114,7 @@ def test_booking(api_url, api_key, product_id, version=2):
 
     json_payload = get_payload_for_reservation(api_url, api_key, product_id, slot, variant_quantity=2, min_quantity=3)
     raw_response, response = client(url, api_key, method=requests.post, json_payload=json_payload)
+    raise_for_unexpected_response_error(raw_response, response)
     reservation = get_reservation(raw_response, response)
 
     url = f'{api_url}/v{version}/booking'
@@ -166,6 +167,7 @@ def test_cancellation(api_url, api_key, product_id, version=2):
     # make a reservation
     json_payload = get_payload_for_reservation(api_url, api_key, product_id, slot, variant_quantity=2, min_quantity=3)
     raw_response, response = client(url, api_key, method=requests.post, json_payload=json_payload)
+    raise_for_unexpected_response_error(raw_response, response)
     reservation = get_reservation(raw_response, response)
 
     # make a booking
@@ -174,6 +176,7 @@ def test_cancellation(api_url, api_key, product_id, version=2):
         'reservation_id': reservation.reservation_id,
         'order_reference': reference_id(),
     })
+    raise_for_unexpected_response_error(raw_response, response)
     booking = get_booking(raw_response, response)
     booking_id = booking.booking_id
 
