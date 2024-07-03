@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.8
+
+- Upgrade `requests` library to version `2.32.3`
+- 
 ## 2.2.7
 
 - Extended the maximum length of the variant ID from 16 chars to 64 chars and added another example to the list.
