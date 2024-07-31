@@ -113,6 +113,11 @@ def test_booking(api_url, api_key, product_id, version=2):
     }
 
     json_payload = get_payload_for_reservation(api_url, api_key, product_id, slot, variant_quantity=2, min_quantity=3)
+    if not json_payload.get('tickets', []):
+        raise FailedTest(
+            message='Skipping test because there are not enough tickets. At least 1 variant must have at least 3 tickets available.',
+            response={'tickets': json_payload.get('tickets', [])},
+        )
     raw_response, response = client(url, api_key, method=requests.post, json_payload=json_payload)
     raise_for_unexpected_response_error(raw_response, response)
     reservation = get_reservation(raw_response, response)
