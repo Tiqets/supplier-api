@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.10
+
+- Checking the type of `max_tickets_per_order` for v2
+
 ## 2.2.9
 
 - Fix booking test [https://github.com/Tiqets/supplier-api/issues/104]
