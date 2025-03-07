@@ -70,6 +70,7 @@ class Product:
     provides_pricing: bool
     required_order_data: Optional[List[RequiredOrderData]] = None
     required_visitor_data: Optional[List[RequiredVisitorData]] = None
+    max_tickets_per_order: Optional[int] = None
 
 
 @dataclass
