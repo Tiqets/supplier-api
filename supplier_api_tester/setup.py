@@ -9,7 +9,7 @@ with open('requirements.txt') as f:
     requirements = f.read().splitlines()
 
 setuptools.setup(
-    name='Supplier API tester',
+    name='Supplier-API-tester',
     version=__version__,
     author='Tiqets Team',
     author_email='connections@tiqets.com',
