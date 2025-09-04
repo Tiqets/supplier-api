@@ -1140,6 +1140,7 @@ components:
           description: |
             List of _additional_ details that must be included for EVERY TRAVELER in the group when creating a reservation.  
             By default, Tiqets does not collect any details from individual travelers.  
+            Only one weight unit is allowed. Do not request both weight_kg and weight_lb but pick one and handle the input on your end.  
             ⚠️ This list is expected to be empty, except for exceptional cases.
           items:
             $ref: "#/components/schemas/RequiredVisitorData"
@@ -1169,6 +1170,7 @@ components:
           - nationality
           - flight_number
           - passport_id
+          - zipcode
     RequiredVisitorData:
         type: string
         description: List of additional fields that need to be provided while creating a reservation. Each field will contain a piece of information about each visitor.
@@ -1179,6 +1181,8 @@ components:
           - address
           - passport_id
           - date_of_birth
+          - weight_kg
+          - weight_lb
     AvailabilityResponse:
       type: object
       additionalProperties:
@@ -1284,7 +1288,7 @@ components:
           description: The additional fields that need to be provided while creating a reservation. Each field will contain a piece of information about the whole order.
           additionalProperties:
             type: string
-            description: "Accepted fields are: `pickup_location`, `dropoff_location`, `nationality`, `flight_number` and `passport_id`. See the payload in the examples."
+            description: "Accepted fields are: `pickup_location`, `dropoff_location`, `nationality`, `flight_number`, `passport_id` and `zipcode`. See the payload in the examples."
     ReservationResponse:
       type: object
       properties:
