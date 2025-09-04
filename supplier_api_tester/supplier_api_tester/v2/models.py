@@ -10,6 +10,7 @@ class RequiredOrderData(Enum):
     nationality = 'nationality'
     flight_number = 'flight_number'
     passport_id = 'passport_id'
+    zipcode = 'zipcode'
 
 
 class RequiredVisitorData(Enum):
@@ -19,6 +20,8 @@ class RequiredVisitorData(Enum):
     address = 'address'
     passport_id = 'passport_id'
     date_of_birth = 'date_of_birth'
+    weight_kg = 'weight_kg'
+    weight_lb = 'weight_lb'
 
 
 @dataclass
