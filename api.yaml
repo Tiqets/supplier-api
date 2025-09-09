@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Tiqets Supplier API
-  version: 2.3.1
+  version: 2.3.2
   description: |
     The Tiqets Supplier API Specification allows Tiqets' Supply Partners to connect their booking systems to Tiqets.com
     if they aren't connected already.
