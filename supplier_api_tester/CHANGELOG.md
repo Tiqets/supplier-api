@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.11
+- Adding support for visitor weight in kg and lbs
+- Adding support for zipcode at order level
+
 ## 2.2.10
 
 - Checking the type of `max_tickets_per_order` for v2
