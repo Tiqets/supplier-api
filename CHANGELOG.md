@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.3.2
+
+- Adding support for visitor weight in kg and lbs
+- Adding support for zipcode at order level
+
 ## 2.3.1
 
 - Added support for a new barcode type: aztec-bytes
@@ -28,23 +33,33 @@
 - Introduces minor syntactic changes to make the API specification and documentation more readable.
 
 ## 2.2.0
+
 #### Reservation
+
 - Update the endpoint's response to accept an optional `unit_price` attribute that MUST be provided when the client makes a
-reservation for a product whose attribute `provides_pricing=true`.
+  reservation for a product whose attribute `provides_pricing=true`.
 
 ## 2.1.1
+
 #### Booking Cancellation
+
 - Deprecate status code `3004` `Tickets already used` and replace it with `3005` `Tickets already used`.
 
 ## 2.1.0
+
 #### Product Catalog
+
 - New product fields:
   - `provides_pricing` - each product can enable or disable pricing by setting this field to `true` or `false`.
+
 #### Reservation
+
 - New variant field
   - `price` - each variant must provide this field when product is expected to have pricing with `provides_pricing=true` from Product Catalog.
 - `required_order_data` and `required_visitor_data` now have lower case fields instead of upper case.
+
 #### Booking Cancellation
+
 - Add a status code `3004` `Tickets already used`
 
 ## 2.0.1
@@ -82,6 +97,7 @@ reservation for a product whose attribute `provides_pricing=true`.
 - Each variant might return information about the current price via the optional attribute `price`.
 - Add a new (optional) attribute `price` to every `Variant` object in the `/v2/availability` endpoint's response. The `Price`
   object has the following fields:
+
   - `face_value`: `string`
   - `currency`: `string`
 
@@ -120,9 +136,11 @@ reservation for a product whose attribute `provides_pricing=true`.
 - Start requiring it from 13th of January 2022
 
 ## 1.4.2
+
 - Removing "/dates" endpoint as redundant
 
 ## 1.4.1
+
 - Adding "PDF" as supported "barcode_format"
 
 ## 1.4.0
