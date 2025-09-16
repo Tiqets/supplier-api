@@ -1240,7 +1240,7 @@ components:
             type: object
             additionalProperties:
               type: string
-              description: "Accepted fields are: `full_name`, `email`, `phone`, `address`, `passport_id` and `date_of_birth`. See the payload in the examples."
+              description: "Accepted fields are: `full_name`, `email`, `phone`, `address`, `passport_id`, `weight_kg`, `weight_lb` and `date_of_birth`. See the payload in the examples."
     Reservation:
       type: object
       required:
