@@ -1,6 +1,11 @@
 # Changelog
 
+## 2.2.12
+
+- Adding the User-Agent header ("Tiqets API Client")
+
 ## 2.2.11
+
 - Adding support for visitor weight in kg and lbs
 - Adding support for zipcode at order level
 
